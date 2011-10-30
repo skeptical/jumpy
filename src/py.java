@@ -1,37 +1,29 @@
-// javac -d classes -cp .:\* xbmc.java && if [ $?=0 ] ; then java -cp classes:\* xbmc ; fi
-// javac -d classes -cp .:./path/py4j0.7.jar:\* src/xbmc.java
-// java -cp /f/git/pms-plugins/xbmc_plugin/classes:/f/git/pms-plugins/xbmc_plugin/path/py4j0.7.jar xbmc 0 ?
 package net.pms.external.infidel;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import java.io.Console;
+import java.lang.Process;
+import java.lang.ProcessBuilder;
 
 import java.net.InetAddress;
 import py4j.GatewayServer;
 import py4j.Py4JNetworkException;
 
-import net.pms.external.infidel.util.jumpyAPI;
+import net.pms.external.infidel.jumpyAPI;
 
 public class py {
 
 	public static String python = "python";
-	public static String path, addr;
-	private static jumpyAPI api;
-	private static GatewayServer server = null;
-	private static Process p = null;
+	public static PrintStream out = System.out;
 	
-	public static boolean start() {
+	public static GatewayServer start(jumpyAPI obj) {
 		for (int i=0; i<32; i++) {
 			try {
-				server = new GatewayServer(api, GatewayServer.DEFAULT_PORT + i);
+				GatewayServer server = new GatewayServer(obj, GatewayServer.DEFAULT_PORT + i);
 				server.start();
-				addr = InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort();
-				return true;
+				return server;
 			}
 			catch(Py4JNetworkException e) {
 				// socket is in use
@@ -39,35 +31,45 @@ public class py {
 			}
 			catch(Exception e) {e.printStackTrace(); continue;}
 		}
-		return false;
+		return null;
 	}
 	
-	public static int run(String cmd, jumpyAPI obj) {
+	public static int run(jumpyAPI obj, String cmd, String pypath) {
 		int exitValue = 0;
-		api = obj;
-		start();
+		GatewayServer server = start(obj);
+		if (server == null) {
+			return -1;
+		}
 		try {
-			String[] argv = (python + "|" + cmd).split("\\|");
+			
+			String[] argv = (python + " | " + cmd).split(" \\| ");
+			boolean windows = System.getProperty("os.name").startsWith("Windows");
 			for (int i=0; i<argv.length; i++) {
-				argv[i] = argv[i].trim();
+				argv[i] = argv[i].trim().replace("||", "|");
+				if (windows) {
+					argv[i] = argv[i].replace("\"", "\\\"");
+				}
 			}
-			System.out.println("Running "+Arrays.toString(argv));
+			out.println("Running "+Arrays.toString(argv));
 
 			ProcessBuilder pb = new ProcessBuilder(argv);
 			pb.redirectErrorStream(true);
 			pb.directory(new File(argv[1]).getParentFile());
 			Map<String,String> env = pb.environment();
-			env.put("PYTHONPATH", path);
+			if (pypath != null ) {
+				env.put("PYTHONPATH", pypath);
+			}
+			String addr = InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort();
 			env.put("JGATEWAY", addr);
-			System.out.println("PYTHONPATH=" + path + "\nJGATEWAY=" + addr + "\n");
+			out.println("PYTHONPATH=" + pypath + "\nJGATEWAY=" + addr + "\n");
 			
-			p = pb.start();
+			Process p = pb.start();
 			
 			String line;
 			BufferedReader br;
 			br = new BufferedReader (new InputStreamReader(p.getInputStream()));
 			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+				out.println(line);
 			}
 			p.waitFor();
 			exitValue = p.exitValue();

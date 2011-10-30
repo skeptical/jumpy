@@ -1,27 +1,20 @@
-// javac -d classes -cp .:\* xbmc.java && if [ $?=0 ] ; then java -cp classes:\* xbmc ; fi
-// javac -d classes -cp .:./path/py4j0.7.jar:\* src/xbmc.java
-// java -cp /f/git/pms-plugins/xbmc_plugin/classes:/f/git/pms-plugins/xbmc_plugin/path/py4j0.7.jar xbmc 0 ?
-//package net.pms.external.infidel;
-
-import java.io.*;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import java.io.File;
 import java.io.Console;
+import java.util.ArrayList;
+import java.net.URLDecoder;
+
 
 import net.pms.external.infidel.py;
-import net.pms.external.infidel.util.jumpyAPI;
+import net.pms.external.infidel.jumpyAPI;
 
 public class jumpstart {
 	public static void main(String[] argv) {
 		
 		class item {
 			public int type;
-			public String name, cmd, thumb, path;
-			item(int type, String name, String cmd, String thumb, String path) {
-				this.type = type; this.name = name; this.cmd = cmd; this.thumb = thumb; this.path = path;
+			public String name, uri, thumb, path;
+			item(int type, String name, String uri, String thumb, String path) {
+				this.type = type; this.name = name; this.uri = uri; this.thumb = thumb; this.path = path;
 			}
 		}
 		
@@ -31,11 +24,11 @@ public class jumpstart {
 			apiobj(String p) {
 				basepath = path = p; items = new ArrayList<item>();
 			}
-			public void addItem(int type, String name, String url, String thumb) {
-				items.add(new item(type, name, url, thumb, path));
+			public void addItem(int type, String name, String uri, String thumb) {
+				items.add(new item(type, name, uri, thumb, path));
 			}
 			public void setPath(String dir) {
-				path = (dir == null || dir.equals("")) ? basepath : path + File.pathSeparator + dir;
+				path = (dir == null ? basepath : path + File.pathSeparator + dir);
 			}
 		}
 
@@ -53,14 +46,18 @@ public class jumpstart {
 				
 		// get the current jar's location from a static context (isn't java lovely?)
 		String home = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+		try{
+		home = URLDecoder.decode(home, "UTF-8");
+		} catch (Exception e) {}
 		
-		apiobj obj = new apiobj(home + File.separatorChar + ".." + File.separatorChar + "src" + File.separatorChar + "lib");
-		String cmd = script.getAbsolutePath();
-		py.path = obj.path;
+//		apiobj obj = new apiobj(home + File.separatorChar + ".." + File.separatorChar + "src" + File.separatorChar + "lib");
+		// jumpy.py is always located alongside the jar
+		apiobj obj = new apiobj(home);
+		String uri = script.getAbsolutePath();
 		
 		while (true) {
 			obj.items.clear();
-			py.run(cmd, obj);
+			py.run(obj, uri, obj.path);
 			int size = obj.items.size();
 			if (size == 0) break;
 			
@@ -69,14 +66,20 @@ public class jumpstart {
 				item x = obj.items.get(i);
 				String type = "";
 				switch (x.type) {
-					case -1: type = " (UNRESOLVED)"; break;
-					case  0: type = ""; break;
-					case  1: type = " (AUDIO)"; break;
-					case  2: type = " (IMAGE)"; break;
-					case  4: type = " (VIDEO)"; break;
-					case  8: type = " (UNKNOWN)"; break;
-					case 16: type = " (PLAYLIST)"; break;
-					case 32: type = " (ISO)"; break;
+					case   -2: type = " (UNRESOLVED)"; break;
+					case   -1: type = ""; break;
+					case    1: type = " (AUDIO)"; break;
+					case    2: type = " (IMAGE)"; break;
+					case    4: type = " (VIDEO)"; break;
+					case   16: type = " (PLAYLIST)"; break;
+					case   32: type = " (ISO)"; break;
+					case 4096: type = " (FEED)"; break;
+					case 4097: type = " (AUDIOFEED)"; break;
+					case 4098: type = " (IMAGEFEED)"; break;
+					case 4100: type = " (VIDEOFEED)"; break;
+					case    0:
+					case    8:
+					default  : type = " (UNKNOWN)"; break;
 				}
 				c.printf("  [%d] %s%s\n", i+1, x.name, type);
 			}
@@ -87,11 +90,12 @@ public class jumpstart {
 				int s = Integer.parseInt(sel)-1;
 				assert s > 0 && s < size;
 				item i = obj.items.get(s);
-				c.printf("--------------------------------\ntype : %d\nname : %s\ncmd  : %s\nthumb: %s\n--------------------------------\n",
-					i.type, i.name, i.cmd, i.thumb);
-			
-				cmd = i.cmd;
-				py.path = obj.path = i.path;
+				c.printf("--------------------------------\ntype : %d\nname : %s\nuri  : %s\nthumb: %s\n--------------------------------\n",
+					i.type, i.name, i.uri, i.thumb);
+				if (i.type > 0) break;
+				
+				uri = i.uri;
+				obj.path = i.path;
 			} catch (Exception e) {
 				System.err.printf("Invalid selection: %s\n", sel);
 				break;

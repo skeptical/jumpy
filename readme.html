@@ -1,0 +1,162 @@
+<html>
+<head>
+<title>PMS-Jumpy</title>
+<style type="text/css">
+.orange {
+	color: #ff6600;
+}
+ul {
+	list-style-type: disc;
+}
+pre, code {
+	color: darkblue;
+	text-decoration: none;
+	/*font-weight: bold;*/
+}
+body {
+   font-family: sans-serif;
+	padding-left: 2em;
+	width: 50em;
+}
+</style>
+</head>
+<body>
+<H3 style="color:darkblue"><span class="orange">PMS-Jumpy</span> - Jump into Python (and onto XBMC)</H3>
+
+PMS-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon)
+is the barest of frameworks for external python processes to interact with PMS,
+currently just to add folders and media items to the xmb. Interaction is through a localhost socket provided by <a href="http://py4j.sourceforge.net" target="_blank">py4j</a>.
+<br/><br/>
+Having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org" target="_blank">xbmc</a>
+addons for use in PMS, I decided to see if I could mock the xbmc plugin API itself so as to run these
+addons under PMS as-is. The result is PMS-Jumpy
+plus a set of python modules to 'jump' the addons.
+<br/><br/>
+The plugin is still very alpha, but functional enough to be of use. I've tested only xbmc
+video addons so far: Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube, and many more. The ones that
+work in xbmc ('mostly') work in jumpy too.
+<br/><br/>
+<b>Requirements</b>
+<ol>
+<li><a href="http://www.python.org/download/releases/2.7.2/#download" target="_blank">Python 2.7</a>.
+To make life simpler <a href="http://superuser.com/questions/143119/how-to-add-python-to-the-windows-path/143121#143121" target="_blank">add python to your system path</a>
+and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-instructions" target="_blank">easy_install</a>.
+</li>
+<li><a href="http://py4j.sourceforge.net/download.html" target="_blank">py4j</a>.
+</li>
+<li><a href="https://github.com/chocolateboy/pmsencoder" target="_blank">PMSEncoder</a> and
+<a href="http://rtmpdump.mplayerhq.hu/" target="_blank">rtmpdump</a>, not required but indispensible as always.
+</li>
+</ol>
+<br/>
+<b>XBMC Installation ("optional")</b>
+<ol>
+<li>Install <a href="http://xbmc.org/download/" target="_blank">xbmc</a> using the default configuration
+for your platform.
+</li>
+<li><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories" target="_blank">Install and configure</a>
+some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons" target="_blank">addons</a>
+inside xbmc (and of course test them too, some are obsolete). You may need to configure username/password depending
+on the plugin, and so on.
+</li>
+</ol>
+<br/>
+<b>Plugin Installation</b>
+<ol>
+<li>Unzip <i>pms-jumpy-0.1.zip</i> to your pms <i>plugins</i> folder.
+</li>
+<li>Open up <i>PMS.conf</i> and set python.path, e.g.
+<pre>python.path = c:\\Python27\\python</pre>
+</li>
+<li>Restart PMS. You should see a 'Jumpy' folder on the xmb containing the 'Hello' demo and any
+media addons found in your xbmc user directory.<br/><br/>
+Note: In Windows you may need to grant network permission for the py4j socket depending on your firewall.
+I didn't need to do this when I tested on win7 (as administrator with firewall on) but I don't know if this
+is always the case.
+</li>
+</ol>
+<br/>
+<b>Writing Your Own Python Scripts</b>
+<ul>
+Have a look at <i>helloworld.py</i> and <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder. Basically your script does something,
+adds some items to the current xmb folder and exits.  
+<ul>
+<li>A script is always called from its own directory.
+</li>
+<li>Initially your script is called with no arguments. You can only add folders during this first call.
+</li>
+<li>Any folder item you add will call your script (or another) with
+whatever arguments you've provided when the user clicks on it.
+</li>
+<li>Any media item you add will of course be handled by PMS in the usual way.
+</li>
+</ul>
+</ul>
+<b>API</b>
+<ul>
+The extremely basic API is initialized on import
+<pre>import jumpy</pre>
+defining a global object <code>pms</code> (i.e. the current xmb folder) with the following 2 methods:
+<br/><br/>
+<li><b>pms.addItem</b></li>
+<pre>pms.addItem(type, name, cmd, thumb)</pre>
+or
+<pre>pms.addItem(type, name, [cmd, argv1, argv2, ...], thumb)</pre>
+where
+<ul>
+<li><code>type</code> is one of these constants:
+<pre>
+# media items           # folder items
+PMS_AUDIO               PMS_FOLDER
+PMS_IMAGE               PMS_UNRESOLVED
+PMS_VIDEO
+PMS_UNKNOWN
+PMS_PLAYLIST
+PMS_ISO
+PMS_AUDIOFEED
+PMS_IMAGEFEED
+PMS_VIDEOFEED
+</pre>
+</li>
+<li><code>name</code> is the item's label.
+</li>
+<li><code>cmd</code> is either a command or a uri depending on the given <code>type</code>:
+<ul>
+<li>For folder items <code>cmd</code> is a single command or <code>[cmd, argv1, argv2, ...]</code> is a standard argv[] command list
+to be executed by python in the future.</li>
+<li>For media items <code>cmd</code> is a single resolved path/url.
+</li>
+</ul>
+</li>
+<li><code>thumb</code> is a path or url to the item's thumbnail image.
+</li>
+</ul>
+<br/>
+<li><b>pms.setPath</b></li>
+<pre>pms.setPath(path)</pre>
+where
+<ul>
+<li><code>path</code> is a path segment to be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a> when the item is executed in the future.
+<code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
+You typically set this once at the beginning, after which any descendants will inherit it. Its value builds incrementally, and
+can be cleared to its initial value for the current folder using <code>pms.setPath(None)</code>.
+<pre>
+</pre>
+</li>
+</ul>
+</ul>
+
+<br/>
+<b>Jumpstarting Scripts</b>
+<ul>
+<i>Jumpstart</i> is a console utility to speed up development by testing
+scripts outside of PMS. To see how it works first edit the java and python paths in
+<i>plugins/jumpy/jumpstart.bat</i> if necessary and then open up a console there and type
+<pre>jumpstart helloworld.py</pre>or
+<pre>jumpstart xbmc.py</pre>
+</ul>
+
+</body>
+</html>
+
+<!--http://wiki.xbmc.org/index.php?title=Python_Development-->
