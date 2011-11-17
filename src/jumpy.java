@@ -30,7 +30,7 @@ import net.pms.external.infidel.jumpyAPI;
 public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 
 	public static final String appName = "jumpy";
-	private static final String version = "0.1";
+	private static final String version = "0.1.1";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
@@ -88,7 +88,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		for (File script:scripts) {
 			log("loading " + script.getName() + ".", true);
 			log("%n");
-			setPath("");
+			setPath(null);
 			py.run(this, script.getPath(), pypath);
 		}
 	}
