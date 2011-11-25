@@ -56,6 +56,13 @@ public class py {
 			pb.redirectErrorStream(true);
 			pb.directory(new File(argv[1]).getParentFile());
 			Map<String,String> env = pb.environment();
+//			if (windows) {
+//				String pythonhome = new File(python).getParent();
+//				if (pythonhome != null) {
+//					env.put("PATH", pythonhome + File.pathSeparator + env.get("PATH"));
+//					out.println("Adding '" + pythonhome + "' to PATH.");
+//				}
+//			}
 			if (pypath != null ) {
 				env.put("PYTHONPATH", pypath);
 			}
