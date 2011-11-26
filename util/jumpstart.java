@@ -10,6 +10,7 @@ import net.pms.external.infidel.jumpyAPI;
 public class jumpstart {
 	public static void main(String[] argv) {
 		
+		py py = new py();
 		class item {
 			public int type;
 			public String name, uri, thumb, path;

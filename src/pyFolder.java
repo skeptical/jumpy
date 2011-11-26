@@ -26,6 +26,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public String uri;
 	public String basepath = null, pypath = null;
 	private jumpyRoot jumpy;
+	private py python;
 	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null);
@@ -36,6 +37,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		this.jumpy = jumpy;
 		this.uri = uri;
 		this.basepath = this.pypath = pypath;
+		this.python = new py();
 	}
 	
 	@Override
@@ -43,7 +45,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		discovered = false;
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");
-		py.run(this, uri, pypath);
+		python.run(this, uri, pypath);
 	}
 
 	public boolean refreshChildren() {

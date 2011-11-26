@@ -30,7 +30,7 @@ import net.pms.external.infidel.jumpyAPI;
 public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 
 	public static final String appName = "jumpy";
-	private static final String version = "0.1.1";
+	private static final String version = "0.1.2";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
@@ -41,6 +41,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 	private String basepath, pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
+	private py python;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -57,6 +58,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		
 		py.python = (String)configuration.getCustomProperty("python.path");
 		py.out = logger;
+		python = new py();
 		basepath = pypath = home + "lib";
 		
 		log("initializing jumpy " + version, true);
@@ -89,7 +91,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 			log("loading " + script.getName() + ".", true);
 			log("%n");
 			setPath(null);
-			py.run(this, script.getPath(), pypath);
+			python.run(this, script.getPath(), pypath);
 		}
 	}
 	

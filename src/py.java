@@ -18,7 +18,7 @@ public class py {
 	public static String python = "python";
 	public static PrintStream out = System.out;
 	
-	public static GatewayServer start(jumpyAPI obj) {
+	public GatewayServer start(jumpyAPI obj) {
 		for (int i=0; i<32; i++) {
 			try {
 				GatewayServer server = new GatewayServer(obj, GatewayServer.DEFAULT_PORT + i);
@@ -34,7 +34,7 @@ public class py {
 		return null;
 	}
 	
-	public static int run(jumpyAPI obj, String cmd, String pypath) {
+	public int run(jumpyAPI obj, String cmd, String pypath) {
 		int exitValue = 0;
 		GatewayServer server = start(obj);
 		if (server == null) {
@@ -56,13 +56,6 @@ public class py {
 			pb.redirectErrorStream(true);
 			pb.directory(new File(argv[1]).getParentFile());
 			Map<String,String> env = pb.environment();
-//			if (windows) {
-//				String pythonhome = new File(python).getParent();
-//				if (pythonhome != null) {
-//					env.put("PATH", pythonhome + File.pathSeparator + env.get("PATH"));
-//					out.println("Adding '" + pythonhome + "' to PATH.");
-//				}
-//			}
 			if (pypath != null ) {
 				env.put("PYTHONPATH", pypath);
 			}

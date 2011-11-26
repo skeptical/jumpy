@@ -1,6 +1,6 @@
 <project name="jumpy" default="dist" basedir=".">
 
-	<property name="jumpy" value="jumpy-0.1.1" />
+	<property name="jumpy" value="jumpy-0.1.2" />
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
