@@ -107,7 +107,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		logger.log(msg);
 	}
 	
-	public void log(String msg, boolean minimal) {
+	public synchronized void log(String msg, boolean minimal) {
 		if (minimal) {
 			PMS.minimal(msgtag + msg);
 		}
@@ -156,11 +156,11 @@ class quickLog extends PrintStream {
 		this.tag = tag;
 	}
 
-	public void log(String msg) {
+	public synchronized void log(String msg) {
 		printf(msg.trim().replaceAll("%n","").equals("") ? msg : tag + msg + "%n");
 	}
 
-	public void write(byte buf[], int off, int len) {
+	public synchronized void write(byte buf[], int off, int len) {
 		try {
 			super.write(buf, off, len);
 			flush();
