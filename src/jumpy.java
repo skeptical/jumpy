@@ -27,7 +27,7 @@ import net.pms.external.infidel.py;
 import net.pms.external.infidel.jumpyRoot;
 import net.pms.external.infidel.jumpyAPI;
 
-public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
+public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 	public static final String appName = "jumpy";
 	private static final String version = "0.1.2";
@@ -37,11 +37,11 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
    private Properties conf = null;
 	private String home;
 	private boolean debug = false;
-	private VirtualFolder top;
-	private String basepath, pypath;
+	private String pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
 	private py python;
+	private File[] scripts;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -59,24 +59,14 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		py.python = (String)configuration.getCustomProperty("python.path");
 		py.out = logger;
 		python = new py();
-		basepath = pypath = home + "lib";
+		pypath = home + "lib";
 		
 		log("initializing jumpy " + version, true);
 		log("home=" + home, true);
 		log("python=" + py.python, true);
 		log("pypath=" + pypath, true);
-	}
-	
-	@Override
-	public DLNAResource getChild() {
-		top = new VirtualFolder("Jumpy", null);
-		log("adding root folder.", true);
-		loadScripts();
-		return top;
-	}
 
-	public void loadScripts() {
-		File[] scripts = new File(home).listFiles(
+		scripts = new File(home).listFiles(
 			new FilenameFilter() {
 				public boolean accept(File dir, String name) {
 					return name.endsWith(".py") && new File(dir.getPath() + File.separatorChar + name).isFile();
@@ -87,23 +77,23 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		log("Found " + scripts.length + " scripts.", true);
 		log("%n");
 
+	}
+	
+	@Override
+	public DLNAResource getChild() {
+		pyFolder top = new pyFolder(this, "Jumpy", null, null, pypath);
+		log("adding root folder.", true);
 		for (File script:scripts) {
+			log("%n");
 			log("loading " + script.getName() + ".", true);
 			log("%n");
-			setPath(null);
-			python.run(this, script.getPath(), pypath);
+			python.run(top, script.getPath(), pypath);
 		}
+		return top;
 	}
-	
+
 	@Override
-	public void addItem(int type, String name, String uri, String thumb) {
-		if (type == FOLDER) {
-			top.addChild(new pyFolder(this, name, uri, thumb, pypath));
-		}
-	}
-	
-	@Override
-	public void log(String msg) {
+	public synchronized  void log(String msg) {
 		logger.log(msg);
 	}
 	
@@ -114,11 +104,6 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyAPI, jumpyRoot {
 		logger.log(msg);
 	}
 	
-	@Override
-	public void setPath(String dir) {
-		pypath = (dir == null ? basepath : pypath + File.pathSeparator + dir);
-	}
-
 	@Override
 	public JComponent config() {
 		return null;
