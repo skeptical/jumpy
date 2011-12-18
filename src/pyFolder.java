@@ -42,6 +42,9 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	
 	@Override
 	public void discoverChildren() {
+		if (uri == null || uri.equals("")) {
+			return;
+		}
 		discovered = false;
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");

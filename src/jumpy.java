@@ -42,6 +42,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 	private quickLog logger;
 	private py python;
 	private File[] scripts;
+	private pyFolder top;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -52,7 +53,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		
 		try {
 			logfile = new FileOutputStream(home + "jumpy.log");
-		}catch(Exception e) {e.printStackTrace();}
+		} catch(Exception e) {e.printStackTrace();}
 		logger = new quickLog(logfile, "[jumpy] ");
 		logger.stdout = debug;
 		
@@ -77,11 +78,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		log("Found " + scripts.length + " scripts.", true);
 		log("%n");
 
-	}
-	
-	@Override
-	public DLNAResource getChild() {
-		pyFolder top = new pyFolder(this, "Jumpy", null, null, pypath);
+		top = new pyFolder(this, "Jumpy", null, null, pypath);
 		log("adding root folder.", true);
 		for (File script:scripts) {
 			log("%n");
@@ -89,6 +86,10 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			log("%n");
 			python.run(top, script.getPath(), pypath);
 		}
+	}
+	
+	@Override
+	public DLNAResource getChild() {
 		return top;
 	}
 
