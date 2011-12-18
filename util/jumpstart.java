@@ -1,8 +1,6 @@
-import java.io.File;
-import java.io.Console;
+import java.io.*;
 import java.util.ArrayList;
 import java.net.URLDecoder;
-
 
 import net.pms.external.infidel.py;
 import net.pms.external.infidel.jumpyAPI;
@@ -45,16 +43,30 @@ public class jumpstart {
 			System.exit(1);
 		}
 				
+		File logfile = new File("jumpstart.log");
+		int r = 0;
+		String[] hist = new String[0];
+		if (logfile.exists()) {
+			byte[] b = new byte[(int)logfile.length()];
+			try {
+				FileInputStream l = new FileInputStream(logfile);
+				l.read(b);
+				l.close();
+			} catch (Exception e) {}
+			hist = new String(b).split(" ");
+		}
+
 		// get the current jar's location from a static context (isn't java lovely?)
 		String home = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
 		try{
-		home = URLDecoder.decode(home, "UTF-8");
+			home = URLDecoder.decode(home, "UTF-8");
 		} catch (Exception e) {}
 		
 //		apiobj obj = new apiobj(home + File.separatorChar + ".." + File.separatorChar + "src" + File.separatorChar + "lib");
 		// jumpy.py is always located alongside the jar
 		apiobj obj = new apiobj(home);
 		String uri = script.getAbsolutePath();
+		String log = "";
 		
 		while (true) {
 			obj.items.clear();
@@ -84,8 +96,16 @@ public class jumpstart {
 				}
 				c.printf("  [%d] %s%s\n", i+1, x.name, type);
 			}
-			String sel = c.readLine("Choose an item or 'enter' to quit: ");
-			if (sel.equals("q") || sel.equals("")) break;
+			boolean def = (hist.length > 0 && r < hist.length);
+			String sel = c.readLine("Choose an item or 'q' to quit [" + (def ? hist[r] : "q") + "]: ");
+			if (sel.equals("q")) break;
+			if (sel.equals("")) {
+				if (!def) break;
+				sel = hist[r++];
+			} else {
+				hist = new String[0];
+			}
+			log = log + sel + " ";
 			
 			try {
 				int s = Integer.parseInt(sel)-1;
@@ -102,6 +122,12 @@ public class jumpstart {
 				break;
 			}
 		}
+//		c.printf("log: %s\n", log);
+		try {
+			FileOutputStream l = new FileOutputStream(logfile);
+			l.write(log.getBytes());
+			l.close();
+		} catch (Exception e) {}
 	}
 }
 

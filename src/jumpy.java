@@ -30,7 +30,7 @@ import net.pms.external.infidel.jumpyAPI;
 public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 	public static final String appName = "jumpy";
-	private static final String version = "0.1.2";
+	private static final String version = "0.1.3";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
