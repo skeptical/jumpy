@@ -9,16 +9,20 @@ import java.io.PrintStream;
 import java.io.IOException;
 
 import java.util.Properties;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Date;
 
 import javax.swing.JComponent;
-//import javax.swing.JFrame;
 
+import org.apache.commons.lang.StringUtils;
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
+import net.pms.logging.LoggingConfigFileLoader;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -30,13 +34,13 @@ import net.pms.external.infidel.jumpyAPI;
 public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 	public static final String appName = "jumpy";
-	private static final String version = "0.1.3";
+	public static final String version = "0.1.4";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
    private Properties conf = null;
-	private String home;
-	private boolean debug = false;
+	public String home, jumpylog, jumpyconf;
+	public boolean debug = false;
 	private String pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
@@ -46,24 +50,30 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 	
 	public jumpy() {
 		pms = PMS.get();
-		home = System.getProperty("user.dir") + File.separatorChar
-			 + "plugins" + File.separatorChar + appName + File.separatorChar;
 		configuration = PMS.getConfiguration();
+		home = new File(configuration.getPluginDirectory() + File.separatorChar + appName)
+			.getAbsolutePath() + File.separatorChar;
+		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
 		
 		try {
-			logfile = new FileOutputStream(home + "jumpy.log");
+			jumpylog = new File(LoggingConfigFileLoader.getLogFilePaths().get("debug.log"))
+				.getParent() + File.separatorChar + "jumpy.log";
+			logfile = new FileOutputStream(jumpylog);
 		} catch(Exception e) {e.printStackTrace();}
 		logger = new quickLog(logfile, "[jumpy] ");
 		logger.stdout = debug;
-		
+
 		py.python = (String)configuration.getCustomProperty("python.path");
 		py.out = logger;
 		python = new py();
 		pypath = home + "lib";
 		
+		log(new Date().toString());
 		log("initializing jumpy " + version, true);
 		log("home=" + home, true);
+		log("log=" + jumpylog, true);
+		log("conf=" + jumpyconf, true);
 		log("python=" + py.python, true);
 		log("pypath=" + pypath, true);
 
@@ -86,6 +96,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			log("%n");
 			python.run(top, script.getPath(), pypath);
 		}
+		dbgpack_register();
 	}
 	
 	@Override
@@ -105,10 +116,10 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		logger.log(msg);
 	}
 	
-	@Override
-	public JComponent config() {
+   @Override
+   public JComponent config() {
 		return null;
-	}
+   }
 
 	@Override
 	public String name() {
@@ -123,12 +134,32 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
       if (conf == null) {
 		   conf = new Properties();
 			try {
-				FileInputStream conf_file = new FileInputStream(home + appName + ".conf");	
+				FileInputStream conf_file = new FileInputStream(jumpyconf);	
 				conf.load(conf_file);
 				conf_file.close();
 			} catch (IOException e) {}
 		}
 		debug = Boolean.valueOf(conf.getProperty("debug", "false"));
+   }
+
+   public void writeconf() {
+		conf.setProperty("debug", String.valueOf(debug));
+		try {
+			FileOutputStream conf_file = new FileOutputStream(jumpyconf);	
+			conf.store(conf_file, name());
+			conf_file.close();
+		} catch (IOException e) {}
+   }
+
+   public void dbgpack_register() {
+		String files = (String)configuration.getCustomProperty("dbgpack");
+		HashSet dbgpk = StringUtils.isBlank(files) ? new HashSet() :
+			new HashSet(Arrays.asList(files.split(",")));
+		dbgpk.add(jumpylog);
+		dbgpk.add(jumpyconf);
+		dbgpk.add(new File(jumpylog).getParent() + File.separatorChar + "pmsencoder.log");
+		files = StringUtils.join(dbgpk, ',');
+		configuration.setCustomProperty("dbgpack", files);
    }
 
 }
