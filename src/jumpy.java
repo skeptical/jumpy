@@ -16,6 +16,8 @@ import java.util.Date;
 import javax.swing.JComponent;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
@@ -51,7 +53,8 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
-		home = new File(configuration.getPluginDirectory() + File.separatorChar + appName)
+		String plugins = configuration.getPluginDirectory();
+		home = new File(plugins + File.separatorChar + appName)
 			.getAbsolutePath() + File.separatorChar;
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
@@ -96,7 +99,10 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			log("%n");
 			python.run(top, script.getPath(), pypath);
 		}
-		dbgpack_register();
+		if (System.getProperty("os.name").startsWith("Windows") &&
+				new File(plugins).list(new WildcardFileFilter("dbgpack*.jar")).length > 0) {
+			dbgpack_register();
+		}
 	}
 	
 	@Override
@@ -155,10 +161,18 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		String files = (String)configuration.getCustomProperty("dbgpack");
 		HashSet dbgpk = StringUtils.isBlank(files) ? new HashSet() :
 			new HashSet(Arrays.asList(files.split(",")));
-		dbgpk.add(jumpylog);
-		dbgpk.add(jumpyconf);
-		dbgpk.add(new File(jumpylog).getParent() + File.separatorChar + "pmsencoder.log");
+      // avoid duplicates: user may have already entered these as relative paths
+      if (! files.contains("jumpy.log")) {
+			dbgpk.add(jumpylog);
+      }
+      if (! files.contains("jumpy.conf")) {
+			dbgpk.add(jumpyconf);
+      }
+      if (! files.contains("pmsencoder.log")) {
+         dbgpk.add(new File(jumpylog).getParent() + File.separatorChar + "pmsencoder.log");
+      }
 		files = StringUtils.join(dbgpk, ',');
+		log("dbgpack: " + files);
 		configuration.setCustomProperty("dbgpack", files);
    }
 

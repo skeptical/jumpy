@@ -63,7 +63,7 @@ on the plugin, and so on.
 <br/>
 <b>Plugin Installation</b>
 <ol>
-<li>Unzip <i>pms-jumpy-0.1.zip</i> to your pms <i>plugins</i> folder.
+<li>Unzip <i>pms-jumpy-x.x.zip</i> to your pms <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set python.path, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -75,6 +75,25 @@ I didn't need to do this when I tested on win7 (as administrator with firewall o
 is always the case.
 </li>
 </ol>
+<br/>
+<b>Log and Conf</b>
+<ul>
+Locations are according to your PMS installation (see jumpy's init messages inside your <i>debug.log</i> for the specific paths):<br/><br/>
+<ul>
+<li><b><i>jumpy.log</i></b>: located wherever <i>debug.log</i> is.
+</li><br/>
+<li><b><i>jumpy.conf</i></b>:  omitted by default, but should be located wherever <i>PMS.conf</i> is.
+The available settings are:
+<pre><i># whether to copy log output to the console (true|false)</i>
+debug=false
+</pre>
+</li>
+</ul>
+When reporting bugs please attach these together as one zip file (or use the <a href="https://github.com/SharkHunter/DbgPack">DbgPack</a> plugin):
+<ul>
+<i>&bull;PMS.conf &nbsp;&nbsp;&bull;debug.log &nbsp;&nbsp;&bull;jumpy.log &nbsp;&nbsp;&bull;pmsencoder.log</i>
+</ul>
+</ul>
 <br/>
 <b>Writing Your Own Python Scripts</b>
 <ul>
