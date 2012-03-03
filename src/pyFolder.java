@@ -51,11 +51,6 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		python.run(this, uri, pypath);
 	}
 
-	public boolean refreshChildren() {
-		discovered = false;
-		return true;
-	}
-
 	@Override
 	public void addItem(int type, String name, String uri, String thumb) {
 		
