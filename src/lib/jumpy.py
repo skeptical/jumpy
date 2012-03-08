@@ -34,3 +34,14 @@ def addItem(t, name, argv, thumb):
 
 __builtin__.pms.addItem = addItem
 
+# flush regularly to stay in sync with java output
+class flushed(object):
+    def __init__(self, s):
+        self.s = s
+    def write(self, x):
+        self.s.write(x)
+        self.s.flush()
+sys.stdout = flushed(sys.stdout)
+
+__builtin__.sys = sys
+
