@@ -2,8 +2,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.net.URLDecoder;
 
-import net.pms.external.infidel.py;
-import net.pms.external.infidel.jumpyAPI;
+import net.pms.external.infidel.jumpy.py;
+import net.pms.external.infidel.jumpy.jumpyAPI;
 
 public class jumpstart {
 	public static void main(String[] argv) {

@@ -1,4 +1,4 @@
-package net.pms.external.infidel;
+package net.pms.external.infidel.jumpy;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,12 +26,12 @@ import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 
+import org.ini4j.Ini;
+import org.ini4j.Profile.Section;
+
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
-import net.pms.external.infidel.py;
-import net.pms.external.infidel.jumpyRoot;
-import net.pms.external.infidel.jumpyAPI;
 
 public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
@@ -41,14 +41,14 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 	private PMS pms;
 	private PmsConfiguration configuration;
    private Properties conf = null;
-	public String home, jumpylog, jumpyconf;
-	public boolean debug = false;
+	public String home, jumpylog, jumpyconf, bookmarksini, lasturi;
+	public boolean debug, showBookmarks;
 	private String pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
 	private py python;
 	private File[] scripts;
-	private pyFolder top;
+	private pyFolder top, bookmarks;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -58,6 +58,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			.getAbsolutePath() + File.separatorChar;
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
+		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
 		
 		try {
 			jumpylog = new File(LoggingConfigFileLoader.getLogFilePaths().get("debug.log"))
@@ -73,12 +74,16 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		pypath = home + "lib";
 		
 		log(new Date().toString());
+		log("%n");
 		log("initializing jumpy " + version, true);
+		log("%n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
 		log("conf=" + jumpyconf, true);
+		log("bookmarks=" + bookmarksini, true);
 		log("python=" + py.python, true);
 		log("pypath=" + pypath, true);
+		log("%n");
 
 		scripts = new File(home).listFiles(
 			new FilenameFilter() {
@@ -88,17 +93,24 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			}
 		);
 
-		log("Found " + scripts.length + " scripts.", true);
-		log("%n");
-
+		log("Adding root folder.", true);
 		top = new pyFolder(this, "Jumpy", null, null, pypath);
-		log("adding root folder.", true);
+
+		if (showBookmarks) {
+			bookmarks = new pyFolder(this, "Bookmarks", null, null, pypath);
+			top.addChild(bookmarks);
+			readbookmarks();
+		}
+		
+		log("Found " + scripts.length + " scripts.", true);
+
 		for (File script:scripts) {
 			log("%n");
 			log("loading " + script.getName() + ".", true);
 			log("%n");
 			python.run(top, script.getPath(), pypath);
 		}
+		
 		if (System.getProperty("os.name").startsWith("Windows") &&
 				new File(plugins).list(new WildcardFileFilter("dbgpack*.jar")).length > 0) {
 			dbgpack_register();
@@ -146,15 +158,64 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			} catch (IOException e) {}
 		}
 		debug = Boolean.valueOf(conf.getProperty("debug", "false"));
+		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "false"));
    }
 
    public void writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
+		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		try {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);	
 			conf.store(conf_file, name());
 			conf_file.close();
 		} catch (IOException e) {}
+   }
+
+   public void bookmark(pyFolder folder) {
+   	bookmark(folder, true);
+   }
+   
+   public void bookmark(pyFolder folder, boolean copy) {
+   	boolean adding = (folder.type != pyFolder.BOOKMARK);
+   	log((adding ? "Adding" : "Deleting") + " bookmark: " + folder.getName() + ".");
+   	if (adding) {
+			// if the renderer can't play the VirtualVideoAction it may send repeated requests
+			if (folder.uri.equals(lasturi)) return;
+			lasturi = folder.uri;
+			pyFolder bookmark = copy ? new pyFolder(folder) : folder;
+			bookmark.type = pyFolder.BOOKMARK;
+			bookmarks.addChild(bookmark);
+   	} else {
+   		bookmarks.getChildren().remove(folder);
+   	}
+   	writebookmarks();
+   }
+
+   public void readbookmarks() {
+   	try {
+			Ini ini = new Ini(new File(bookmarksini));
+			for (String name : ini.keySet()) {
+				Section b = ini.get(name);
+				bookmark(new pyFolder(this, name, b.get("uri"), b.get("thumbnail"), b.get("pypath")), false);
+			}
+		} catch (Exception e) {e.printStackTrace();}
+   }
+
+   public void writebookmarks() {
+   	try {
+			File f = new File(bookmarksini);
+			f.delete();
+			f.createNewFile();
+			Ini ini = new Ini(f);
+			for (DLNAResource item : bookmarks.getChildren()) {
+				pyFolder bookmark = (pyFolder)item;
+				String name = bookmark.getName();
+				ini.put(name, "uri", bookmark.uri);
+				ini.put(name, "thumbnail", bookmark.thumbnail);
+				ini.put(name, "pypath", bookmark.pypath);
+			}
+			ini.store();
+		} catch (Exception e) {e.printStackTrace();}
    }
 
    public void dbgpack_register() {

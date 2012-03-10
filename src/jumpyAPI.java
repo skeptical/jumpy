@@ -1,4 +1,5 @@
-package net.pms.external.infidel;
+package net.pms.external.infidel.jumpy;
+
 
 public interface jumpyAPI {
 	

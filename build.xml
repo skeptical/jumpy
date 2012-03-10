@@ -33,7 +33,7 @@
 		<copy file="${src}/plugin" todir="${build}"/>
 		<jar jarfile="${jumpy}.jar" basedir="${build}">
 			<manifest>
-				<attribute name="Class-Path" value="jumpy/lib/py4j0.7.jar"/>
+				<attribute name="Class-Path" value="jumpy/lib/py4j0.7.jar jumpy/lib/ini4j-0.5.2.jar"/>
 			</manifest>
 		</jar>
 	</target>
@@ -51,6 +51,7 @@
 		</copy>
 		<copy file="${src}/lib/jumpy.py" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/py4j0.7.jar" todir="${dist}/jumpy/lib"/>
+		<copy file="lib/ini4j-0.5.2.jar" todir="${dist}/jumpy/lib"/>
 		<zip destfile="pms-${jumpy}.zip" basedir="${dist}"/>
 	</target>
 

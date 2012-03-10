@@ -1,4 +1,4 @@
-package net.pms.external.infidel;
+package net.pms.external.infidel.jumpy;
 
 import java.io.*;
 import java.util.Arrays;
@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import py4j.GatewayServer;
 import py4j.Py4JNetworkException;
 
-import net.pms.external.infidel.jumpyAPI;
 
 public class py {
 

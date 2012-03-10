@@ -1,8 +1,7 @@
-package net.pms.external.infidel;
-
-import java.io.IOException;
+package net.pms.external.infidel.jumpy;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
@@ -17,24 +16,29 @@ import net.pms.dlna.RealFile;
 import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
 
-import net.pms.external.infidel.py;
-import net.pms.external.infidel.jumpyRoot;
-import net.pms.external.infidel.jumpyAPI;
-
 
 public class pyFolder extends VirtualFolder implements jumpyAPI {
-	public String uri;
+	public String uri, thumbnail;
 	public String basepath = null, pypath = null;
 	private jumpyRoot jumpy;
 	private py python;
+	
+	public static final int NORMAL = 0;
+	public static final int BOOKMARK = 1;
+	public int type = NORMAL;
 	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null);
 	}
 	
+	public pyFolder(pyFolder other) {
+		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath);
+	}
+	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon, String pypath) {
 		super(name, thumbnailIcon);
 		this.jumpy = jumpy;
+		this.thumbnail = thumbnailIcon;
 		this.uri = uri;
 		this.basepath = this.pypath = pypath;
 		this.python = new py();
@@ -45,10 +49,30 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		if (uri == null || uri.equals("")) {
 			return;
 		}
-		discovered = false;
+		getChildren().clear();
+		if (((jumpy)jumpy).showBookmarks) {
+			final pyFolder me = this;
+			addChild(new VirtualVideoAction((type == NORMAL ? "Add" : "Delete") + " bookmark", true) {
+				public boolean enable() {
+					jumpy.bookmark(me);
+					return true;
+				}
+			});
+		}
+//		discovered = false;
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");
 		python.run(this, uri, pypath);
+	}
+
+	@Override
+	public void resolve() {
+		discovered=false;
+	}
+
+	@Override
+	public boolean isRefreshNeeded() {
+		return true;
 	}
 
 	@Override
