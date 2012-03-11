@@ -23,9 +23,9 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	private jumpyRoot jumpy;
 	private py python;
 	
-	public static final int NORMAL = 0;
-	public static final int BOOKMARK = 1;
-	public int type = NORMAL;
+	public boolean isBookmark = false;
+	public boolean refreshOnce = true;
+	public boolean refreshAlways = false;
 	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null);
@@ -42,6 +42,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		this.uri = uri;
 		this.basepath = this.pypath = pypath;
 		this.python = new py();
+		this.refreshAlways = (((jumpy)jumpy).refresh == 0);
 	}
 	
 	@Override
@@ -52,22 +53,26 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		getChildren().clear();
 		if (((jumpy)jumpy).showBookmarks) {
 			final pyFolder me = this;
-			addChild(new VirtualVideoAction((type == NORMAL ? "Add" : "Delete") + " bookmark", true) {
+			addChild(new VirtualVideoAction((isBookmark ? "Delete" : "Add") + " bookmark", true) {
 				public boolean enable() {
 					jumpy.bookmark(me);
 					return true;
 				}
 			});
 		}
-//		discovered = false;
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");
 		python.run(this, uri, pypath);
+		refreshOnce = false;
 	}
 
+	public void refresh() {
+		refreshOnce = true;
+	}
+	
 	@Override
 	public void resolve() {
-		discovered=false;
+		discovered = !(refreshOnce || refreshAlways);
 	}
 
 	@Override

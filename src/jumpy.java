@@ -12,6 +12,8 @@ import java.util.Properties;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JComponent;
 
@@ -22,6 +24,7 @@ import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
+import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
@@ -43,12 +46,14 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
    private Properties conf = null;
 	public String home, jumpylog, jumpyconf, bookmarksini, lasturi;
 	public boolean debug, showBookmarks;
+	public int refresh;
+	private Timer timer;
 	private String pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
 	private py python;
 	private File[] scripts;
-	private pyFolder top, bookmarks;
+	private pyFolder top, bookmarks, util;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -81,6 +86,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		log("log=" + jumpylog, true);
 		log("conf=" + jumpyconf, true);
 		log("bookmarks=" + bookmarksini, true);
+		log("refresh=" + refresh, true);
 		log("python=" + py.python, true);
 		log("pypath=" + pypath, true);
 		log("%n");
@@ -98,10 +104,24 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 		if (showBookmarks) {
 			bookmarks = new pyFolder(this, "Bookmarks", null, null, pypath);
+			bookmarks.refreshAlways = true;
 			top.addChild(bookmarks);
 			readbookmarks();
 		}
 		
+		if (refresh != 0) {
+			util = new pyFolder(this, "Util", null, null, pypath);
+			top.addChild(util);
+			final jumpy me = this;
+			util.addChild(new VirtualVideoAction("Refresh", true) {
+				public boolean enable() {
+					me.refresh(false);
+					return true;
+				}
+			});
+			refresh(false);
+		}
+
 		log("Found " + scripts.length + " scripts.", true);
 
 		for (File script:scripts) {
@@ -158,32 +178,66 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			} catch (IOException e) {}
 		}
 		debug = Boolean.valueOf(conf.getProperty("debug", "false"));
-		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "false"));
+		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
+		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
    }
 
    public void writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
+		conf.setProperty("refresh", String.valueOf(refresh));
 		try {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);	
-			conf.store(conf_file, name());
+			conf.store(conf_file, null);
 			conf_file.close();
 		} catch (IOException e) {}
    }
 
+   public void refreshChildren(pyFolder folder) {
+		for (DLNAResource item : folder.getChildren()) {
+			if (item instanceof pyFolder) {
+				((pyFolder)item).refresh();
+			}
+		}
+   }
+   
+   public void refresh(boolean timed) {
+		refreshChildren(top);
+		if (showBookmarks) {
+			refreshChildren(bookmarks);
+		}
+   	if (timed) {
+			log("Timed " + refresh + " minute refresh.");
+		} else if (refresh > 0) {
+			if (timer != null) {
+				timer.cancel();
+			}
+			timer = new Timer(true);
+			final jumpy me = this;
+			timer.scheduleAtFixedRate(new TimerTask() {
+				public void run() {
+					me.refresh(true);
+				}
+			}, refresh * 60000, refresh * 60000);
+			log("Refresh, resetting " + refresh + " minute timer.");
+		} else {
+			log("Refresh.");
+		}
+   }
+   
    public void bookmark(pyFolder folder) {
    	bookmark(folder, true);
    }
    
    public void bookmark(pyFolder folder, boolean copy) {
-   	boolean adding = (folder.type != pyFolder.BOOKMARK);
+   	boolean adding = (!folder.isBookmark);
    	log((adding ? "Adding" : "Deleting") + " bookmark: " + folder.getName() + ".");
    	if (adding) {
 			// if the renderer can't play the VirtualVideoAction it may send repeated requests
 			if (folder.uri.equals(lasturi)) return;
 			lasturi = folder.uri;
 			pyFolder bookmark = copy ? new pyFolder(folder) : folder;
-			bookmark.type = pyFolder.BOOKMARK;
+			bookmark.isBookmark = true;
 			bookmarks.addChild(bookmark);
    	} else {
    		bookmarks.getChildren().remove(folder);
