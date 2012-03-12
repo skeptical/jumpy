@@ -23,6 +23,17 @@ public interface jumpyAPI {
 
 	public void addItem(int type, String name, String uri, String thumb);
 	public void setPath(String dir);
+	public void setEnv(String name, String val);
+
+	public static final String[] apiName = {"", "VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART"};
+	public static final int VERSION = 1;
+	public static final int HOME = 2;
+	public static final int PROFILEDIR = 3;
+	public static final int LOGDIR = 4;
+	public static final int PLUGINJAR = 5;
+	public static final int RESTART = 6;
+	
+	public String util(int action, String data);
 }
 
 

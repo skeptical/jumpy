@@ -13,6 +13,11 @@ pre, code {
 	text-decoration: none;
 	/*font-weight: bold;*/
 }
+kbd {
+	color: darkblue;
+	text-decoration: none;
+	font-weight: bold;
+}
 body {
    font-family: sans-serif;
 	padding-left: 2em;
@@ -84,8 +89,15 @@ Locations are according to your PMS installation (see jumpy's init messages insi
 </li><br/>
 <li><b><i>jumpy.conf</i></b>:  omitted by default, but should be located wherever <i>PMS.conf</i> is.
 The available settings are:
-<pre><i># whether to copy log output to the console (true|false)</i>
-debug=false
+<pre><i># whether to activate bookmarks (true|false)</i>
+<b>bookmarks</b>=true
+
+<i># how often to refresh folder content in minutes
+# (-1=never 0=always 1=one minute)</i>
+<b>refresh</b>=60
+
+<i># whether to copy log output to the console (true|false)</i>
+<b>debug</b>=false
 </pre>
 </li>
 </ul>
@@ -115,12 +127,11 @@ whatever arguments you've provided when the user clicks on it.
 <ul>
 The extremely basic API is initialized on import
 <pre>import jumpy</pre>
-defining a global object <code>pms</code> (i.e. the current xmb folder) with the following 2 methods:
+defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
 <br/><br/>
-<li><b>pms.addItem</b></li>
-<pre>pms.addItem(type, name, cmd, thumb)</pre>
-or
-<pre>pms.addItem(type, name, [cmd, argv1, argv2, ...], thumb)</pre>
+<li><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb)</code></li>
+or<br/>
+<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb)</code><br/><br/>
 where
 <ul>
 <li><code>type</code> is one of these constants:
@@ -151,18 +162,46 @@ to be executed by python in the future.</li>
 </li>
 </ul>
 <br/>
-<li><b>pms.setPath</b></li>
-<pre>pms.setPath(path)</pre>
-where
+<li><kbd>pms.setPath</kbd><code>(path)</code></li>
 <ul>
-<li><code>path</code> is a path segment to be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a> when the item is executed in the future.
+<code>path</code> is a path segment to be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a> when the item is executed in the future.
 <code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
 You typically set this once at the beginning, after which any descendants will inherit it. Its value builds incrementally, and
 can be cleared to its initial value for the current folder using <code>pms.setPath(None)</code>.
-<pre>
-</pre>
-</li>
 </ul>
+<br/>
+<li><kbd>pms.setEnv</kbd><code>(name, val)</code></li>
+<ul>
+Define an environment variable to be set when the current folder or its descendants are executed in the future.
+<code>pms.setEnv(None, None)</code> will clear the current folder's user-defined variables.
+</ul>
+<br/>
+<li><kbd>pms.version</kbd><code>()</code></li>
+<ul>Get jumpy's version.
+</ul>
+<br/>
+<li><kbd>pms.getHome</kbd><code>()</code></li>
+<ul>Get jumpy's home path.
+</ul>
+<br/>
+<li><kbd>pms.getProfileDir</kbd><code>()</code></li>
+<ul>Get the PMS profile path (where confs can be read/written).
+</ul>
+<br/>
+<li><kbd>pms.getLogDir</kbd><code>()</code></li>
+<ul>Get the PMS log path (where logs can be written).
+</ul>
+<br/>
+<li><kbd>pms.getPluginJar</kbd><code>()</code></li>
+<ul>Get the path to the running <i>jumpy.jar</i>.
+</ul>
+<br/>
+<li><kbd>pms.restart</kbd><code>()</code></li>
+<ul>Restart PMS' http server.
+</ul>
+<br/>
+
+
 </ul>
 
 <br/>

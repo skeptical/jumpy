@@ -3,6 +3,9 @@ package net.pms.external.infidel.jumpy;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
@@ -20,6 +23,7 @@ import net.pms.dlna.WebAudioStream;
 public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public String uri, thumbnail;
 	public String basepath = null, pypath = null;
+	public Map<String,String> env;
 	private jumpyRoot jumpy;
 	private py python;
 	
@@ -28,19 +32,31 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public boolean refreshAlways = false;
 	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon) {
-		this(jumpy, name, uri, thumbnailIcon, null);
-	}
-	
-	public pyFolder(pyFolder other) {
-		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath);
+		this(jumpy, name, uri, thumbnailIcon, null, null);
 	}
 	
 	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon, String pypath) {
+		this(jumpy, name, uri, thumbnailIcon, pypath, null);
+	}
+	
+	public pyFolder(pyFolder other) {
+		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath, other.env);
+	}
+	
+	public pyFolder(jumpyRoot jumpy, String name, Map<String,String> m) {
+		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("pypath"), m);
+	}
+	
+	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon, String pypath, Map<String,String> env) {
 		super(name, thumbnailIcon);
 		this.jumpy = jumpy;
 		this.thumbnail = thumbnailIcon;
 		this.uri = uri;
 		this.basepath = this.pypath = pypath;
+		this.env = new HashMap<String,String>();
+		if (env != null && !env.isEmpty()) {
+			this.env.putAll(env);
+		}
 		this.python = new py();
 		this.refreshAlways = (((jumpy)jumpy).refresh == 0);
 	}
@@ -62,7 +78,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		}
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");
-		python.run(this, uri, pypath);
+		python.run(this, uri, pypath, env);
 		refreshOnce = false;
 	}
 
@@ -97,11 +113,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		switch (type) {
 			case FOLDER:
 				media = "folder";
-				addChild(new pyFolder(jumpy, name, uri, thumb, pypath));
+				addChild(new pyFolder(jumpy, name, uri, thumb, pypath, env));
 				break;
 			case UNRESOLVED:
 				media = "unresolved item";
-				addChild(new pyFolder(jumpy, name, uri, thumb, pypath));
+				addChild(new pyFolder(jumpy, name, uri, thumb, pypath, env));
 				break;
 			case Format.VIDEO:
 				media = "video";
@@ -149,4 +165,39 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		pypath = (dir == null ? basepath : pypath + File.pathSeparator + dir);
 	}
 
+	@Override
+	public void setEnv(String name, String val) {
+		if (name == null && val == null ) {
+			jumpy.log("setEnv: clear all.");
+			env.clear();
+		} else {
+			jumpy.log("setEnv: " + name + "=" + val);
+			env.put(name, val);
+		}
+	}
+
+	@Override
+	public String util(int action, String data) {
+
+		jumpy.log("util: " + apiName[action] +  ", " + data);
+		switch (action) {
+			case VERSION:
+				return py.version;
+			case HOME:
+				return ((jumpy)jumpy).home;
+			case PROFILEDIR:
+				return new File(((jumpy)jumpy).jumpyconf).getParent();
+			case LOGDIR:
+				return new File(((jumpy)jumpy).jumpylog).getParent();
+			case PLUGINJAR:
+				return this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+			case RESTART:
+				try {
+					python.shutdown();
+					PMS.get().reset();
+				} catch(Exception e) {e.printStackTrace();}
+				break;
+		}
+		return "";
+	}
 }

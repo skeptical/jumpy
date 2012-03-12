@@ -22,9 +22,16 @@ except NameError:
 	__builtin__.PMS_AUDIOFEED = 4097
 	__builtin__.PMS_IMAGEFEED = 4098
 	__builtin__.PMS_VIDEOFEED = 4100
+	# util() constants
+	__builtin__.PMS_VERSION = 1;
+	__builtin__.PMS_HOME = 2;
+	__builtin__.PMS_PROFILEDIR = 3;
+	__builtin__.PMS_LOGDIR = 4;
+	__builtin__.PMS_PLUGINJAR = 5;
+	__builtin__.PMS_RESTART = 6;
 
 # wrapper to flatten the argv list into a tokenized string
-def addItem(t, name, argv, thumb):
+def pms_addItem(t, name, argv, thumb):
 	if type(argv).__name__ == 'list':
 		a = []
 		for arg in argv:
@@ -32,7 +39,35 @@ def addItem(t, name, argv, thumb):
 		argv = ' | '.join(a)
 	pms._addItem(t, name, argv, thumb)
 
-__builtin__.pms.addItem = addItem
+# convenience wrappers
+def pms_util(action, data = None):
+	return pms.util(action, data)
+
+def pms_version():
+	return pms.util(PMS_VERSION, None)
+
+def pms_getHome():
+	return pms.util(PMS_HOME, None)
+
+def pms_getProfileDir():
+	return pms.util(PMS_PROFILEDIR, None)
+
+def pms_getLogDir():
+	return pms.util(PMS_LOGDIR, None)
+
+def pms_getPluginJar():
+	return pms.util(PMS_PLUGINJAR, None)
+
+def pms_restart():
+	return pms.util(PMS_RESTART, None)
+
+__builtin__.pms.addItem = pms_addItem
+__builtin__.pms.version = pms_version
+__builtin__.pms.getHome = pms_getHome
+__builtin__.pms.getProfileDir = pms_getProfileDir
+__builtin__.pms.getLogDir = pms_getLogDir
+__builtin__.pms.getPluginJar = pms_getPluginJar
+__builtin__.pms.restart = pms_restart
 
 # flush regularly to stay in sync with java output
 class flushed(object):

@@ -29,7 +29,7 @@ import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 
-import org.ini4j.Ini;
+import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
 
 //import org.slf4j.Logger;
@@ -75,6 +75,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 		py.python = (String)configuration.getCustomProperty("python.path");
 		py.out = logger;
+		py.version = version;
 		python = new py();
 		pypath = home + "lib";
 		
@@ -129,6 +130,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			log("loading " + script.getName() + ".", true);
 			log("%n");
 			python.run(top, script.getPath(), pypath);
+			top.env.clear();
 		}
 		
 		if (System.getProperty("os.name").startsWith("Windows") &&
@@ -167,7 +169,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 	@Override
 	public void shutdown () {
 	}
-	
+
    public void readconf() {
       if (conf == null) {
 		   conf = new Properties();
@@ -247,12 +249,11 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
    public void readbookmarks() {
    	try {
-			Ini ini = new Ini(new File(bookmarksini));
+			Wini ini = new Wini(new File(bookmarksini));
 			for (String name : ini.keySet()) {
-				Section b = ini.get(name);
-				bookmark(new pyFolder(this, name, b.get("uri"), b.get("thumbnail"), b.get("pypath")), false);
+				bookmark(new pyFolder(this, name, ini.get(name)), false);
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
    }
 
    public void writebookmarks() {
@@ -260,13 +261,16 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			File f = new File(bookmarksini);
 			f.delete();
 			f.createNewFile();
-			Ini ini = new Ini(f);
+			Wini ini = new Wini(f);
 			for (DLNAResource item : bookmarks.getChildren()) {
 				pyFolder bookmark = (pyFolder)item;
 				String name = bookmark.getName();
 				ini.put(name, "uri", bookmark.uri);
 				ini.put(name, "thumbnail", bookmark.thumbnail);
 				ini.put(name, "pypath", bookmark.pypath);
+				if (bookmark.env != null && !bookmark.env.isEmpty()) {
+					ini.get(name).putAll(bookmark.env);
+				}
 			}
 			ini.store();
 		} catch (Exception e) {e.printStackTrace();}

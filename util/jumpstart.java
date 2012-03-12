@@ -1,14 +1,19 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Map;
 import java.net.URLDecoder;
 
 import net.pms.external.infidel.jumpy.py;
 import net.pms.external.infidel.jumpy.jumpyAPI;
 
 public class jumpstart {
+
+	static py py;
+
 	public static void main(String[] argv) {
 		
-		py py = new py();
+		py = new py();
+		py.version = "0.1.3";
 		class item {
 			public int type;
 			public String name, uri, thumb, path;
@@ -20,6 +25,7 @@ public class jumpstart {
 		class apiobj implements jumpyAPI {
 			public ArrayList<item> items;
 			public String basepath, path;
+			private Map<String,String> env;
 			apiobj(String p) {
 				basepath = path = p; items = new ArrayList<item>();
 			}
@@ -28,6 +34,25 @@ public class jumpstart {
 			}
 			public void setPath(String dir) {
 				path = (dir == null ? basepath : path + File.pathSeparator + dir);
+			}
+			public void setEnv(String name, String val) {
+				if (name == null && val == null ) env.clear();
+				else env.put(name, val);
+			}
+			public String util(int action, String data) {
+				System.out.println("util: " + apiName[action] +  ", " + data);
+				switch (action) {
+					case VERSION:
+						return jumpstart.py.version;
+					case PLUGINJAR:
+						return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+					case HOME:
+					case PROFILEDIR:
+					case LOGDIR:
+					case RESTART:
+						break;
+				}
+				return "";
 			}
 		}
 
@@ -70,7 +95,7 @@ public class jumpstart {
 		
 		while (true) {
 			obj.items.clear();
-			py.run(obj, uri, obj.path);
+			py.run(obj, uri, obj.path, obj.env);
 			int size = obj.items.size();
 			if (size == 0) break;
 			
