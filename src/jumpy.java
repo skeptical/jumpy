@@ -29,9 +29,6 @@ import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 
-import org.ini4j.Wini;
-import org.ini4j.Profile.Section;
-
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
@@ -39,21 +36,22 @@ import org.ini4j.Profile.Section;
 public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.1.5";
+	public static final String version = "0.1.6";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
    private Properties conf = null;
 	public String home, jumpylog, jumpyconf, bookmarksini, lasturi;
-	public boolean debug, showBookmarks;
+	public boolean debug, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
-	private String pypath;
+	public String pypath;
 	private FileOutputStream logfile;
 	private quickLog logger;
 	private py python;
 	private File[] scripts;
-	private pyFolder top, bookmarks, util;
+	public pyFolder top, util;
+	private bookmarker bookmarks;
 	
 	public jumpy() {
 		pms = PMS.get();
@@ -104,10 +102,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		top = new pyFolder(this, "Jumpy", null, null, pypath);
 
 		if (showBookmarks) {
-			bookmarks = new pyFolder(this, "Bookmarks", null, null, pypath);
-			bookmarks.refreshAlways = true;
-			top.addChild(bookmarks);
-			readbookmarks();
+			bookmarks = new bookmarker(this);
 		}
 		
 		if (refresh != 0) {
@@ -131,6 +126,12 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 			log("%n");
 			python.run(top, script.getPath(), pypath);
 			top.env.clear();
+		}
+		
+		for (DLNAResource item : top.getChildren()) {
+			if (item instanceof pyFolder) {
+				((pyFolder)item).canBookmark = false;
+			}
 		}
 		
 		if (System.getProperty("os.name").startsWith("Windows") &&
@@ -181,12 +182,14 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		}
 		debug = Boolean.valueOf(conf.getProperty("debug", "false"));
 		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
+		verboseBookmarks = Boolean.valueOf(conf.getProperty("verbose_bookmarks", "true"));
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
    }
 
    public void writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
+		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
 		conf.setProperty("refresh", String.valueOf(refresh));
 		try {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);	
@@ -206,7 +209,7 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
    public void refresh(boolean timed) {
 		refreshChildren(top);
 		if (showBookmarks) {
-			refreshChildren(bookmarks);
+			refreshChildren(bookmarks.bookmarks);
 		}
    	if (timed) {
 			log("Timed " + refresh + " minute refresh.");
@@ -228,52 +231,14 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
    }
    
    public void bookmark(pyFolder folder) {
-   	bookmark(folder, true);
-   }
-   
-   public void bookmark(pyFolder folder, boolean copy) {
-   	boolean adding = (!folder.isBookmark);
-   	log((adding ? "Adding" : "Deleting") + " bookmark: " + folder.getName() + ".");
-   	if (adding) {
+   	if (!folder.isBookmark) {
 			// if the renderer can't play the VirtualVideoAction it may send repeated requests
 			if (folder.uri.equals(lasturi)) return;
 			lasturi = folder.uri;
-			pyFolder bookmark = copy ? new pyFolder(folder) : folder;
-			bookmark.isBookmark = true;
-			bookmarks.addChild(bookmark);
+			bookmarks.add(folder);
    	} else {
-   		bookmarks.getChildren().remove(folder);
+   		bookmarks.remove(folder);
    	}
-   	writebookmarks();
-   }
-
-   public void readbookmarks() {
-   	try {
-			Wini ini = new Wini(new File(bookmarksini));
-			for (String name : ini.keySet()) {
-				bookmark(new pyFolder(this, name, ini.get(name)), false);
-			}
-		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
-   }
-
-   public void writebookmarks() {
-   	try {
-			File f = new File(bookmarksini);
-			f.delete();
-			f.createNewFile();
-			Wini ini = new Wini(f);
-			for (DLNAResource item : bookmarks.getChildren()) {
-				pyFolder bookmark = (pyFolder)item;
-				String name = bookmark.getName();
-				ini.put(name, "uri", bookmark.uri);
-				ini.put(name, "thumbnail", bookmark.thumbnail);
-				ini.put(name, "pypath", bookmark.pypath);
-				if (bookmark.env != null && !bookmark.env.isEmpty()) {
-					ini.get(name).putAll(bookmark.env);
-				}
-			}
-			ini.store();
-		} catch (Exception e) {e.printStackTrace();}
    }
 
    public void dbgpack_register() {

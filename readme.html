@@ -62,7 +62,7 @@ for your platform.
 <li><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories" target="_blank">Install and configure</a>
 some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons" target="_blank">addons</a>
 inside xbmc (and of course test them too, some are obsolete). You may need to configure username/password depending
-on the plugin, and so on.
+on the addon, and so on.
 </li>
 </ol>
 <br/>
@@ -81,25 +81,38 @@ is always the case.
 </li>
 </ol>
 <br/>
+<b>Bookmarks</b>
+<ul>
+Press the <i>Add bookmark</i> button in any folder to create a bookmark inside <i> Jumpy > Bookmarks</i>. These are saved to <b><i>jumpy-bookmarks.ini</i></b> in your PMS profile folder (wherever <i>PMS.conf</i> is). You can edit this file, for instance to change the labels or reorder the items.
+</ul>
+<br/>
 <b>Log and Conf</b>
 <ul>
 Locations are according to your PMS installation (see jumpy's init messages inside your <i>debug.log</i> for the specific paths):<br/><br/>
 <ul>
 <li><b><i>jumpy.log</i></b>: located wherever <i>debug.log</i> is.
 </li><br/>
-<li><b><i>jumpy.conf</i></b>:  omitted by default, but should be located wherever <i>PMS.conf</i> is.
+<li><b><i>jumpy.conf</i></b>: omitted by default, but should be located wherever <i>PMS.conf</i> is.
 The available settings are:
 <pre><i># whether to activate bookmarks (true|false)</i>
 <b>bookmarks</b>=true
 
+<i># whether to qualify the bookmark name (true|false)
+# e.g. 'Live :ESPN' instead of just 'Live'</i>
+<b>verbose_bookmarks</b>=true
+
 <i># how often to refresh folder content in minutes
-# (-1=never 0=always 1=one minute)</i>
+# (-1=never|0=always|1=one minute)</i>
 <b>refresh</b>=60
 
 <i># whether to copy log output to the console (true|false)</i>
 <b>debug</b>=false
 </pre>
 </li>
+<li><b><i>jumpy-xbmc.conf</i></b>: omitted by default, but should be located wherever <i>PMS.conf</i> is.
+If you need to override the location where jumpy looks for xbmc, create this file and set:
+<pre><b>xbmc_home</b>=c:\path\to\my\XBMC</pre>
+</li><br/>
 </ul>
 When reporting bugs please attach these together as one zip file (or use the <a href="https://github.com/SharkHunter/DbgPack">DbgPack</a> plugin):
 <ul>
