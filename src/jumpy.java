@@ -33,7 +33,7 @@ import net.pms.logging.LoggingConfigFileLoader;
 //import org.slf4j.LoggerFactory;
 
 
-public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
+public class jumpy implements AdditionalFolderAtRoot {
 
 	public static final String appName = "jumpy";
 	public static final String version = "0.1.6";
@@ -145,7 +145,6 @@ public class jumpy implements AdditionalFolderAtRoot, jumpyRoot {
 		return top;
 	}
 
-	@Override
 	public synchronized  void log(String msg) {
 		logger.log(msg);
 	}

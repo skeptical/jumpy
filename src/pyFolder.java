@@ -24,7 +24,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public String uri, thumbnail;
 	public String basepath = null, pypath = null;
 	public Map<String,String> env;
-	private jumpyRoot jumpy;
+	private jumpy jumpy;
 	private py python;
 	
 	public boolean canBookmark = true;
@@ -32,11 +32,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public boolean refreshOnce = true;
 	public boolean refreshAlways = false;
 	
-	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon) {
+	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null, null);
 	}
 	
-	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon, String pypath) {
+	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath) {
 		this(jumpy, name, uri, thumbnailIcon, pypath, null);
 	}
 	
@@ -44,11 +44,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath, other.env);
 	}
 	
-	public pyFolder(jumpyRoot jumpy, String name, Map<String,String> m) {
+	public pyFolder(jumpy jumpy, String name, Map<String,String> m) {
 		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("pypath"), m);
 	}
 	
-	public pyFolder(jumpyRoot jumpy, String name, String uri, String thumbnailIcon, String pypath, Map<String,String> env) {
+	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath, Map<String,String> env) {
 		super(name, thumbnailIcon);
 		this.jumpy = jumpy;
 		this.thumbnail = thumbnailIcon;
@@ -59,7 +59,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 			this.env.putAll(env);
 		}
 		this.python = new py();
-		this.refreshAlways = (((jumpy)jumpy).refresh == 0);
+		this.refreshAlways = (jumpy.refresh == 0);
 	}
 	
 	public void setName(String name) {
@@ -72,7 +72,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 			return;
 		}
 		getChildren().clear();
-		if (((jumpy)jumpy).showBookmarks && canBookmark) {
+		if (jumpy.showBookmarks && canBookmark) {
 			final pyFolder me = this;
 			addChild(new VirtualVideoAction((isBookmark ? "Delete" : "Add") + " bookmark", true) {
 				public boolean enable() {
@@ -203,11 +203,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 			case VERSION:
 				return py.version;
 			case HOME:
-				return ((jumpy)jumpy).home;
+				return jumpy.home;
 			case PROFILEDIR:
-				return new File(((jumpy)jumpy).jumpyconf).getParent();
+				return new File(jumpy.jumpyconf).getParent();
 			case LOGDIR:
-				return new File(((jumpy)jumpy).jumpylog).getParent();
+				return new File(jumpy.jumpylog).getParent();
 			case PLUGINJAR:
 				return this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 			case RESTART:
