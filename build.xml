@@ -1,4 +1,4 @@
-<project name="jumpy" default="dist" basedir=".">
+<project name="jumpy" default="jar" basedir=".">
 
 	<loadfile srcfile="src/jumpy.java" property="ver">
 		<filterchain>
@@ -29,7 +29,7 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="clean, compile" >
+	<target name="jar" depends="clean, compile, util" >
 		<copy file="${src}/plugin" todir="${build}"/>
 		<jar jarfile="${jumpy}.jar" basedir="${build}">
 			<manifest>
@@ -42,7 +42,11 @@
 		<ant dir="util" useNativeBasedir="true" inheritAll="false"/>
 	</target>
 
-	<target name="dist" depends="jar, util" >
+	<target name="dist" depends="jar" >
+		<antcall target="disttasks"/>
+	</target>
+
+	<target name="disttasks" >
 		<mkdir dir="${dist}/jumpy/lib"/>
 		<copy file="${jumpy}.jar" todir="${dist}"/>
 		<copy file="readme.html" todir="${dist}/jumpy"/>
@@ -55,15 +59,15 @@
 		<zip destfile="pms-${jumpy}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="src" >
+	<target name="release" >
 		<delete file="pms-${jumpy}-src.zip" />
 		<delete dir="tmp"/>
 		<exec executable = "git">
 			<arg value = "clone" />
 			<arg value = "file://${basedir}" />
 			<arg value = "tmp/${jumpy}" />
-			<arg value = "-b" />
-			<arg value = "master" />
+<!--			<arg value = "-b" />-->
+<!--			<arg value = "master" />-->
 			<arg value = "--no-hardlinks" />
 			<arg value = "--depth" />
 			<arg value = "1" />
@@ -75,7 +79,14 @@
 			<arg value = "../pms-${jumpy}-src.zip" />
 			<arg value = "${jumpy}" />
 		</exec>
+		<exec executable = "sh" dir="tmp/${jumpy}/lib">
+			<arg value="-c"/>
+			<arg value="cp -s ../../../lib/*.jar ."/>
+		</exec>
+		<ant dir="tmp/${jumpy}" target="jar" useNativeBasedir="true" inheritAll="false"/>
+		<move file="tmp/${jumpy}/${jumpy}.jar" todir="."/>
 		<delete dir="tmp"/>
+		<antcall target="disttasks"/>
 	</target>
 
 	<target name="xbmc" >
