@@ -5,6 +5,9 @@
 .orange {
 	color: #ff6600;
 }
+.comment {
+	color: dimgrey;
+}
 ul {
 	list-style-type: disc;
 }
@@ -94,18 +97,18 @@ Locations are according to your PMS installation (see jumpy's init messages insi
 </li><br/>
 <li><b><i>jumpy.conf</i></b>: omitted by default, but should be located wherever <i>PMS.conf</i> is.
 The available settings are:
-<pre><i># whether to activate bookmarks (true|false)</i>
+<pre><i class="comment"># whether to activate bookmarks (true|false)</i>
 <b>bookmarks</b>=true
 
-<i># whether to qualify the bookmark name (true|false)
+<i class="comment"># whether to qualify the bookmark name (true|false)
 # e.g. 'Live :ESPN' instead of just 'Live'</i>
 <b>verbose_bookmarks</b>=true
 
-<i># how often to refresh folder content in minutes
+<i class="comment"># how often to refresh folder content in minutes
 # (-1=never|0=always|1=one minute)</i>
 <b>refresh</b>=60
 
-<i># whether to copy log output to the console (true|false)</i>
+<i class="comment"># whether to copy log output to the console (true|false)</i>
 <b>debug</b>=false
 </pre>
 </li>
@@ -122,7 +125,7 @@ When reporting bugs please attach these together as one zip file (or use the <a 
 <br/>
 <b>Writing Your Own Python Scripts</b>
 <ul>
-Have a look at <i>helloworld.py</i> and <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder. Basically your script does something,
+Have a look at <a href="#helloworld.py"><i>helloworld.py</i></a> below and <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder. Basically your script does something,
 adds some items to the current xmb folder and exits.  
 <ul>
 <li>A script is always called from its own directory.
@@ -149,7 +152,7 @@ where
 <ul>
 <li><code>type</code> is one of these constants:
 <pre>
-# media items           # folder items
+<i class="comment"># media items           # folder items</i>
 PMS_AUDIO               PMS_FOLDER
 PMS_IMAGE               PMS_UNRESOLVED
 PMS_VIDEO
@@ -212,9 +215,26 @@ Define an environment variable to be set when the current folder or its descenda
 <li><kbd>pms.restart</kbd><code>()</code></li>
 <ul>Restart PMS' http server.
 </ul>
+</ul>
 <br/>
+<b><a name="helloworld.py">helloworld.py</a></b>
+<ul>
+<pre>import sys, jumpy
 
+if len(sys.argv) == 1:
+	<i class="comment"># initial call, add a 'Hello' folder and exit</i>
+	print "hello"
+	pms.addItem(PMS_FOLDER, "Hello", [sys.argv[0], "hello"], "")
 
+elif sys.argv[1] == "hello":
+	<i class="comment"># user clicked on our 'Hello' folder, add some videos and exit</i>
+	print "world"
+	pms.addItem(PMS_VIDEO, "W", "w.mpg", "")
+	pms.addItem(PMS_VIDEO, "O", "o.mpg", "")
+	pms.addItem(PMS_VIDEO, "R", "r.mpg", "")
+	pms.addItem(PMS_VIDEO, "L", "l.mpg", "")
+	pms.addItem(PMS_VIDEO, "D", "d.mpg", "")
+</pre>
 </ul>
 
 <br/>
