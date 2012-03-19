@@ -47,10 +47,6 @@ public class bookmarker {
 		store();
 	}
    
-   public String topName(pyFolder folder) {
-		return folder.getXMBPath(folder, jumpy.top).split("/")[0].replace("[xbmc]","").trim();
-   }
-   
 	public void load() {
 		Wini ini = new Wini();
 		ini.getConfig().setMultiSection(true);
@@ -59,11 +55,10 @@ public class bookmarker {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
-			for (int i=0; i < section.size(); i++) {
-				pyFolder bookmark = new pyFolder(jumpy, section.getName(), section);
-				bookmark.isBookmark = true;
-				bookmarks.addChild(bookmark);
-			}
+			jumpy.log("section: " + section.getName());
+			pyFolder bookmark = new pyFolder(jumpy, section.getName(), section);
+			bookmark.isBookmark = true;
+			bookmarks.addChild(bookmark);
 		}
    }
 
@@ -76,31 +71,21 @@ public class bookmarker {
 				pyFolder bookmark = (pyFolder)item;
 				String name = bookmark.getName();
 				Section section = ini.add(name);
-				int index = section.size();
-
-				// ini4j forces this inelegant distinction - see BasicMultiMap.put()
-				if (index == 0) {
-					section.put("uri", bookmark.uri);
-					section.put("thumbnail", bookmark.thumbnail);
-					section.put("pypath", bookmark.pypath);
-					if (bookmark.env != null && !bookmark.env.isEmpty()) {
-						for (Map.Entry<String,String> var : bookmark.env.entrySet()) {
-							section.put(var.getKey(), var.getValue());
-						}
-					}
-				} else {
-					section.put("uri", bookmark.uri, index);
-					section.put("thumbnail", bookmark.thumbnail, index);
-					section.put("pypath", bookmark.pypath, index);
-					if (bookmark.env != null && !bookmark.env.isEmpty()) {
-						for (Map.Entry<String,String> var : bookmark.env.entrySet()) {
-							section.put(var.getKey(), var.getValue(), index);
-						}
+				section.put("uri", bookmark.uri);
+				section.put("thumbnail", bookmark.thumbnail);
+				section.put("pypath", bookmark.pypath);
+				if (bookmark.env != null && !bookmark.env.isEmpty()) {
+					for (Map.Entry<String,String> var : bookmark.env.entrySet()) {
+						section.put(var.getKey(), var.getValue());
 					}
 				}
 			}
 			ini.store();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
+   }
+   
+   public String topName(pyFolder folder) {
+		return folder.getXMBPath(folder, jumpy.top).split("/")[0].replace("[xbmc]","").trim();
    }
 }
 
