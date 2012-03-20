@@ -29,6 +29,7 @@ except NameError:
 	__builtin__.PMS_LOGDIR = 4;
 	__builtin__.PMS_PLUGINJAR = 5;
 	__builtin__.PMS_RESTART = 6;
+	__builtin__.PMS_FOLDERNAME = 7;
 
 # wrapper to flatten the argv list into a tokenized string
 def pms_addItem(t, name, argv, thumb):
@@ -61,6 +62,9 @@ def pms_getPluginJar():
 def pms_restart():
 	return pms.util(PMS_RESTART, None)
 
+def pms_getFolderName():
+	return pms.util(PMS_FOLDERNAME, None)
+
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.version = pms_version
 __builtin__.pms.getHome = pms_getHome
@@ -68,6 +72,7 @@ __builtin__.pms.getProfileDir = pms_getProfileDir
 __builtin__.pms.getLogDir = pms_getLogDir
 __builtin__.pms.getPluginJar = pms_getPluginJar
 __builtin__.pms.restart = pms_restart
+__builtin__.pms.getFolderName = pms_getFolderName
 
 # flush regularly to stay in sync with java output
 class flushed(object):

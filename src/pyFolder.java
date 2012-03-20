@@ -216,6 +216,8 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 					PMS.get().reset();
 				} catch(Exception e) {e.printStackTrace();}
 				break;
+			case FOLDERNAME:
+				return this.getName();
 		}
 		return "";
 	}

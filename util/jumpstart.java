@@ -24,7 +24,7 @@ public class jumpstart {
 		
 		class apiobj implements jumpyAPI {
 			public ArrayList<item> items;
-			public String basepath, path;
+			public String basepath, path, name = "Item";
 			private Map<String,String> env;
 			apiobj(String p) {
 				basepath = path = p; items = new ArrayList<item>();
@@ -46,6 +46,8 @@ public class jumpstart {
 						return jumpstart.py.version;
 					case PLUGINJAR:
 						return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+					case FOLDERNAME:
+						return this.name;
 					case HOME:
 					case PROFILEDIR:
 					case LOGDIR:
@@ -142,6 +144,7 @@ public class jumpstart {
 				
 				uri = i.uri;
 				obj.path = i.path;
+				obj.name = i.name;
 			} catch (Exception e) {
 				System.err.printf("Invalid selection: %s\n", sel);
 				break;
