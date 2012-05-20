@@ -38,7 +38,7 @@ import com.sharkhunter.dbgpack.dbgpack;
 public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.1.6";
+	public static final String version = "0.1.7";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;

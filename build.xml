@@ -43,11 +43,7 @@
 	</target>
 
 	<target name="dist" depends="jar" >
-		<antcall target="disttasks"/>
-	</target>
-
-	<target name="disttasks" >
-		<delete dir="${dist}"/>
+<!--		<delete dir="${dist}"/>-->
 		<mkdir dir="${dist}/jumpy/lib"/>
 		<copy file="${jumpy}.jar" todir="${dist}"/>
 		<copy file="readme.html" todir="${dist}/jumpy"/>
@@ -61,6 +57,7 @@
 	</target>
 
 	<target name="release" >
+		<!-- Note: This target is linux-only -->
 		<delete file="pms-${jumpy}-src.zip" />
 		<delete dir="tmp"/>
 		<exec executable = "git">
@@ -84,10 +81,13 @@
 			<arg value="-c"/>
 			<arg value="cp -s ../../../lib/*.jar ."/>
 		</exec>
-		<ant dir="tmp/${jumpy}" target="jar" useNativeBasedir="true" inheritAll="false"/>
+		<copy todir="tmp/${jumpy}/script">
+			<fileset dir="script" excludes="**/*.pyc **/*log* **/*test* **/*.0 **/ignore/**"/>
+		</copy>
+		<ant dir="tmp/${jumpy}" target="dist" useNativeBasedir="true" inheritAll="false"/>
 		<move file="tmp/${jumpy}/${jumpy}.jar" todir="."/>
+		<move file="tmp/${jumpy}/pms-${jumpy}.zip" todir="."/>
 		<delete dir="tmp"/>
-		<antcall target="disttasks"/>
 	</target>
 
 	<target name="xbmc" >
