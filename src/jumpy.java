@@ -32,8 +32,10 @@ import net.pms.logging.LoggingConfigFileLoader;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+import com.sharkhunter.dbgpack.dbgpack;
 
-public class jumpy implements AdditionalFolderAtRoot {
+
+public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	public static final String appName = "jumpy";
 	public static final String version = "0.1.6";
@@ -132,11 +134,6 @@ public class jumpy implements AdditionalFolderAtRoot {
 			if (item instanceof pyFolder) {
 				((pyFolder)item).canBookmark = false;
 			}
-		}
-		
-		if (System.getProperty("os.name").startsWith("Windows") &&
-				new File(plugins).list(new WildcardFileFilter("dbgpack*.jar")).length > 0) {
-			dbgpack_register();
 		}
 	}
 	
@@ -240,24 +237,9 @@ public class jumpy implements AdditionalFolderAtRoot {
    	}
    }
 
-   public void dbgpack_register() {
-		String files = (String)configuration.getCustomProperty("dbgpack");
-		HashSet dbgpk = StringUtils.isBlank(files) ? new HashSet() :
-			new HashSet(Arrays.asList(files.split(",")));
-      // avoid duplicates: user may have already entered these as relative paths
-      if (! files.contains("jumpy.log")) {
-			dbgpk.add(jumpylog);
-      }
-      if (! files.contains("jumpy.conf")) {
-			dbgpk.add(jumpyconf);
-      }
-      if (! files.contains("pmsencoder.log")) {
-         dbgpk.add(new File(jumpylog).getParent() + File.separatorChar + "pmsencoder.log");
-      }
-		files = StringUtils.join(dbgpk, ',');
-		log("dbgpack: " + files);
-		configuration.setCustomProperty("dbgpack", files);
-   }
+	public Object dbgpack_cb() {
+		return new String[] {jumpylog, jumpyconf};
+	}
 
 }
 
