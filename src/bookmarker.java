@@ -36,14 +36,14 @@ public class bookmarker {
 			bookmark.setName(name);
 		}
 		bookmarks.addChild(bookmark);
-		jumpy.log("Added bookmark: " + name);
+		jumpy.log("Adding bookmark: " + name);
 		store();
 	}
 	
 	public void remove(pyFolder folder) {
 		String name = folder.getName();
 		bookmarks.getChildren().remove(folder);
-		jumpy.log("Removed bookmark: " + name);
+		jumpy.log("Removing bookmark: " + name);
 		store();
 	}
    
@@ -55,7 +55,7 @@ public class bookmarker {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
-			jumpy.log("section: " + section.getName());
+			jumpy.log("Reading bookmark: " + section.getName());
 			pyFolder bookmark = new pyFolder(jumpy, section.getName(), section);
 			bookmark.isBookmark = true;
 			bookmarks.addChild(bookmark);

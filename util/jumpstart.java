@@ -20,6 +20,7 @@ public class jumpstart {
 			item(int type, String name, String uri, String thumb, String path) {
 				this.type = type; this.name = name; this.uri = uri; this.thumb = thumb; this.path = path;
 			}
+			// TODO: env
 		}
 		
 		class apiobj implements jumpyAPI {
