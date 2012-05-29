@@ -91,7 +91,7 @@
 	</target>
 
 	<target name="xbmc" >
-		
+
 		<loadfile srcfile="script/xbmc/xbmcinit.py" property="xver">
 			<filterchain>
 				<linecontains> <contains value="version "/> </linecontains>

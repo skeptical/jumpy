@@ -26,28 +26,28 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public Map<String,String> env;
 	private jumpy jumpy;
 	private py python;
-	
+
 	public boolean canBookmark = true;
 	public boolean isBookmark = false;
 	public boolean refreshOnce = true;
 	public boolean refreshAlways = false;
-	
+
 	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null, null);
 	}
-	
+
 	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath) {
 		this(jumpy, name, uri, thumbnailIcon, pypath, null);
 	}
-	
+
 	public pyFolder(pyFolder other) {
 		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath, other.env);
 	}
-	
+
 	public pyFolder(jumpy jumpy, String name, Map<String,String> m) {
 		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("pypath"), m);
 	}
-	
+
 	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath, Map<String,String> env) {
 		super(name, thumbnailIcon);
 		this.jumpy = jumpy;
@@ -61,11 +61,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		this.python = new py();
 		this.refreshAlways = (jumpy.refresh == 0);
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public void discoverChildren() {
 		if (uri == null || uri.equals("")) {
@@ -90,7 +90,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 	public void refresh() {
 		refreshOnce = true;
 	}
-	
+
 	@Override
 	public void resolve() {
 		discovered = !(refreshOnce || refreshAlways);
@@ -101,7 +101,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		return true;
 	}
 
-	
+
 	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
 		DLNAResource p = folder;
 		String xmbpath = "/";
@@ -117,7 +117,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 
 	@Override
 	public void addItem(int type, String name, String uri, String thumb) {
-		
+
 		// see if target is a local file
 		File f = null;
 		if (type > FOLDER) {
@@ -126,7 +126,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 				f = null;
 			}
 		}
-		
+
 		String media = "unknown";
 
 		switch (type) {
@@ -178,7 +178,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		}
 		jumpy.log("Adding " + media +  ": " + name + ".");
 	}
-	
+
 	@Override
 	public void setPath(String dir) {
 		pypath = (dir == null ? basepath : pypath + File.pathSeparator + dir);

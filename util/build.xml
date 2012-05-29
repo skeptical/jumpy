@@ -24,10 +24,10 @@
 	<target name="dist" depends="clean, compile"
 				description="generate the distribution" >
 		<jar jarfile="${jumpstart.jar}" basedir="${build}">
-      <manifest>
-        <attribute name="Main-Class" value="jumpstart" />
-      </manifest>
-      </jar>
+		<manifest>
+		  <attribute name="Main-Class" value="jumpstart" />
+		</manifest>
+		</jar>
 		<mkdir dir="${dist}/jumpy/lib"/>
 		<copy todir="${dist}/jumpy">
 			<fileset dir="." includes="jumpstart jumpstart.bat"/>

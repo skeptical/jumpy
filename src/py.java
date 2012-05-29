@@ -19,7 +19,7 @@ public class py {
 	public static String version = "";
 	private Process p = null;
 	private GatewayServer server = null;
-	
+
 	public GatewayServer start(jumpyAPI obj) {
 		for (int i=0; i<32; i++) {
 			try {
@@ -35,11 +35,11 @@ public class py {
 		}
 		return null;
 	}
-	
+
 	public int run(jumpyAPI obj, String cmd, String pypath) {
 		return run(obj, cmd, pypath, null);
 	}
-	
+
 	public int run(jumpyAPI obj, String cmd, String pypath, Map<String,String> myenv) {
 		int exitValue = 0;
 		server = start(obj);
@@ -47,7 +47,7 @@ public class py {
 			return -1;
 		}
 		try {
-			
+
 			String[] argv = (python + " | " + cmd).split(" \\| ");
 			boolean windows = System.getProperty("os.name").startsWith("Windows");
 			for (int i=0; i<argv.length; i++) {
@@ -76,9 +76,9 @@ public class py {
 				}
 			}
 			out.println("");
-			
+
 			p = pb.start();
-			
+
 			String line;
 			BufferedReader br;
 			br = new BufferedReader (new InputStreamReader(p.getInputStream()));
@@ -91,10 +91,10 @@ public class py {
 			br.close();
 			server.shutdown();
 		} catch(Exception e) {e.printStackTrace();}
-		
+
 		return exitValue;
 	}
-	
+
 	public int shutdown() {
 		try {
 			if (p != null) {

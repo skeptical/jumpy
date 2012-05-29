@@ -11,7 +11,7 @@ public class jumpstart {
 	static py py;
 
 	public static void main(String[] argv) {
-		
+
 		py = new py();
 		py.version = "0.1.3";
 		class item {
@@ -22,7 +22,7 @@ public class jumpstart {
 			}
 			// TODO: env
 		}
-		
+
 		class apiobj implements jumpyAPI {
 			public ArrayList<item> items;
 			public String basepath, path, name = "Item";
@@ -64,13 +64,13 @@ public class jumpstart {
 			System.err.println("No console.");
 			System.exit(1);
 		}
-		
+
 		File script = new File(argv.length > 0 ? argv[0] : "default.py");
 		if (! script.exists()) {
 			System.err.printf("'%s' not found.\nUsage: jumpstart <scriptfile>\n", script.getPath());
 			System.exit(1);
 		}
-				
+
 		File logfile = new File("jumpstart.log");
 		int r = 0;
 		String[] hist = new String[0];
@@ -89,19 +89,19 @@ public class jumpstart {
 		try{
 			home = URLDecoder.decode(home, "UTF-8");
 		} catch (Exception e) {}
-		
+
 //		apiobj obj = new apiobj(home + File.separatorChar + ".." + File.separatorChar + "src" + File.separatorChar + "lib");
 		// jumpy.py is always located alongside the jar
 		apiobj obj = new apiobj(home);
 		String uri = script.getAbsolutePath();
 		String log = "";
-		
+
 		while (true) {
 			obj.items.clear();
 			py.run(obj, uri, obj.path, obj.env);
 			int size = obj.items.size();
 			if (size == 0) break;
-			
+
 			c.printf("\n------------- MENU -------------\n");
 			for (int i=0; i<size; i++) {
 				item x = obj.items.get(i);
@@ -134,7 +134,7 @@ public class jumpstart {
 				hist = new String[0];
 			}
 			log = log + sel + " ";
-			
+
 			try {
 				int s = Integer.parseInt(sel)-1;
 				assert s > 0 && s < size;
@@ -142,7 +142,7 @@ public class jumpstart {
 				c.printf("--------------------------------\ntype : %d\nname : %s\nuri  : %s\nthumb: %s\n--------------------------------\n",
 					i.type, i.name, i.uri, i.thumb);
 				if (i.type > 0) break;
-				
+
 				uri = i.uri;
 				obj.path = i.path;
 				obj.name = i.name;

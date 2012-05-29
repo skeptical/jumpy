@@ -16,7 +16,7 @@ public class bookmarker {
 	public pyFolder bookmarks;
 	public boolean verbose = true;
 	private String bookmarksini;
-	
+
 	public bookmarker(jumpy jumpy) {
 		this.jumpy = jumpy;
 		bookmarks = new pyFolder(jumpy, "Bookmarks", null, null, jumpy.pypath);
@@ -26,7 +26,7 @@ public class bookmarker {
 		verbose = jumpy.verboseBookmarks;
 		load();
 	}
-	
+
 	public void add(pyFolder folder) {
 		String name = folder.getName();
 		pyFolder bookmark = new pyFolder(folder);
@@ -39,19 +39,19 @@ public class bookmarker {
 		jumpy.log("Adding bookmark: " + name);
 		store();
 	}
-	
+
 	public void remove(pyFolder folder) {
 		String name = folder.getName();
 		bookmarks.getChildren().remove(folder);
 		jumpy.log("Removing bookmark: " + name);
 		store();
 	}
-   
+
 	public void load() {
 		Wini ini = new Wini();
 		ini.getConfig().setMultiSection(true);
 		ini.setFile(new File(bookmarksini));
-   	try {
+		try {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
@@ -60,10 +60,10 @@ public class bookmarker {
 			bookmark.isBookmark = true;
 			bookmarks.addChild(bookmark);
 		}
-   }
+	}
 
 	public void store() {
-   	try {
+		try {
 			Wini ini = new Wini();
 			ini.getConfig().setMultiSection(true);
 			ini.setFile(new File(bookmarksini));
@@ -82,10 +82,10 @@ public class bookmarker {
 			}
 			ini.store();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
-   }
-   
-   public String topName(pyFolder folder) {
+	}
+
+	public String topName(pyFolder folder) {
 		return folder.getXMBPath(folder, jumpy.top).split("/")[0].replace("[xbmc]","").trim();
-   }
+	}
 }
 

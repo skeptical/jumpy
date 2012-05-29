@@ -1,1 +1,17 @@
-/f/git/github/DbgPack/src/com/sharkhunter/dbgpack/dbgpack.java
+package com.sharkhunter.dbgpack;
+
+// Examples:
+//
+//		public Object dbgpack_cb() {
+//			return mylog;
+//		}
+//
+//		public Object dbgpack_cb() {
+//			return new String[] {mylog, myconf};
+//		}
+
+public interface dbgpack {
+	// return a String or String[]
+	public Object dbgpack_cb();
+}
+

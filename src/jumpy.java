@@ -38,11 +38,11 @@ import com.sharkhunter.dbgpack.dbgpack;
 public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.1.7";
+	public static final String version = "0.1.8";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	private PmsConfiguration configuration;
-   private Properties conf = null;
+	private Properties conf = null;
 	public String home, jumpylog, jumpyconf, bookmarksini, lasturi;
 	public boolean debug, showBookmarks, verboseBookmarks;
 	public int refresh;
@@ -54,7 +54,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	private File[] scripts;
 	public pyFolder top, util;
 	private bookmarker bookmarks;
-	
+
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
@@ -64,7 +64,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
 		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
-		
+
 		try {
 			jumpylog = new File(LoggingConfigFileLoader.getLogFilePaths().get("debug.log"))
 				.getParent() + File.separatorChar + "jumpy.log";
@@ -78,7 +78,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		py.version = version;
 		python = new py();
 		pypath = home + "lib";
-		
+
 		log(new Date().toString());
 		log("%n");
 		log("initializing jumpy " + version, true);
@@ -106,7 +106,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		if (showBookmarks) {
 			bookmarks = new bookmarker(this);
 		}
-		
+
 		if (refresh != 0) {
 			util = new pyFolder(this, "Util", null, null, pypath);
 			top.addChild(util);
@@ -129,14 +129,14 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			python.run(top, script.getPath(), pypath);
 			top.env.clear();
 		}
-		
+
 		for (DLNAResource item : top.getChildren()) {
 			if (item instanceof pyFolder) {
 				((pyFolder)item).canBookmark = false;
 			}
 		}
 	}
-	
+
 	@Override
 	public DLNAResource getChild() {
 		return top;
@@ -145,18 +145,18 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public synchronized  void log(String msg) {
 		logger.log(msg);
 	}
-	
+
 	public synchronized void log(String msg, boolean minimal) {
 		if (minimal) {
 			PMS.minimal(msgtag + msg);
 		}
 		logger.log(msg);
 	}
-	
-   @Override
-   public JComponent config() {
+
+	@Override
+	public JComponent config() {
 		return null;
-   }
+	}
 
 	@Override
 	public String name() {
@@ -167,11 +167,11 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public void shutdown () {
 	}
 
-   public void readconf() {
-      if (conf == null) {
-		   conf = new Properties();
+	public void readconf() {
+		if (conf == null) {
+			conf = new Properties();
 			try {
-				FileInputStream conf_file = new FileInputStream(jumpyconf);	
+				FileInputStream conf_file = new FileInputStream(jumpyconf);
 				conf.load(conf_file);
 				conf_file.close();
 			} catch (IOException e) {}
@@ -180,34 +180,34 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
 		verboseBookmarks = Boolean.valueOf(conf.getProperty("verbose_bookmarks", "true"));
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
-   }
+	}
 
-   public void writeconf() {
+	public void writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
 		conf.setProperty("refresh", String.valueOf(refresh));
 		try {
-			FileOutputStream conf_file = new FileOutputStream(jumpyconf);	
+			FileOutputStream conf_file = new FileOutputStream(jumpyconf);
 			conf.store(conf_file, null);
 			conf_file.close();
 		} catch (IOException e) {}
-   }
+	}
 
-   public void refreshChildren(pyFolder folder) {
+	public void refreshChildren(pyFolder folder) {
 		for (DLNAResource item : folder.getChildren()) {
 			if (item instanceof pyFolder) {
 				((pyFolder)item).refresh();
 			}
 		}
-   }
-   
-   public void refresh(boolean timed) {
+	}
+
+	public void refresh(boolean timed) {
 		refreshChildren(top);
 		if (showBookmarks) {
 			refreshChildren(bookmarks.bookmarks);
 		}
-   	if (timed) {
+		if (timed) {
 			log("Timed " + refresh + " minute refresh.");
 		} else if (refresh > 0) {
 			if (timer != null) {
@@ -224,18 +224,18 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		} else {
 			log("Refresh.");
 		}
-   }
-   
-   public void bookmark(pyFolder folder) {
-   	if (!folder.isBookmark) {
+	}
+
+	public void bookmark(pyFolder folder) {
+		if (!folder.isBookmark) {
 			// if the renderer can't play the VirtualVideoAction it may send repeated requests
 			if (folder.uri.equals(lasturi)) return;
 			lasturi = folder.uri;
 			bookmarks.add(folder);
-   	} else {
-   		bookmarks.remove(folder);
-   	}
-   }
+		} else {
+			bookmarks.remove(folder);
+		}
+	}
 
 	public Object dbgpack_cb() {
 		return new String[] {jumpylog, jumpyconf};
@@ -246,7 +246,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 class quickLog extends PrintStream {
 	private static String tag;
 	public static boolean stdout = false;
-	
+
 	public quickLog(FileOutputStream log, String tag) {
 		super(log);
 		this.tag = tag;
