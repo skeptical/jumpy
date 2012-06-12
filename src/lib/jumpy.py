@@ -32,12 +32,12 @@ except NameError:
 	__builtin__.PMS_FOLDERNAME = 7;
 
 # wrapper to flatten the argv list into a tokenized string
-def pms_addItem(t, name, argv, thumb):
+def pms_addItem(t, name, argv, thumb = None):
 	if type(argv).__name__ == 'list':
 		a = []
 		for arg in argv:
-			a.append(arg.replace('|','||'))
-		argv = ' | '.join(a)
+			a.append(arg.replace(' , ',' ,, '))
+		argv = '[%s]' % ' , '.join(a)
 	pms._addItem(t, name, argv, thumb)
 
 # convenience wrappers
@@ -84,4 +84,31 @@ class flushed(object):
 sys.stdout = flushed(sys.stdout)
 
 __builtin__.sys = sys
+
+
+if __name__ == "__main__" and len(sys.argv) > 1:
+
+	# we're running via system call:
+	# interpret the args as a function call and see what happens
+
+	args = []
+	for arg in sys.argv[2:]:
+		# check if it's a constant
+		if arg[0:4] == "PMS_":
+			try:
+				args.append(str(eval(arg)))
+				continue
+			except: pass
+		# it must be a string
+		args.append(repr(arg))
+
+	code = 'output=pms_%s(%s)' % (sys.argv[1], ','.join(args))
+	sys.stderr.write("calling pms.%s\n" % code[11:])
+
+	try:
+		exec code
+		if output: print output
+	except:
+		sys.stderr.write("Error: invalid syntax.\n")
+		sys.exit(-1)
 

@@ -43,17 +43,17 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	private PMS pms;
 	private PmsConfiguration configuration;
 	private Properties conf = null;
-	public String home, jumpylog, jumpyconf, bookmarksini, lasturi;
+	public String home, jumpylog, jumpyconf, bookmarksini, scriptsini, lasturi;
 	public boolean debug, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
-	public String pypath;
+	public String syspath;
 	private FileOutputStream logfile;
 	private quickLog logger;
-	private py python;
 	private File[] scripts;
-	public pyFolder top, util;
+	public scriptFolder top, util;
 	private bookmarker bookmarks;
+	private userscripts userscripts;
 
 	public jumpy() {
 		pms = PMS.get();
@@ -64,6 +64,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
 		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
+		scriptsini = configuration.getProfileDirectory() + File.separator + appName + "-scripts.ini";
 
 		try {
 			jumpylog = new File(LoggingConfigFileLoader.getLogFilePaths().get("debug.log"))
@@ -73,23 +74,50 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		logger = new quickLog(logfile, "[jumpy] ");
 		logger.stdout = debug;
 
-		py.python = (String)configuration.getCustomProperty("python.path");
-		py.out = logger;
-		py.version = version;
-		python = new py();
-		pypath = home + "lib";
+		if (configuration.getCustomProperty("python.path") == null) {
+			log("%n%n%nWARNING: No 'python.path' setting found in PMS.conf.%n%n%n");
+		}
+
+		runner.pms = home + "lib" + File.separatorChar + "jumpy.py";
+		runner.out = logger;
+		runner.version = version;
+		syspath = home + "lib";
 
 		log(new Date().toString());
 		log("%n");
 		log("initializing jumpy " + version, true);
 		log("%n");
+
+		String scriptexts = (String)configuration.getCustomProperty("script.filetypes");
+		if (scriptexts != null) {
+			for (String ext : scriptexts.split(",")) {
+				String interpreter = (String)configuration.getCustomProperty(ext + ".interpreter");
+				if (interpreter == null) {
+					log("WARNING: add a '" + ext + ".interpreter' setting to PMS.conf if you want automatic '" + ext + "' script support.");
+				} else {
+					log("registering " + interpreter + " to interpret ." + ext + " scripts.");
+				}
+				runner.interpreters.put(ext, interpreter);
+			}
+		}
+
+		Object path;
+		for (String interpreter : runner.interpreters.values()) {
+			if ((path = configuration.getCustomProperty(interpreter + ".path")) != null) {
+				log("setting " + interpreter + " to " + (String)path);
+				runner.putexec(interpreter, (String)path);
+			}
+		}
+
+		log("%n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
 		log("conf=" + jumpyconf, true);
 		log("bookmarks=" + bookmarksini, true);
+		log("userscripts=" + bookmarksini, true);
 		log("refresh=" + refresh, true);
-		log("python=" + py.python, true);
-		log("pypath=" + pypath, true);
+		log("python=" + runner.getexec("python"), true);
+		log("pypath=" + syspath, true);
 		log("%n");
 
 		scripts = new File(home).listFiles(
@@ -101,14 +129,16 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		);
 
 		log("Adding root folder.", true);
-		top = new pyFolder(this, "Jumpy", null, null, pypath);
+		top = new scriptFolder(this, "Jumpy", null, null, syspath);
 
 		if (showBookmarks) {
 			bookmarks = new bookmarker(this);
 		}
 
+		userscripts = new userscripts(this);
+
 		if (refresh != 0) {
-			util = new pyFolder(this, "Util", null, null, pypath);
+			util = new scriptFolder(this, "Util", null, null, syspath);
 			top.addChild(util);
 			final jumpy me = this;
 			util.addChild(new VirtualVideoAction("Refresh", true) {
@@ -120,19 +150,23 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			refresh(false);
 		}
 
-		log("Found " + scripts.length + " scripts.", true);
+		userscripts.autostart();
 
+		log("%n");
+		log("Found " + scripts.length + " python scripts.", true);
+
+		runner ex = new runner();
 		for (File script:scripts) {
 			log("%n");
-			log("loading " + script.getName() + ".", true);
+			log("starting " + script.getName() + ".", true);
 			log("%n");
-			python.run(top, script.getPath(), pypath);
+			ex.run(top, "[" + script.getPath() + "]", syspath);
 			top.env.clear();
 		}
 
 		for (DLNAResource item : top.getChildren()) {
-			if (item instanceof pyFolder) {
-				((pyFolder)item).canBookmark = false;
+			if (item instanceof scriptFolder) {
+				((scriptFolder)item).canBookmark = false;
 			}
 		}
 	}
@@ -194,10 +228,10 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		} catch (IOException e) {}
 	}
 
-	public void refreshChildren(pyFolder folder) {
+	public void refreshChildren(scriptFolder folder) {
 		for (DLNAResource item : folder.getChildren()) {
-			if (item instanceof pyFolder) {
-				((pyFolder)item).refresh();
+			if (item instanceof scriptFolder) {
+				((scriptFolder)item).refresh();
 			}
 		}
 	}
@@ -226,7 +260,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		}
 	}
 
-	public void bookmark(pyFolder folder) {
+	public void bookmark(scriptFolder folder) {
 		if (!folder.isBookmark) {
 			// if the renderer can't play the VirtualVideoAction it may send repeated requests
 			if (folder.uri.equals(lasturi)) return;

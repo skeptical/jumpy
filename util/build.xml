@@ -7,7 +7,7 @@
 	<property name="dist" location="../dist"/>
 
 	<path id="lib.path.ref">
-		<fileset id="libs.ref" dir="../lib" includes="py4j*.jar"/>
+		<fileset id="libs.ref" dir="../lib" includes="py4j*.jar commons-exec*.jar"/>
 	</path>
 
 	<target name="init">
@@ -17,7 +17,7 @@
 
 	<target name="compile" depends="init"
 				description="compile the source " >
-		<javac srcdir="${src}:${src2}" destdir="${build}" classpathref="lib.path.ref" includes="jumpstart.java py.java jumpyAPI.java">
+		<javac srcdir="${src}:${src2}" destdir="${build}" classpathref="lib.path.ref" includes="jumpstart.java runner.java jumpyAPI.java">
 		</javac>
 	</target>
 
@@ -25,7 +25,8 @@
 				description="generate the distribution" >
 		<jar jarfile="${jumpstart.jar}" basedir="${build}">
 		<manifest>
-		  <attribute name="Main-Class" value="jumpstart" />
+			<attribute name="Main-Class" value="jumpstart" />
+			<attribute name="Class-Path" value="py4j0.7.jar ini4j-0.5.2.jar /commons-exec-1.1.jar"/>
 		</manifest>
 		</jar>
 		<mkdir dir="${dist}/jumpy/lib"/>

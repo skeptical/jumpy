@@ -1,19 +1,22 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.net.URLDecoder;
 
-import net.pms.external.infidel.jumpy.py;
+import org.apache.commons.exec.util.StringUtils;
+
+import net.pms.external.infidel.jumpy.runner;
 import net.pms.external.infidel.jumpy.jumpyAPI;
 
 public class jumpstart {
 
-	static py py;
+	static runner ex;
 
 	public static void main(String[] argv) {
 
-		py = new py();
-		py.version = "0.1.3";
+		ex = new runner();
+		ex.version = "0.1.3";
 		class item {
 			public int type;
 			public String name, uri, thumb, path;
@@ -44,7 +47,7 @@ public class jumpstart {
 				System.out.println("util: " + apiName[action] +  ", " + data);
 				switch (action) {
 					case VERSION:
-						return jumpstart.py.version;
+						return jumpstart.ex.version;
 					case PLUGINJAR:
 						return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 					case FOLDERNAME:
@@ -65,7 +68,8 @@ public class jumpstart {
 			System.exit(1);
 		}
 
-		File script = new File(argv.length > 0 ? argv[0] : "default.py");
+		ex.scriptarg = argv.length-1;
+		File script = new File(argv[argv.length-1]);
 		if (! script.exists()) {
 			System.err.printf("'%s' not found.\nUsage: jumpstart <scriptfile>\n", script.getPath());
 			System.exit(1);
@@ -90,15 +94,18 @@ public class jumpstart {
 			home = URLDecoder.decode(home, "UTF-8");
 		} catch (Exception e) {}
 
-//		apiobj obj = new apiobj(home + File.separatorChar + ".." + File.separatorChar + "src" + File.separatorChar + "lib");
 		// jumpy.py is always located alongside the jar
+		ex.pms = home + File.separatorChar + "jumpy.py";
 		apiobj obj = new apiobj(home);
-		String uri = script.getAbsolutePath();
+		if (argv.length == 1) {
+			argv[0] = "\"" + argv[0] + "\"";
+		}
+		String uri = "[" + StringUtils.toString(argv, " , ") + "]";
 		String log = "";
 
 		while (true) {
 			obj.items.clear();
-			py.run(obj, uri, obj.path, obj.env);
+			ex.run(obj, uri, obj.path, obj.env);
 			int size = obj.items.size();
 			if (size == 0) break;
 

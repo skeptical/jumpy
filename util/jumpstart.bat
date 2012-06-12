@@ -8,5 +8,5 @@ set lib=%~dp0\lib
 if not "%path_set%"=="yes" set path=%PYTHON%;%PATH%
 set path_set=yes
 
-%JAVA_HOME%\bin\java.exe -cp "%lib%/jumpstart.jar;%lib%/py4j0.7.jar" jumpstart %*
+%JAVA_HOME%\bin\java.exe -cp "%lib%/jumpstart.jar;%lib%/py4j0.7.jar;%lib%/commons-exec-1.1.jar" jumpstart %*
 

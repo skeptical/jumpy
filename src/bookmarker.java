@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 
 import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
@@ -13,13 +15,15 @@ import net.pms.dlna.DLNAResource;
 
 public class bookmarker {
 	private jumpy jumpy;
-	public pyFolder bookmarks;
+	public scriptFolder bookmarks;
 	public boolean verbose = true;
 	private String bookmarksini;
 
+	static List<String> temporal = Arrays.asList(new String[]{"pms", "PYTHONPATH", "JGATEWAY"});
+
 	public bookmarker(jumpy jumpy) {
 		this.jumpy = jumpy;
-		bookmarks = new pyFolder(jumpy, "Bookmarks", null, null, jumpy.pypath);
+		bookmarks = new scriptFolder(jumpy, "Bookmarks", null, null, jumpy.syspath);
 		bookmarks.refreshAlways = true;
 		jumpy.top.addChild(bookmarks);
 		bookmarksini = jumpy.bookmarksini;
@@ -27,9 +31,9 @@ public class bookmarker {
 		load();
 	}
 
-	public void add(pyFolder folder) {
+	public void add(scriptFolder folder) {
 		String name = folder.getName();
-		pyFolder bookmark = new pyFolder(folder);
+		scriptFolder bookmark = new scriptFolder(folder);
 		bookmark.isBookmark = true;
 		if (verbose) {
 			name += (" :" + topName(folder));
@@ -40,7 +44,7 @@ public class bookmarker {
 		store();
 	}
 
-	public void remove(pyFolder folder) {
+	public void remove(scriptFolder folder) {
 		String name = folder.getName();
 		bookmarks.getChildren().remove(folder);
 		jumpy.log("Removing bookmark: " + name);
@@ -51,14 +55,32 @@ public class bookmarker {
 		Wini ini = new Wini();
 		ini.getConfig().setMultiSection(true);
 		ini.setFile(new File(bookmarksini));
+		boolean oldstyle = false;
 		try {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
 			jumpy.log("Reading bookmark: " + section.getName());
-			pyFolder bookmark = new pyFolder(jumpy, section.getName(), section);
+
+			// temporary old-style conversion support, to be removed
+			if (section.containsKey("pypath")) {
+				oldstyle = true;
+				section.put("syspath", section.get("pypath"));
+				section.remove("pypath");
+				section.put("uri", "[" + section.get("uri")
+					.replace(" , ", " ,, ")
+					.replace(" | ", " , ")
+					.replace("||", "|") + "]");
+			}
+
+			scriptFolder bookmark = new scriptFolder(jumpy, section.getName(), section);
 			bookmark.isBookmark = true;
 			bookmarks.addChild(bookmark);
+		}
+		// temporary old-style conversion support, to be removed
+		if (oldstyle) {
+			jumpy.log("Converted old-style bookmarks.");
+			store();
 		}
 	}
 
@@ -68,15 +90,18 @@ public class bookmarker {
 			ini.getConfig().setMultiSection(true);
 			ini.setFile(new File(bookmarksini));
 			for (DLNAResource item : bookmarks.getChildren()) {
-				pyFolder bookmark = (pyFolder)item;
+				scriptFolder bookmark = (scriptFolder)item;
 				String name = bookmark.getName();
 				Section section = ini.add(name);
 				section.put("uri", bookmark.uri);
 				section.put("thumbnail", bookmark.thumbnail);
-				section.put("pypath", bookmark.pypath);
+				section.put("syspath", bookmark.syspath);
 				if (bookmark.env != null && !bookmark.env.isEmpty()) {
 					for (Map.Entry<String,String> var : bookmark.env.entrySet()) {
-						section.put(var.getKey(), var.getValue());
+						String key = var.getKey();
+						if (! temporal.contains(key)) {
+							section.put(key, var.getValue());
+						}
 					}
 				}
 			}
@@ -84,7 +109,7 @@ public class bookmarker {
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 	}
 
-	public String topName(pyFolder folder) {
+	public String topName(scriptFolder folder) {
 		return folder.getXMBPath(folder, jumpy.top).split("/")[0].replace("[xbmc]","").trim();
 	}
 }

@@ -20,45 +20,45 @@ import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
 
 
-public class pyFolder extends VirtualFolder implements jumpyAPI {
+public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	public String uri, thumbnail;
-	public String basepath = null, pypath = null;
+	public String basepath = null, syspath = null;
 	public Map<String,String> env;
 	private jumpy jumpy;
-	private py python;
+	private runner ex;
 
 	public boolean canBookmark = true;
 	public boolean isBookmark = false;
 	public boolean refreshOnce = true;
 	public boolean refreshAlways = false;
 
-	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon) {
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon) {
 		this(jumpy, name, uri, thumbnailIcon, null, null);
 	}
 
-	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath) {
-		this(jumpy, name, uri, thumbnailIcon, pypath, null);
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String syspath) {
+		this(jumpy, name, uri, thumbnailIcon, syspath, null);
 	}
 
-	public pyFolder(pyFolder other) {
-		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.pypath, other.env);
+	public scriptFolder(scriptFolder other) {
+		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.syspath, other.env);
 	}
 
-	public pyFolder(jumpy jumpy, String name, Map<String,String> m) {
-		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("pypath"), m);
+	public scriptFolder(jumpy jumpy, String name, Map<String,String> m) {
+		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("syspath"), m);
 	}
 
-	public pyFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String pypath, Map<String,String> env) {
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String syspath, Map<String,String> env) {
 		super(name, thumbnailIcon);
 		this.jumpy = jumpy;
 		this.thumbnail = thumbnailIcon;
 		this.uri = uri;
-		this.basepath = this.pypath = pypath;
+		this.basepath = this.syspath = syspath;
 		this.env = new HashMap<String,String>();
 		if (env != null && !env.isEmpty()) {
 			this.env.putAll(env);
 		}
-		this.python = new py();
+		this.ex = new runner();
 		this.refreshAlways = (jumpy.refresh == 0);
 	}
 
@@ -73,7 +73,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		}
 		getChildren().clear();
 		if (jumpy.showBookmarks && canBookmark) {
-			final pyFolder me = this;
+			final scriptFolder me = this;
 			addChild(new VirtualVideoAction((isBookmark ? "Delete" : "Add") + " bookmark", true) {
 				public boolean enable() {
 					jumpy.bookmark(me);
@@ -83,7 +83,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		}
 		jumpy.log("%n");
 		jumpy.log("Opening folder: " + name + ".%n");
-		python.run(this, uri, pypath, env);
+		ex.run(this, uri, syspath, env);
 		refreshOnce = false;
 	}
 
@@ -101,6 +101,22 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		return true;
 	}
 
+	public static DLNAResource mkdirs(DLNAResource root, String path) {
+		DLNAResource parent = root, child;
+		boolean exists = true;
+		for (String dir:path.split("/")) {
+			if (exists && (child = parent.searchByName(dir)) != null) {
+				parent = child;
+			} else {
+//				jumpy.log("adding folder: " + dir);
+				parent.addChild(new VirtualFolder(dir, null));
+//				parent.addChild(new scriptFolder(jumpy, dir, null));
+				parent = parent.searchByName(dir);
+				exists = false;
+			}
+		}
+		return parent;
+	}
 
 	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
 		DLNAResource p = folder;
@@ -132,11 +148,11 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		switch (type) {
 			case FOLDER:
 				media = "folder";
-				addChild(new pyFolder(jumpy, name, uri, thumb, pypath, env));
+				addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
 				break;
 			case UNRESOLVED:
 				media = "unresolved item";
-				addChild(new pyFolder(jumpy, name, uri, thumb, pypath, env));
+				addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
 				break;
 			case Format.VIDEO:
 				media = "video";
@@ -181,7 +197,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 
 	@Override
 	public void setPath(String dir) {
-		pypath = (dir == null ? basepath : pypath + File.pathSeparator + dir);
+		syspath = (dir == null ? basepath : syspath + File.pathSeparator + dir);
 	}
 
 	@Override
@@ -201,7 +217,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 		jumpy.log("util: " + apiName[action] +  ", " + data);
 		switch (action) {
 			case VERSION:
-				return py.version;
+				return ex.version;
 			case HOME:
 				return jumpy.home;
 			case PROFILEDIR:
@@ -212,7 +228,7 @@ public class pyFolder extends VirtualFolder implements jumpyAPI {
 				return this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 			case RESTART:
 				try {
-					python.shutdown();
+					ex.shutdown();
 					PMS.get().reset();
 				} catch(Exception e) {e.printStackTrace();}
 				break;
