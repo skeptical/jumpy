@@ -26,7 +26,8 @@ public interface jumpyAPI {
 	public void setEnv(String name, String val);
 
 	public static final String[] apiName = {"",
-		"VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART", "FOLDERNAME"};
+		"VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART", "FOLDERNAME",
+		"GETPROPERTY", "SETPROPERTY"};
 	public static final int VERSION = 1;
 	public static final int HOME = 2;
 	public static final int PROFILEDIR = 3;
@@ -34,8 +35,10 @@ public interface jumpyAPI {
 	public static final int PLUGINJAR = 5;
 	public static final int RESTART = 6;
 	public static final int FOLDERNAME = 7;
+	public static final int GETPROPERTY = 8;
+	public static final int SETPROPERTY = 9;
 
-	public String util(int action, String data);
+	public String util(int action, String arg1, String arg2);
 }
 
 

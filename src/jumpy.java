@@ -41,7 +41,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public static final String version = "0.1.8";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
-	private PmsConfiguration configuration;
+	public PmsConfiguration configuration;
 	private Properties conf = null;
 	public String home, jumpylog, jumpyconf, bookmarksini, scriptsini, lasturi;
 	public boolean debug, showBookmarks, verboseBookmarks;

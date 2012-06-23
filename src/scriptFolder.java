@@ -212,12 +212,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	}
 
 	@Override
-	public String util(int action, String data) {
+	public String util(int action, String arg1, String arg2) {
 
-		jumpy.log("util: " + apiName[action] +  ", " + data);
+		jumpy.log("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
 		switch (action) {
 			case VERSION:
-				return ex.version;
+				return jumpy.version;
 			case HOME:
 				return jumpy.home;
 			case PROFILEDIR:
@@ -234,6 +234,10 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				break;
 			case FOLDERNAME:
 				return this.getName();
+			case GETPROPERTY:
+				return (String)PMS.get().getConfiguration().getCustomProperty(arg1);
+			case SETPROPERTY:
+				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
 		}
 		return "";
 	}

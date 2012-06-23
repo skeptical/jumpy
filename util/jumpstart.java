@@ -43,8 +43,8 @@ public class jumpstart {
 				if (name == null && val == null ) env.clear();
 				else env.put(name, val);
 			}
-			public String util(int action, String data) {
-				System.out.println("util: " + apiName[action] +  ", " + data);
+			public String util(int action, String arg1, String arg2) {
+				System.out.println("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
 				switch (action) {
 					case VERSION:
 						return jumpstart.ex.version;

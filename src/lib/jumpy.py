@@ -6,7 +6,9 @@ try: pms
 except NameError:
 	host, port = os.environ['JGATEWAY'].split(':')
 	client = GatewayClient(address=host, port=int(port))
-	__builtin__.pms = JavaGateway(client).entry_point
+	gateway = JavaGateway(client)
+	__builtin__.pms = gateway.entry_point
+#	__builtin__.pms = JavaGateway(client).entry_point
 	__builtin__.pms._addItem = pms.addItem
 	# new constants:
 	__builtin__.PMS_UNRESOLVED = -2
@@ -30,6 +32,8 @@ except NameError:
 	__builtin__.PMS_PLUGINJAR = 5;
 	__builtin__.PMS_RESTART = 6;
 	__builtin__.PMS_FOLDERNAME = 7;
+	__builtin__.PMS_GETPROPERTY = 8;
+	__builtin__.PMS_SETPROPERTY = 9;
 
 # wrapper to flatten the argv list into a tokenized string
 def pms_addItem(t, name, argv, thumb = None):
@@ -41,29 +45,42 @@ def pms_addItem(t, name, argv, thumb = None):
 	pms._addItem(t, name, argv, thumb)
 
 # convenience wrappers
-def pms_util(action, data = None):
-	return pms.util(action, data)
+def pms_util(action, arg1=None, arg2=None):
+	return pms.util(action, arg1, arg2)
+
+# 'varargs' version to use with 'String...' on java side:
+#def pms_util(action, *args):
+#	argarray = JavaGateway(client).new_array(gateway.jvm.java.lang.String, len(args))
+#	for i in range(len(args)):
+#		argarray[i] = args[i]
+#	return pms.util(action, argarray)
 
 def pms_version():
-	return pms.util(PMS_VERSION, None)
+	return pms_util(PMS_VERSION)
 
 def pms_getHome():
-	return pms.util(PMS_HOME, None)
+	return pms_util(PMS_HOME)
 
 def pms_getProfileDir():
-	return pms.util(PMS_PROFILEDIR, None)
+	return pms_util(PMS_PROFILEDIR)
 
 def pms_getLogDir():
-	return pms.util(PMS_LOGDIR, None)
+	return pms_util(PMS_LOGDIR)
 
 def pms_getPluginJar():
-	return pms.util(PMS_PLUGINJAR, None)
+	return pms_util(PMS_PLUGINJAR)
 
 def pms_restart():
-	return pms.util(PMS_RESTART, None)
+	return pms_util(PMS_RESTART)
 
 def pms_getFolderName():
-	return pms.util(PMS_FOLDERNAME, None)
+	return pms_util(PMS_FOLDERNAME)
+
+def pms_getProperty(key):
+	return pms_util(PMS_GETPROPERTY, key)
+
+def pms_setProperty(key, val):
+	pms_util(PMS_SETPROPERTY, key, val)
 
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.version = pms_version
@@ -73,6 +90,8 @@ __builtin__.pms.getLogDir = pms_getLogDir
 __builtin__.pms.getPluginJar = pms_getPluginJar
 __builtin__.pms.restart = pms_restart
 __builtin__.pms.getFolderName = pms_getFolderName
+__builtin__.pms.getProperty = pms_getProperty
+__builtin__.pms.setProperty = pms_setProperty
 
 # flush regularly to stay in sync with java output
 class flushed(object):
