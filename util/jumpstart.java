@@ -33,8 +33,9 @@ public class jumpstart {
 			apiobj(String p) {
 				basepath = path = p; items = new ArrayList<item>();
 			}
-			public void addItem(int type, String name, String uri, String thumb) {
-				items.add(new item(type, name, uri, thumb, path));
+			public void addItem(int type, String filename, String uri, String thumb) {
+				// TODO: path syntax in filename + tree structure?
+				items.add(new item(type, filename, uri, thumb, path));
 			}
 			public void setPath(String dir) {
 				path = (dir == null ? basepath : path + File.pathSeparator + dir);

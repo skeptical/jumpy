@@ -32,9 +32,13 @@ public class userscripts {
 		try {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
-		String path;
+		String path, alt;
 		for (Section section : ini.values()) {
 			jumpy.log("Adding user script: " + section.getName());
+
+			if ((alt = section.get("cmd")) != null && alt.startsWith("pms ")) {
+				section.put("cmd", runner.getpms() + alt.substring(3));
+			}
 
 			if ((path = section.remove("folder")) != null) {
 				DLNAResource folder = scriptFolder.mkdirs(jumpy.top, path);
