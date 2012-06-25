@@ -2,6 +2,8 @@ import os, os.path, sys, imp
 import __builtin__
 from py4j.java_gateway import GatewayClient, JavaGateway
 
+print "python %s.%s.%s" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
+
 try: pms
 except NameError:
 	host, port = os.environ['JGATEWAY'].split(':')
