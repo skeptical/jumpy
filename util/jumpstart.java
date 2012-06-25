@@ -2,9 +2,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.HashMap;
 import java.net.URLDecoder;
 
 import org.apache.commons.exec.util.StringUtils;
+//import org.apache.commons.io.FilenameUtils;
 
 import net.pms.external.infidel.jumpy.runner;
 import net.pms.external.infidel.jumpy.jumpyAPI;
@@ -12,56 +14,14 @@ import net.pms.external.infidel.jumpy.jumpyAPI;
 public class jumpstart {
 
 	static runner ex;
+	public static item root = null;
 
 	public static void main(String[] argv) {
 
-		ex = new runner();
-		ex.version = "0.1.3";
-		class item {
-			public int type;
-			public String name, uri, thumb, path;
-			item(int type, String name, String uri, String thumb, String path) {
-				this.type = type; this.name = name; this.uri = uri; this.thumb = thumb; this.path = path;
-			}
-			// TODO: env
-		}
+		if (argv.length == 0) usage();
 
-		class apiobj implements jumpyAPI {
-			public ArrayList<item> items;
-			public String basepath, path, name = "Item";
-			private Map<String,String> env;
-			apiobj(String p) {
-				basepath = path = p; items = new ArrayList<item>();
-			}
-			public void addItem(int type, String filename, String uri, String thumb) {
-				// TODO: path syntax in filename + tree structure?
-				items.add(new item(type, filename, uri, thumb, path));
-			}
-			public void setPath(String dir) {
-				path = (dir == null ? basepath : path + File.pathSeparator + dir);
-			}
-			public void setEnv(String name, String val) {
-				if (name == null && val == null ) env.clear();
-				else env.put(name, val);
-			}
-			public String util(int action, String arg1, String arg2) {
-				System.out.println("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
-				switch (action) {
-					case VERSION:
-						return jumpstart.ex.version;
-					case PLUGINJAR:
-						return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-					case FOLDERNAME:
-						return this.name;
-					case HOME:
-					case PROFILEDIR:
-					case LOGDIR:
-					case RESTART:
-						break;
-				}
-				return "";
-			}
-		}
+		ex = new runner();
+		ex.version = "0.2.0";
 
 		Console c = System.console();
 		if (c == null) {
@@ -72,13 +32,13 @@ public class jumpstart {
 		ex.scriptarg = argv.length-1;
 		File script = new File(argv[argv.length-1]);
 		if (! script.exists()) {
-			System.err.printf("'%s' not found.\nUsage: jumpstart <scriptfile>\n", script.getPath());
-			System.exit(1);
+			System.err.printf("'%s' not found.\n", script.getPath());
+			usage();
 		}
 
+		String[] hist = new String[32];
+		int level = 0, last = 0;
 		File logfile = new File("jumpstart.log");
-		int r = 0;
-		String[] hist = new String[0];
 		if (logfile.exists()) {
 			byte[] b = new byte[(int)logfile.length()];
 			try {
@@ -86,7 +46,10 @@ public class jumpstart {
 				l.read(b);
 				l.close();
 			} catch (Exception e) {}
-			hist = new String(b).split(" ");
+			String[] l = new String(b).trim().split(" +");
+			last = l.length;
+			for (int i=0; i<last; i++)
+				hist[i] = l[i];
 		}
 
 		// get the current jar's location from a static context (isn't java lovely?)
@@ -97,22 +60,25 @@ public class jumpstart {
 
 		// jumpy.py is always located alongside the jar
 		ex.pms = home + File.separatorChar + "jumpy.py";
-		apiobj obj = new apiobj(home);
+
 		if (argv.length == 1) {
 			argv[0] = "\"" + argv[0] + "\"";
 		}
-		String uri = "[" + StringUtils.toString(argv, " , ") + "]";
-		String log = "";
+		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
+			home + File.separatorChar + "lib", null);
+		item current = root;
 
 		while (true) {
-			obj.items.clear();
-			ex.run(obj, uri, obj.path, obj.env);
-			int size = obj.items.size();
+			if (! current.discovered) {
+				ex.run(current, current.uri, current.syspath, current.env);
+				current.discovered = true;
+			}
+			int size = current.children.size();
 			if (size == 0) break;
 
 			c.printf("\n------------- MENU -------------\n");
 			for (int i=0; i<size; i++) {
-				item x = obj.items.get(i);
+				item x = (item)current.get(i);
 				String type = "";
 				switch (x.type) {
 					case   -2: type = " (UNRESOLVED)"; break;
@@ -132,39 +98,158 @@ public class jumpstart {
 				}
 				c.printf("  [%d] %s%s\n", i+1, x.name, type);
 			}
-			boolean def = (hist.length > 0 && r < hist.length);
-			String sel = c.readLine("Choose an item or 'q' to quit [" + (def ? hist[r] : "q") + "]: ");
+			String sel = c.readLine("Choose an item, u=up h=home q=quit [" + (level < last ? hist[level] : "q") + "]: ");
 			if (sel.equals("q")) break;
-			if (sel.equals("")) {
-				if (!def) break;
-				sel = hist[r++];
-			} else {
-				hist = new String[0];
+			if (sel.equals("u")){
+				if (level > 0) {
+					current = (item)current.parent;
+					level--;
+				}
+				continue;
 			}
-			log = log + sel + " ";
+			if (sel.equals("h")){
+				current = root;
+				level = 0;
+				continue;
+			}
+			if (sel.equals("")) {
+				if (level >= last) break;
+				sel = hist[level++];
+			} else {
+				hist[level++] = sel;
+				last = level;
+			}
 
 			try {
 				int s = Integer.parseInt(sel)-1;
 				assert s > 0 && s < size;
-				item i = obj.items.get(s);
+				current = (item)current.get(s);
 				c.printf("--------------------------------\ntype : %d\nname : %s\nuri  : %s\nthumb: %s\n--------------------------------\n",
-					i.type, i.name, i.uri, i.thumb);
-				if (i.type > 0) break;
-
-				uri = i.uri;
-				obj.path = i.path;
-				obj.name = i.name;
+					current.type, current.name, current.uri, current.thumb);
+				if (current.type > 0) break;
 			} catch (Exception e) {
 				System.err.printf("Invalid selection: %s\n", sel);
 				break;
 			}
 		}
-//		c.printf("log: %s\n", log);
 		try {
+			String log = "";
+			for (int i=0; i<last; i++)
+				log = log + hist[i] + " ";
+//			c.printf("log: %s\n", log);
 			FileOutputStream l = new FileOutputStream(logfile);
-			l.write(log.getBytes());
+			l.write(log.trim().getBytes());
 			l.close();
 		} catch (Exception e) {}
 	}
+
+	public static void usage() {
+		System.err.printf("Usage: jumpstart <scriptfile>\n");
+		System.exit(1);
+	}
 }
+
+class node {
+	public ArrayList<node> children = new ArrayList<node>();
+	public node parent = null;
+	public String name;
+	public void add(node child) {
+		child.parent = this;
+		if (!children.contains(child))
+			children.add(child);
+	}
+	private void remove(node child) {
+		if (children.contains(child))
+			children.remove(child);
+	}
+	public node get(int index) {
+		return children.get(index);
+	}
+	public node get(String name) {
+		for (node child : children)
+			if (name.equals(child.name))
+				return child;
+		return null;
+	}
+}
+
+class item extends node implements jumpyAPI {
+
+	public int type;
+	public String uri, thumb, syspath, basepath;
+	public Map<String,String> env;
+	public boolean discovered;
+
+	item(int type, String name, String uri, String thumb, String syspath, Map<String,String> env) {
+		this.type = type; this.name = name; this.uri = uri; this.thumb = thumb;
+		this.basepath = this.syspath = syspath;
+		this.env = new HashMap<String,String>();
+		if (env != null && !env.isEmpty()) {
+			this.env.putAll(env);
+		}
+		this.discovered = false;
+	}
+
+	public void addItem(int type, String filename, String uri, String thumb) {
+		item folder = this;
+		String name = filename;
+		if (filename.contains("/")) {
+			File f = new File(filename);
+			name = f.getName();
+			String path = f.getParent();
+			if (path != null) {
+				folder = mkdirs(f.isAbsolute() ? jumpstart.root : this, path);
+			}
+//			name = FilenameUtils.getName(filename);
+//			String path = FilenameUtils.getPath(filename);
+//			if (path != null) {
+//				folder = mkdirs(FilenameUtils.getPrefixLength(filename) == 0 ? this : jumpstart.root, path);
+//			}
+		}
+		folder.add(new item(type, name, uri, thumb, syspath, env));
+	}
+	public void setPath(String dir) {
+		syspath = (dir == null ? basepath : syspath + File.pathSeparator + dir);
+	}
+	public void setEnv(String name, String val) {
+		if (name == null && val == null ) env.clear();
+		else env.put(name, val);
+	}
+	public String util(int action, String arg1, String arg2) {
+		System.out.println("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
+		switch (action) {
+			case VERSION:
+				return jumpstart.ex.version;
+			case PLUGINJAR:
+				return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+			case FOLDERNAME:
+				return this.name;
+			case HOME:
+			case PROFILEDIR:
+			case LOGDIR:
+			case RESTART:
+			case GETPROPERTY:
+			case SETPROPERTY:
+				break;
+		}
+		return "";
+	}
+	public static item mkdirs(item root, String path) {
+		item parent = root, child;
+		boolean exists = true;
+		for (String dir:path.split("/")) {
+			if (exists && (child = (item)parent.get(dir)) != null) {
+				parent = child;
+			} else {
+				parent.add(new item(-1, dir, "", "", "", parent.env));
+				parent = (item)parent.get(dir);
+				parent.discovered = true;
+				exists = false;
+			}
+		}
+		return parent;
+	}
+}
+
+
 
