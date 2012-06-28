@@ -34,28 +34,28 @@ public class userscripts {
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		String path, alt;
 		for (Section section : ini.values()) {
-			jumpy.log("Adding user script: " + section.getName());
+			String name = section.getName();
+			jumpy.log("Adding user script: " + name);
 
 			if ((alt = section.get("cmd")) != null && alt.startsWith("pms ")) {
 				section.put("cmd", runner.getpms() + alt.substring(3));
 			}
 
-			if ((path = section.remove("folder")) != null) {
-				DLNAResource folder = scriptFolder.mkdirs(jumpy.top, path);
-				section.remove("autostart");
-				scriptFolder script = new scriptFolder(jumpy, section.getName(), section.remove("cmd"), section.remove("thumb"), jumpy.syspath, section);
-				folder.addChild(script);
+			if (! (name.startsWith("+") || name.startsWith("-"))) {
+				jumpy.top.addItem(jumpyAPI.FOLDER, name, section.remove("cmd"), section.remove("thumb")/*, section*/);
 			}
 		}
 	}
 
-	public void autostart() {
+	public void autorun(boolean startup) {
 		runner ex = new runner();
+		String flag = (startup ? "+" : "-");
+		String context = (startup ? "starting " : "finishing ");
 		for (Section section : ini.values()) {
-			boolean start = Boolean.valueOf(section.remove("autostart"));
-			if (start) {
+			String name = section.getName();
+			if (name.startsWith(flag)) {
 				jumpy.log("%n");
-				jumpy.log("starting " + section.getName() + ".", true);
+				jumpy.log(context + " " + name + ".", true);
 				jumpy.log("%n");
 				ex.run(jumpy.top, section.remove("cmd"), jumpy.syspath, section);
 				jumpy.top.env.clear();

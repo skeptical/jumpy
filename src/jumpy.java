@@ -150,7 +150,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			refresh(false);
 		}
 
-		userscripts.autostart();
+		userscripts.autorun(true);
 
 		log("%n");
 		log("Found " + scripts.length + " python scripts.", true);
@@ -199,6 +199,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	@Override
 	public void shutdown () {
+		userscripts.autorun(false);
 	}
 
 	public void readconf() {

@@ -166,7 +166,7 @@ public class runner {
 //		return run(obj, Arrays.asList(argv), syspath, myenv);
 //	}
 
-	private int run(jumpyAPI obj,List<String> argv, String syspath, Map<String,String> myenv) {
+	private int run(jumpyAPI obj, List<String> argv, String syspath, Map<String,String> myenv) {
 		jumpy = obj;
 		int exitValue = 0;
 		argv = fixArgs(argv);
