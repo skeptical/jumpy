@@ -23,6 +23,7 @@ public class runner {
 
 	public static String pms = "lib/jumpy.py";
 	private static boolean pmsok = false;
+	private static boolean quiet = false;
 	public static PrintStream out = System.out;
 	public static String version = "";
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
@@ -155,6 +156,19 @@ public class runner {
 		return null;
 	}
 
+	public void log(String str) {
+		if (! quiet) {
+			out.println(str);
+		}
+	}
+
+	public int quiet(jumpyAPI obj, String cmd, String syspath, Map<String,String> myenv) {
+		quiet = true;
+		int r = run(obj, cmd, syspath, myenv);
+		quiet = false;
+		return r;
+	}
+
 	public int run(jumpyAPI obj, String cmd, String syspath) {
 		return run(obj, split(cmd), syspath, null);
 	}
@@ -179,8 +193,8 @@ public class runner {
 		}
 
 		File startdir = absolute(argv.get(scriptarg)).getParentFile().getAbsoluteFile();
-		out.println("Running " + Arrays.toString(argv.toArray(new String[0])));
-		out.println("in directory '" + startdir.getAbsolutePath() + "'");
+		log("Running " + Arrays.toString(argv.toArray(new String[0])));
+		log("in directory '" + startdir.getAbsolutePath() + "'");
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder(argv);
@@ -192,7 +206,7 @@ public class runner {
 			}
 			if (myenv != null && !myenv.isEmpty()) {
 				for (Map.Entry<String,String> var : myenv.entrySet()) {
-					out.println(var.getKey() + "=" + var.getValue());
+					log(var.getKey() + "=" + var.getValue());
 				}
 				env.putAll(myenv);
 			}

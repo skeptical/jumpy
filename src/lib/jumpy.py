@@ -1,8 +1,6 @@
-import os, os.path, sys, imp
+import os, os.path, sys, imp, traceback
 import __builtin__
 from py4j.java_gateway import GatewayClient, JavaGateway
-
-print "python %s.%s.%s" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro)
 
 try: pms
 except NameError:
@@ -84,6 +82,9 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
+def pms_setEnv(name, val):
+	pms.setEnv(name, val)
+
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.version = pms_version
 __builtin__.pms.getHome = pms_getHome
@@ -107,7 +108,10 @@ sys.stdout = flushed(sys.stdout)
 __builtin__.sys = sys
 
 
-if __name__ == "__main__" and len(sys.argv) > 1:
+if __name__ == "__main__" and len(sys.argv) == 1:
+	sys.stderr.write("python %s.%s.%s\n" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+
+elif __name__ == "__main__":
 
 	# we're running via system call:
 	# interpret the args as a function call and see what happens
@@ -130,6 +134,8 @@ if __name__ == "__main__" and len(sys.argv) > 1:
 		exec code
 		if output: print output
 	except:
+		traceback.print_exc(file=sys.stderr)
 		sys.stderr.write("Error: invalid syntax.\n")
 		sys.exit(-1)
+
 

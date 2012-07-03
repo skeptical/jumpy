@@ -118,6 +118,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("refresh=" + refresh, true);
 		log("python=" + runner.getexec("python"), true);
 		log("pypath=" + syspath, true);
+
+		runner ex = new runner();
+		ex.quiet(top, "[" + runner.pms + "]", syspath, null);
 		log("%n");
 
 		scripts = new File(home).listFiles(
@@ -135,7 +138,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			bookmarks = new bookmarker(this);
 		}
 
-		userscripts = new userscripts(this);
 
 		if (refresh != 0) {
 			util = new scriptFolder(this, "Util", null, null, syspath);
@@ -150,12 +152,12 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			refresh(false);
 		}
 
+		userscripts = new userscripts(this);
 		userscripts.autorun(true);
 
 		log("%n");
 		log("Found " + scripts.length + " python scripts.", true);
 
-		runner ex = new runner();
 		for (File script:scripts) {
 			log("%n");
 			log("starting " + script.getName() + ".", true);
