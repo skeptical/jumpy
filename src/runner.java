@@ -35,6 +35,7 @@ public class runner {
 
 	public static HashMap<String,String> interpreters = new HashMap<String,String>() {{
 		put("py", "python");
+		put("sh", "sh");
 		put("pl", "perl");
 		put("rb", "ruby");
 		put("php", "php");
