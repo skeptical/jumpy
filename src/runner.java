@@ -84,9 +84,14 @@ public class runner {
 		return pms;
 	}
 
+	public static boolean isOuterQuoted(String str)  {
+		return (StringUtils.isQuoted(str) &&
+			! str.matches("\\\".*\\\"\\s+\\\".*\\\"|'.*'\\s+'.*'"));
+	}
+
 	public List<String> split(String cmd) {
 		cmd = cmd.trim();
-		delims = cmd.startsWith("[") || StringUtils.isQuoted(cmd);
+		delims = (cmd.startsWith("[") || isOuterQuoted(cmd));
 		if (delims) {
 			cmd = cmd.substring(1, cmd.length()-1);
 		}

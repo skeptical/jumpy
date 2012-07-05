@@ -53,19 +53,19 @@ public class jumpstart {
 		}
 
 		// get the current jar's location from a static context (isn't java lovely?)
-		String home = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+		String lib = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
 		try{
-			home = URLDecoder.decode(home, "UTF-8");
+			lib = URLDecoder.decode(lib, "UTF-8");
 		} catch (Exception e) {}
 
 		// jumpy.py is always located alongside the jar
-		ex.pms = home + File.separatorChar + "jumpy.py";
+		ex.pms = lib + File.separatorChar + "jumpy.py";
 
-		if (argv.length == 1) {
-			argv[0] = "\"" + argv[0] + "\"";
-		}
+//		if (argv.length == 1 && ! StringUtils.isQuoted(argv[0])) {
+//			argv[0] = "\"" + argv[0] + "\"";
+//		}
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
-			home + File.separatorChar + "lib", null);
+			lib, null);
 		item current = root;
 
 		while (true) {
@@ -193,7 +193,7 @@ class item extends node implements jumpyAPI {
 	public void addItem(int type, String filename, String uri, String thumb) {
 		item folder = this;
 		String name = filename;
-		if (filename.contains("/")) {
+		if (type == jumpyAPI.FOLDER && filename.contains("/")) {
 			File f = new File(filename);
 			name = f.getName();
 			String path = f.getParent();
@@ -237,7 +237,7 @@ class item extends node implements jumpyAPI {
 	public static item mkdirs(item root, String path) {
 		item parent = root, child;
 		boolean exists = true;
-		for (String dir:path.split("/")) {
+		for (String dir:path.replace("\\", "/").split("/")) {
 			if (exists && (child = (item)parent.get(dir)) != null) {
 				parent = child;
 			} else {

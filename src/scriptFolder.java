@@ -137,7 +137,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		DLNAResource folder = this;
 
 		String name = filename;
-		if (filename.contains("/")) {
+		if (type == FOLDER && filename.contains("/")) {
 			name = FilenameUtils.getName(filename);
 			String path = FilenameUtils.getPath(filename);
 			if (path != null) {

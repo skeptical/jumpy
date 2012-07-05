@@ -55,7 +55,7 @@ public class userscripts {
 			String name = section.getName();
 			if (name.startsWith(flag)) {
 				jumpy.log("%n");
-				jumpy.log(context + " " + name + ".", true);
+				jumpy.log(context + name + ".", true);
 				jumpy.log("%n");
 				ex.run(jumpy.top, section.remove("cmd"), jumpy.syspath, section);
 				jumpy.top.env.clear();
