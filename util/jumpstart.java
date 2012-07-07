@@ -61,11 +61,10 @@ public class jumpstart {
 		// jumpy.py is always located alongside the jar
 		ex.pms = lib + File.separatorChar + "jumpy.py";
 
-//		if (argv.length == 1 && ! StringUtils.isQuoted(argv[0])) {
-//			argv[0] = "\"" + argv[0] + "\"";
-//		}
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
 			lib, null);
+		ex.quiet(root, "[" + runner.pms + "]", lib, null);
+
 		item current = root;
 
 		while (true) {
@@ -230,6 +229,9 @@ class item extends node implements jumpyAPI {
 			case RESTART:
 			case GETPROPERTY:
 			case SETPROPERTY:
+				break;
+			case SETPMS:
+				runner.pms = arg1;
 				break;
 		}
 		return "";

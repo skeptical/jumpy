@@ -27,7 +27,7 @@ public interface jumpyAPI {
 
 	public static final String[] apiName = {"",
 		"VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART", "FOLDERNAME",
-		"GETPROPERTY", "SETPROPERTY"};
+		"GETPROPERTY", "SETPROPERTY", "SETPMS"};
 	public static final int VERSION = 1;
 	public static final int HOME = 2;
 	public static final int PROFILEDIR = 3;
@@ -37,6 +37,7 @@ public interface jumpyAPI {
 	public static final int FOLDERNAME = 7;
 	public static final int GETPROPERTY = 8;
 	public static final int SETPROPERTY = 9;
+	public static final int SETPMS = 10;
 
 	public String util(int action, String arg1, String arg2);
 }

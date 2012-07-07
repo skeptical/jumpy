@@ -34,6 +34,7 @@ except NameError:
 	__builtin__.PMS_FOLDERNAME = 7;
 	__builtin__.PMS_GETPROPERTY = 8;
 	__builtin__.PMS_SETPROPERTY = 9;
+	__builtin__.PMS_SETPMS = 10;
 
 # wrapper to flatten the argv list into a tokenized string
 def pms_addItem(t, name, argv, thumb = None):
@@ -109,7 +110,20 @@ __builtin__.sys = sys
 
 
 if __name__ == "__main__" and len(sys.argv) == 1:
+
 	sys.stderr.write("python %s.%s.%s\n" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+
+	if sys.platform.startswith('win32'):
+		# reset %pms% to short paths so we don't get into trouble with cmd /c
+		try:
+			from ctypes import windll, create_unicode_buffer, sizeof
+			buf = create_unicode_buffer(512)
+			windll.kernel32.GetShortPathNameW(u'%s' % sys.executable, buf, sizeof(buf))
+			py = buf.value
+			windll.kernel32.GetShortPathNameW(u'%s' % sys.argv[0], buf, sizeof(buf))
+			pms_util(PMS_SETPMS, '%s %s' % (py, buf.value))
+		except:
+			traceback.print_exc(file=sys.stderr)
 
 elif __name__ == "__main__":
 

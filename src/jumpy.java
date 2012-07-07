@@ -119,6 +119,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("python=" + runner.getexec("python"), true);
 		log("pypath=" + syspath, true);
 
+		log("Adding root folder.", true);
+		top = new scriptFolder(this, "Jumpy", null, null, syspath);
+
 		runner ex = new runner();
 		ex.quiet(top, "[" + runner.pms + "]", syspath, null);
 		log("%n");
@@ -130,9 +133,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 				}
 			}
 		);
-
-		log("Adding root folder.", true);
-		top = new scriptFolder(this, "Jumpy", null, null, syspath);
 
 		if (showBookmarks) {
 			bookmarks = new bookmarker(this);
