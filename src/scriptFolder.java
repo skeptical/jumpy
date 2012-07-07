@@ -207,13 +207,13 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	}
 
 	@Override
-	public void setPath(String dir) {
-		syspath = (dir == null ? basepath : syspath + File.pathSeparator + dir);
+	public void addPath(String path) {
+		syspath = (path == null ? basepath : syspath + File.pathSeparator + path);
 	}
 
 	@Override
 	public void setEnv(String name, String val) {
-		if (name == null && val == null ) {
+		if (name == null) {
 			jumpy.log("setEnv: clear all.");
 			env.clear();
 		} else {

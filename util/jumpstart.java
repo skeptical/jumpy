@@ -207,11 +207,11 @@ class item extends node implements jumpyAPI {
 		}
 		folder.add(new item(type, name, uri, thumb, syspath, env));
 	}
-	public void setPath(String dir) {
-		syspath = (dir == null ? basepath : syspath + File.pathSeparator + dir);
+	public void addPath(String path) {
+		syspath = (path == null ? basepath : syspath + File.pathSeparator + path);
 	}
 	public void setEnv(String name, String val) {
-		if (name == null && val == null ) env.clear();
+		if (name == null) env.clear();
 		else env.put(name, val);
 	}
 	public String util(int action, String arg1, String arg2) {

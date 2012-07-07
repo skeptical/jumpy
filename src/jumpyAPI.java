@@ -22,7 +22,7 @@ public interface jumpyAPI {
 	public static final int IMAGEFEED = 4098; // Format.IMAGE|FEED;
 
 	public void addItem(int type, String filename, String uri, String thumb);
-	public void setPath(String dir);
+	public void addPath(String path);
 	public void setEnv(String name, String val);
 
 	public static final String[] apiName = {"",

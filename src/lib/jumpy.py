@@ -10,6 +10,8 @@ except NameError:
 	__builtin__.pms = gateway.entry_point
 #	__builtin__.pms = JavaGateway(client).entry_point
 	__builtin__.pms._addItem = pms.addItem
+	__builtin__.pms._addPath = pms.addPath
+	__builtin__.pms._setEnv = pms.setEnv
 	# new constants:
 	__builtin__.PMS_UNRESOLVED = -2
 	__builtin__.PMS_FOLDER = -1
@@ -46,6 +48,15 @@ def pms_addItem(t, name, argv, thumb = None):
 	pms._addItem(t, name, argv, thumb)
 
 # convenience wrappers
+def pms_addPath(path=None):
+	pms._addPath(path)
+
+def pms_setPath(path=None): # deprecated
+	pms._addPath(path)
+
+def pms_setEnv(name=None, val=None):
+	pms._setEnv(name, val)
+
 def pms_util(action, arg1=None, arg2=None):
 	return pms.util(action, arg1, arg2)
 
@@ -83,10 +94,10 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
-def pms_setEnv(name, val):
-	pms.setEnv(name, val)
-
 __builtin__.pms.addItem = pms_addItem
+__builtin__.pms.addPath = pms_addPath
+__builtin__.pms.setPath = pms_addPath # deprecated
+__builtin__.pms.setEnv = pms_setEnv
 __builtin__.pms.version = pms_version
 __builtin__.pms.getHome = pms_getHome
 __builtin__.pms.getProfileDir = pms_getProfileDir
