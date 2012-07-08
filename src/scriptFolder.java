@@ -3,6 +3,7 @@ package net.pms.external.infidel.jumpy;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -236,7 +237,9 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 			case LOGDIR:
 				return new File(jumpy.jumpylog).getParent();
 			case PLUGINJAR:
-				return this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+				try {
+					return this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().normalize().getPath();
+				} catch(Exception e) {break;}
 			case RESTART:
 				try {
 					ex.shutdown();
@@ -246,7 +249,9 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 			case FOLDERNAME:
 				return this.getName();
 			case GETPROPERTY:
-				return (String)PMS.get().getConfiguration().getCustomProperty(arg1);
+				Object obj = PMS.get().getConfiguration().getCustomProperty(arg1);
+				// return last occurrence
+				return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
 			case SETPROPERTY:
 				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
 				break;
