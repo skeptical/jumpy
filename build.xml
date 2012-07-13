@@ -57,62 +57,6 @@
 		<zip destfile="pms-${jumpy}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="release" >
-		<!-- Note: This target is linux-only -->
-		<delete file="pms-${jumpy}-src.zip" />
-		<delete dir="tmp"/>
-		<exec executable = "git">
-			<arg value = "clone" />
-			<arg value = "file://${basedir}" />
-			<arg value = "tmp/${jumpy}" />
-<!--			<arg value = "-b" />-->
-<!--			<arg value = "master" />-->
-			<arg value = "--no-hardlinks" />
-			<arg value = "--depth" />
-			<arg value = "1" />
-		</exec>
-		<copy file="readme-compile.txt" todir="tmp/${jumpy}"/>
-		<!-- using system zip because ant zip task omits git files -->
-		<exec executable = "zip" dir="tmp">
-			<arg value = "-r" />
-			<arg value = "../pms-${jumpy}-src.zip" />
-			<arg value = "${jumpy}" />
-		</exec>
-		<exec executable = "sh" dir="tmp/${jumpy}/lib">
-			<arg value="-c"/>
-			<arg value="cp -s ../../../lib/*.jar ."/>
-		</exec>
-		<copy todir="tmp/${jumpy}/script">
-			<fileset dir="script" excludes="**/*.pyc **/*log* **/*test* **/*.0 **/ignore/**"/>
-		</copy>
-		<ant dir="tmp/${jumpy}" target="dist" useNativeBasedir="true" inheritAll="false"/>
-		<move file="tmp/${jumpy}/${jumpy}.jar" todir="."/>
-		<move file="tmp/${jumpy}/pms-${jumpy}.zip" todir="."/>
-		<delete dir="tmp"/>
-	</target>
-
-	<target name="xbmc" >
-
-		<loadfile srcfile="script/xbmc/xbmcinit.py" property="xver">
-			<filterchain>
-				<linecontains> <contains value="version "/> </linecontains>
-				<striplinebreaks/>
-				<tokenfilter>
-					<replaceregex pattern=".+=.*'([0-9\.]+)'.*" replace="\1"/>
-				</tokenfilter>
-			</filterchain>
-		</loadfile>
-		<property name="xbmc" value="xbmc-${xver}"/>
-
-		<delete file="${xbmc}.zip" />
-		<mkdir dir="tmp"/>
-		<copy todir="tmp">
-			<fileset dir="script" includes="**/*xbmc* xbmc/*.py" excludes="**/*.pyc **/*test* **/*.0 **/ignore/**"/>
-		</copy>
-		<zip destfile="${xbmc}.zip" basedir="tmp"/>
-		<delete dir="tmp"/>
-	</target>
-
 	<target name="clean" >
 		<delete dir="${build}"/>
 		<delete file="${jumpy}.jar" />
