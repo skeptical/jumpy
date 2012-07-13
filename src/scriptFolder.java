@@ -19,8 +19,11 @@ import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.ImagesFeed;
 import net.pms.formats.Format;
 import net.pms.dlna.RealFile;
+import net.pms.dlna.FeedItem;
 import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
+import net.pms.dlna.PlaylistFolder;
+import net.pms.dlna.DVDISOFile;
 
 
 public class scriptFolder extends VirtualFolder implements jumpyAPI {
@@ -176,15 +179,19 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				break;
 			case Format.IMAGE:
 				media = "image";
-//				folder.addChild(f == null ? new WebAudioStream(name, uri, thumb) : new RealFile(f, name));
+				folder.addChild(f == null ? new FeedItem(name, uri, thumb, null, Format.IMAGE) : new RealFile(f, name));
 				break;
 			case Format.PLAYLIST:
 				media = "playlist";
-//				folder.addChild(new WebAudioStream(name, uri, thumb));
+				if (f != null ) {
+					folder.addChild(new PlaylistFolder(f));
+				}
 				break;
 			case Format.ISO:
 				media = "iso";
-//				folder.addChild(new WebAudioStream(name, uri, thumb));
+				if (f != null ) {
+					folder.addChild(new DVDISOFile(f));
+				}
 				break;
 			case IMAGEFEED:
 				media = "imagefeed";
