@@ -34,9 +34,13 @@ ehthumbs.db
 Icon?
 Thumbs.db
 .fuse_hidden*
+*~
 
 # misc #
 ######################
 build
 autoterm.conf
 *.0
+*.orig
+*.reject
+*.diff
