@@ -246,6 +246,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 					PMS.get().reset();
 				} catch(Exception e) {e.printStackTrace();}
 				break;
+			case REBOOT:
+				try {
+					ex.shutdown();
+				} catch(Exception e) {e.printStackTrace();}
+				util.restart();
+				break;
 			case FOLDERNAME:
 				return this.getName();
 			case GETPROPERTY:

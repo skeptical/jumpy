@@ -37,6 +37,7 @@ except NameError:
 	__builtin__.PMS_GETPROPERTY = 8;
 	__builtin__.PMS_SETPROPERTY = 9;
 	__builtin__.PMS_SETPMS = 10;
+	__builtin__.PMS_REBOOT = 11;
 
 # wrapper to flatten the argv list into a tokenized string
 def pms_addItem(t, name, argv, thumb = None):
@@ -85,6 +86,9 @@ def pms_getPluginJar():
 def pms_restart():
 	return pms_util(PMS_RESTART)
 
+def pms_reboot():
+	return pms_util(PMS_REBOOT)
+
 def pms_getFolderName():
 	return pms_util(PMS_FOLDERNAME)
 
@@ -104,6 +108,7 @@ __builtin__.pms.getProfileDir = pms_getProfileDir
 __builtin__.pms.getLogDir = pms_getLogDir
 __builtin__.pms.getPluginJar = pms_getPluginJar
 __builtin__.pms.restart = pms_restart
+__builtin__.pms.reboot = pms_reboot
 __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
