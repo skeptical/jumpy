@@ -32,7 +32,7 @@ import net.pms.logging.LoggingConfigFileLoader;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
-import com.sharkhunter.dbgpack.dbgpack;
+import net.pms.external.dbgpack;
 
 
 public class jumpy implements AdditionalFolderAtRoot, dbgpack {
