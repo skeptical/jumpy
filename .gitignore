@@ -42,5 +42,5 @@ build
 autoterm.conf
 *.0
 *.orig
-*.reject
+*.rej
 *.diff

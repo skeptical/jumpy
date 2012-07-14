@@ -8,7 +8,7 @@ Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' 
 
 Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube</i>, and many more. Addons are 'mostly' functional in the sense that all content is shown, but interactive features that require user input are inactive.
 
-Jumpy itself is general-purpose, of course, and you can use it to plug your own scripts, python or other, into PMS as well.
+Jumpy itself is general-purpose, of course, and you can use it to plug <a href="http://skeptical.github.com/jumpy/readme.html#SCRIPTS" target="_blank">your own scripts/commands</a>, python or other, into PMS as well.
 
 <b style="color:black">Requirements</b>
 <ol>
@@ -37,7 +37,7 @@ on the addon, and so on.
 
 <b style="color:black">Plugin Installation</b>
 <ol>
-<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.1.zip">pms-jumpy-0.2.1.zip</a></i> to your pms <i>plugins</i> folder.
+<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.2.zip">pms-jumpy-0.2.2.zip</a></i> to your pms <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
