@@ -37,7 +37,7 @@ on the addon, and so on.
 
 <b style="color:black">Plugin Installation</b>
 <ol>
-<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.0.zip">pms-jumpy-0.2.0.zip</a></i> to your pms <i>plugins</i> folder.
+<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.1.zip">pms-jumpy-0.2.1.zip</a></i> to your pms <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
