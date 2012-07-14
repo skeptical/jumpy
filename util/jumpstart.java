@@ -252,6 +252,8 @@ class item extends node implements jumpyAPI {
 		}
 		return parent;
 	}
+	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
+	}
 }
 
 

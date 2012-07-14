@@ -6,6 +6,7 @@ public interface jumpyAPI {
 	// new constants:
 	public static final int UNRESOLVED = -2;
 	public static final int FOLDER = -1;
+	public static final int VIDEOACTION = -4;
 
 	// constants from net.pms.formats.Format:
 	//	public static final int ISO = 32;
@@ -41,6 +42,15 @@ public interface jumpyAPI {
 	public static final int REBOOT = 11;
 
 	public String util(int action, String arg1, String arg2);
+
+	// constants from net.pms.encoders.Player:
+	// public static final int VIDEO_SIMPLEFILE_PLAYER = 0;
+	// public static final int AUDIO_SIMPLEFILE_PLAYER = 1;
+	// public static final int VIDEO_WEBSTREAM_PLAYER = 2;
+	// public static final int AUDIO_WEBSTREAM_PLAYER = 3;
+	// public static final int MISC_PLAYER = 4;
+	// public static final String NATIVE = "NATIVE";
+	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc);
 }
 
 

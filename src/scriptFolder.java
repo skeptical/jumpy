@@ -141,7 +141,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		DLNAResource folder = this;
 
 		String name = filename;
-		if (type == FOLDER && filename.contains("/")) {
+		if ((type == FOLDER || type == VIDEOACTION) && filename.contains("/")) {
 			name = FilenameUtils.getName(filename);
 			String path = FilenameUtils.getPath(filename);
 			if (path != null) {
@@ -169,9 +169,14 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				media = "unresolved item";
 				folder.addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
 				break;
+			case VIDEOACTION:
+				media = "video action";
+				folder.addChild(new mediaItem(name, "jump", uri, thumb));
+				break;
 			case Format.VIDEO:
 				media = "video";
-				folder.addChild(f == null ? new WebVideoStream(name, uri, thumb) : new RealFile(f, name));
+				DLNAResource vid2 = (f == null ? new WebVideoStream(name, uri, thumb) : new RealFile(f, name));
+				folder.addChild(vid2);
 				break;
 			case Format.AUDIO:
 				media = "audio";
@@ -274,4 +279,10 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		}
 		return "";
 	}
+
+	@Override
+	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
+		jumpy.addPlayer(name, cmdline, supported, type, purpose, desc);
+	}
 }
+

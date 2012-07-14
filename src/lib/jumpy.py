@@ -12,9 +12,11 @@ except NameError:
 	__builtin__.pms._addItem = pms.addItem
 	__builtin__.pms._addPath = pms.addPath
 	__builtin__.pms._setEnv = pms.setEnv
+	__builtin__.pms._addPlayer = pms.addPlayer
 	# new constants:
 	__builtin__.PMS_UNRESOLVED = -2
 	__builtin__.PMS_FOLDER = -1
+	__builtin__.PMS_VIDEOACTION = -4
 	# constants from net.pms.formats.Format:
 	__builtin__.PMS_AUDIO = 1
 	__builtin__.PMS_IMAGE = 2
@@ -22,6 +24,7 @@ except NameError:
 	__builtin__.PMS_UNKNOWN = 8
 	__builtin__.PMS_PLAYLIST = 16
 	__builtin__.PMS_ISO = 32
+	__builtin__.PMS_CUSTOM = 64
 	# new constants (net.pms.formats.Format|FEED) where FEED=4096
 	__builtin__.PMS_AUDIOFEED = 4097
 	__builtin__.PMS_IMAGEFEED = 4098
@@ -38,6 +41,13 @@ except NameError:
 	__builtin__.PMS_SETPROPERTY = 9;
 	__builtin__.PMS_SETPMS = 10;
 	__builtin__.PMS_REBOOT = 11;
+	# constants from net.pms.encoders.Player
+	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
+	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
+	__builtin__.PMS_VIDEO_WEBSTREAM_PLAYER = 2
+	__builtin__.PMS_AUDIO_WEBSTREAM_PLAYER = 3
+	__builtin__.PMS_MISC_PLAYER = 4
+	__builtin__.PMS_NATIVE = "NATIVE"
 
 # wrapper to flatten the argv list into a tokenized string
 def pms_addItem(t, name, argv, thumb = None):
@@ -98,6 +108,9 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
+def pms_addPlayer(name, cmdline, supported, type=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None):
+	pms._addPlayer(name, cmdline, supported, type, purpose, desc)
+
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath
 __builtin__.pms.setPath = pms_addPath # deprecated
@@ -112,6 +125,7 @@ __builtin__.pms.reboot = pms_reboot
 __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
+__builtin__.pms.addPlayer = pms_addPlayer
 
 # flush regularly to stay in sync with java output
 class flushed(object):

@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import java.io.IOException;
 
 import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Date;
@@ -28,6 +30,11 @@ import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.external.AdditionalFolderAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
+import net.pms.formats.Format;
+import net.pms.formats.FormatFactory;
+import net.pms.encoders.Player;
+import net.pms.encoders.PlayerFactory;
+import net.pms.external.ExternalListener;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -54,6 +61,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public scriptFolder top, util;
 	private bookmarker bookmarks;
 	private userscripts userscripts;
+	private List<player> players;
 
 	public jumpy() {
 		pms = PMS.get();
@@ -157,6 +165,11 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			refresh(false);
 		}
 
+		players = new ArrayList<player>();
+		players.add(new player(this,
+			"jumpy", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
+			"Jumpy Video Action Player"));
+
 		userscripts = new userscripts(this);
 		userscripts.autorun(true);
 
@@ -196,6 +209,14 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	@Override
 	public JComponent config() {
+log("%n");
+for (Player p:PlayerFactory.getPlayers()) {
+log("player: name="+p.name()+" id="+p.id()+" type="+p.type() +" "+p.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
+}
+log("%n");
+for (Format f:FormatFactory.getExtensions()) {
+log("format: name="+f+" id="+Arrays.asList(f.getId()).toString()+" type="+f.getType() +" "+f.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
+}
 		return null;
 	}
 
@@ -207,6 +228,14 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	@Override
 	public void shutdown () {
 		userscripts.autorun(false);
+
+		if (players.size() > 0) {
+			boolean changed = false;
+			for (player p : players) {
+				changed = p.enable(false);
+			}
+			if (changed) pms.save();
+		}
 	}
 
 	public void readconf() {
@@ -279,11 +308,16 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		}
 	}
 
+	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
+		players.add(new player(this, name, cmdline, supported, type, purpose, desc));
+	}
+
 	public Object dbgpack_cb() {
 		return new String[] {jumpylog, jumpyconf};
 	}
 
 }
+
 
 class quickLog extends PrintStream {
 	private static String tag;
