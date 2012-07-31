@@ -17,7 +17,7 @@
 
 	<target name="compile" depends="init"
 				description="compile the source " >
-		<javac srcdir="${src}:${src2}" destdir="${build}" classpathref="lib.path.ref" includes="jumpstart.java runner.java jumpyAPI.java">
+		<javac srcdir="${src}:${src2}" destdir="${build}" classpathref="lib.path.ref" includes="jumpstart.java runner.java command.java jumpyAPI.java">
 		</javac>
 	</target>
 

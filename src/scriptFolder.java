@@ -269,7 +269,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
 				break;
 			case SETPMS:
-				runner.pms = arg1;
+				command.pms = arg1;
 				break;
 		}
 		return "";

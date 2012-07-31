@@ -38,7 +38,7 @@ public class userscripts {
 			jumpy.log("Adding user script: " + name);
 
 			if ((alt = section.get("cmd")) != null && alt.startsWith("pms ")) {
-				section.put("cmd", runner.getpms() + alt.substring(3));
+				section.put("cmd", command.getpms() + alt.substring(3));
 			}
 
 			if (! (name.startsWith("+") || name.startsWith("-"))) {

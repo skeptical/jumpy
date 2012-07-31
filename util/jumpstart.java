@@ -8,6 +8,7 @@ import java.net.URLDecoder;
 import org.apache.commons.exec.util.StringUtils;
 //import org.apache.commons.io.FilenameUtils;
 
+import net.pms.external.infidel.jumpy.command;
 import net.pms.external.infidel.jumpy.runner;
 import net.pms.external.infidel.jumpy.jumpyAPI;
 
@@ -29,7 +30,7 @@ public class jumpstart {
 			System.exit(1);
 		}
 
-		ex.scriptarg = argv.length-1;
+		ex.cmdline.scriptarg = argv.length-1;
 		File script = new File(argv[argv.length-1]);
 		if (! script.exists()) {
 			System.err.printf("'%s' not found.\n", script.getPath());
@@ -59,11 +60,11 @@ public class jumpstart {
 		} catch (Exception e) {}
 
 		// jumpy.py is always located alongside the jar
-		ex.pms = lib + File.separatorChar + "jumpy.py";
+		command.pms = lib + File.separatorChar + "jumpy.py";
 
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
 			lib, null);
-		ex.quiet(root, "[" + runner.pms + "]", lib, null);
+		ex.quiet(root, "[" + command.pms + "]", lib, null);
 
 		item current = root;
 
@@ -231,7 +232,7 @@ class item extends node implements jumpyAPI {
 			case SETPROPERTY:
 				break;
 			case SETPMS:
-				runner.pms = arg1;
+				command.pms = arg1;
 				break;
 		}
 		return "";

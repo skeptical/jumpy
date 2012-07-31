@@ -78,7 +78,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			log("%n%n%nWARNING: No 'python.path' setting found in PMS.conf.%n%n%n");
 		}
 
-		runner.pms = home + "lib" + File.separatorChar + "jumpy.py";
+		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
+		command.basepath = net.pms.external.infidel.jumpy.util.getBinPaths(configuration);
+
 		runner.out = logger;
 		runner.version = version;
 		syspath = home + "lib";
@@ -97,15 +99,15 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 				} else {
 					log("registering " + interpreter + " to interpret ." + ext + " scripts.");
 				}
-				runner.interpreters.put(ext, interpreter);
+				command.interpreters.put(ext, interpreter);
 			}
 		}
 
 		Object path;
-		for (String interpreter : runner.interpreters.values()) {
+		for (String interpreter : command.interpreters.values()) {
 			if ((path = configuration.getCustomProperty(interpreter + ".path")) != null) {
 				log("setting " + interpreter + " to " + (String)path);
-				runner.putexec(interpreter, (String)path);
+				command.putexec(interpreter, (String)path);
 			}
 		}
 
@@ -116,14 +118,17 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("bookmarks=" + bookmarksini, true);
 		log("userscripts=" + bookmarksini, true);
 		log("refresh=" + refresh, true);
-		log("python=" + runner.getexec("python"), true);
+		log("python=" + command.getexec("python"), true);
 		log("pypath=" + syspath, true);
+		if (command.basepath != null) {
+			log("binaries="+ command.basepath);
+		}
 
 		log("Adding root folder.", true);
 		top = new scriptFolder(this, "Jumpy", null, null, syspath);
 
 		runner ex = new runner();
-		ex.quiet(top, "[" + runner.pms + "]", syspath, null);
+		ex.quiet(top, "[" + command.pms + "]", syspath, null);
 		log("%n");
 
 		scripts = new File(home).listFiles(
