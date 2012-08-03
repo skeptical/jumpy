@@ -1,8 +1,12 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
+import java.io.IOException;
+
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
+
 import java.lang.System;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
@@ -14,7 +18,10 @@ import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.util.PropertiesUtil;
 
-public class util {
+public class utils {
+
+	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
+	public static boolean mac = System.getProperty("os.name").contains("OS X");
 
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
 	//http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
@@ -79,6 +86,43 @@ public class util {
 //		paths.remove(null);
 		String s = StringUtils.join(paths, File.pathSeparator);
 		return "".equals(s) ? null : s;
+	}
+
+	public static void textedit(String file) {
+		// see if we have a user-specified editor
+		String[] cmd;
+		String editor;
+		if ((editor = (String)PMS.get().getConfiguration().getCustomProperty("text.editor")) != null) {
+			try {
+				cmd = new String[] {editor, file};
+				Runtime.getRuntime().exec(cmd);
+				return;
+			} catch (IOException e) {
+				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
+			}
+		}
+		// try a default desktop open and failing that an explicit system cmd
+		if (! open(file)) {
+			cmd = windows ? new String[] {"start", "Notepad", file} :
+					mac ? new String[] {"open", "-t", file} :
+					new String[] {"xdg-open", file};
+			try {
+				Runtime.getRuntime().exec(cmd);
+			} catch (IOException e) {
+				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
+			}
+		}
+	}
+
+	public static boolean open(String file) {
+		File f = new File(file);
+		try {
+			java.awt.Desktop.getDesktop().open(f);
+			return true;
+		} catch (IOException e) {
+			PMS.debug("Failed to open default viewer: " + f);
+			return false;
+		}
 	}
 
 }

@@ -257,7 +257,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				try {
 					ex.shutdown();
 				} catch(Exception e) {e.printStackTrace();}
-				util.restart();
+				utils.restart();
 				break;
 			case FOLDERNAME:
 				return this.getName();

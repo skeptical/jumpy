@@ -79,7 +79,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		}
 
 		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
-		command.basepath = net.pms.external.infidel.jumpy.util.getBinPaths(configuration);
+		command.basepath = utils.getBinPaths(configuration);
 
 		runner.out = logger;
 		runner.version = version;
@@ -116,7 +116,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("log=" + jumpylog, true);
 		log("conf=" + jumpyconf, true);
 		log("bookmarks=" + bookmarksini, true);
-		log("userscripts=" + bookmarksini, true);
+		log("userscripts=" + scriptsini, true);
 		log("refresh=" + refresh, true);
 		log("python=" + command.getexec("python"), true);
 		log("pypath=" + syspath, true);
