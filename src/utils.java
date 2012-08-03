@@ -20,7 +20,7 @@ import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.util.PropertiesUtil;
 
-public class utils {
+public final class utils {
 
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");

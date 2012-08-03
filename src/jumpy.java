@@ -61,7 +61,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public scriptFolder top, util;
 	private bookmarker bookmarks;
 	private userscripts userscripts;
-	private List<player> players;
+	public List<player> players;
 
 	public jumpy() {
 		pms = PMS.get();
@@ -71,6 +71,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			.getAbsolutePath() + File.separatorChar;
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
+		config.init(this);
 		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
 		scriptsini = configuration.getProfileDirectory() + File.separator + appName + "-scripts.ini";
 
@@ -209,15 +210,15 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	@Override
 	public JComponent config() {
-log("%n");
-for (Player p:PlayerFactory.getPlayers()) {
-log("player: name="+p.name()+" id="+p.id()+" type="+p.type() +" "+p.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
-}
-log("%n");
-for (Format f:FormatFactory.getExtensions()) {
-log("format: name="+f+" id="+Arrays.asList(f.getId()).toString()+" type="+f.getType() +" "+f.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
-}
-		return null;
+//log("%n");
+//for (Player p:PlayerFactory.getPlayers()) {
+//log("player: name="+p.name()+" id="+p.id()+" type="+p.type() +" "+p.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
+//}
+//log("%n");
+//for (Format f:FormatFactory.getExtensions()) {
+//log("format: name="+f+" id="+Arrays.asList(f.getId()).toString()+" type="+f.getType() +" "+f.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
+//}
+		return config.mainPanel();
 	}
 
 	@Override

@@ -39,9 +39,9 @@ public class player extends Player {
 	public String mimetype;
 	public String executable = "";
 	private FormatConfiguration supported;
-	public String about;
+	public String desc, supportStr, cmdStr;
 
-	private jumpy jumpy;
+	public jumpy jumpy;
 
 	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type, int purpose, String desc) {
 		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc);
@@ -124,11 +124,9 @@ public class player extends Player {
 		}
 
 		this.supported = new FormatConfiguration(Arrays.asList(supported.split(",")));
-		this.about = "<html><font size=4>"
-			+ (desc == null ? "Jumpy User-Defined Player" : desc)
-			+ "<br><br>Supported : <font color=blue>" + supported + "</font>"
-			+ (cmdline == null || "".equals(cmdline) ? "" : ("<br>Command : <font color=blue>" + cmdline + "</font>"))
-			+ "</font></html>";
+		this.supportStr = supported;
+		this.desc = desc;
+		this.cmdStr = cmdline;
 
 		PlayerFactory.getAllPlayers().add(0, this);
 		PlayerFactory.getPlayers().add(0, this);
@@ -257,9 +255,7 @@ public class player extends Player {
 
 	@Override
 	public JComponent config() {
-		JLabel label = new JLabel(about, SwingConstants.LEFT);
-		label.setVerticalAlignment(SwingConstants.TOP);
-		return label;
+		return config.playerPanel(this, true);
 	}
 }
 
