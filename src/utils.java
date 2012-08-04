@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import java.net.URI;
+
 import java.lang.System;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
@@ -93,24 +95,53 @@ public class utils {
 		String[] cmd;
 		String editor;
 		if ((editor = (String)PMS.get().getConfiguration().getCustomProperty("text.editor")) != null) {
+			cmd = new String[] {editor, file};
 			try {
-				cmd = new String[] {editor, file};
 				Runtime.getRuntime().exec(cmd);
+				PMS.debug("Opening editor: " + Arrays.toString(cmd));
 				return;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
 			}
 		}
-		// try a default desktop open and failing that an explicit system cmd
-		if (! open(file)) {
-			cmd = windows ? new String[] {"start", "Notepad", file} :
+		// try a default desktop edit and failing that an explicit system cmd
+		if (! edit(file)) {
+			cmd = windows ? new String[] {"Notepad", file} :
 					mac ? new String[] {"open", "-t", file} :
 					new String[] {"xdg-open", file};
 			try {
 				Runtime.getRuntime().exec(cmd);
-			} catch (IOException e) {
+				PMS.debug("Opening editor: " + Arrays.toString(cmd));
+			} catch (Exception e) {
 				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
 			}
+		}
+	}
+
+	public static boolean browse(String uri) {
+		try {
+			if(uri.startsWith("file://") && windows) {
+				return open(uri.substring(7));
+			} else {
+				java.awt.Desktop.getDesktop().browse(new URI(uri));
+				PMS.debug("Opening default browser: " + uri);
+			}
+			return true;
+		} catch (Exception e) {
+			PMS.debug("Failed to open default browser: " + uri);
+			return false;
+		}
+	}
+
+	public static boolean edit(String file) {
+		File f = new File(file);
+		try {
+			java.awt.Desktop.getDesktop().edit(f);
+			PMS.debug("Opening default editor: " + f);
+			return true;
+		} catch (Exception e) {
+			PMS.debug("Failed to open default editor: " + f);
+			return false;
 		}
 	}
 
@@ -118,8 +149,9 @@ public class utils {
 		File f = new File(file);
 		try {
 			java.awt.Desktop.getDesktop().open(f);
+			PMS.debug("Opening default viewer: " + f);
 			return true;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			PMS.debug("Failed to open default viewer: " + f);
 			return false;
 		}
