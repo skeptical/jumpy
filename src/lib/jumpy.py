@@ -59,6 +59,33 @@ def pms_addItem(t, name, argv, thumb = None):
 	pms._addItem(t, name, argv, thumb)
 
 # convenience wrappers
+def pms_addFolder(name, cmd, thumb=None):
+	pms_addItem(PMS_FOLDER, name, cmd, thumb)
+
+def pms_addAudio(name, cmd, thumb=None):
+	pms_addItem(PMS_AUDIO, name, cmd, thumb)
+
+def pms_addImage(name, cmd, thumb=None):
+	pms_addItem(PMS_IMAGE, name, cmd, thumb)
+
+def pms_addVideo(name, cmd, thumb=None):
+	pms_addItem(PMS_VIDEO, name, cmd, thumb)
+
+def pms_addPlaylist(name, cmd, thumb=None):
+	pms_addItem(PMS_PLAYLIST, name, cmd, thumb)
+
+def pms_addISO(name, cmd, thumb=None):
+	pms_addItem(PMS_ISO, name, cmd, thumb)
+
+def pms_addAudiofeed(name, cmd, thumb=None):
+	pms_addItem(PMS_AUDIOFEED, name, cmd, thumb)
+
+def pms_addImagefeed(name, cmd, thumb=None):
+	pms_addItem(PMS_IMAGEFEED, name, cmd, thumb)
+
+def pms_addVideofeed(name, cmd, thumb=None):
+	pms_addItem(PMS_VIDEOFEED, name, cmd, thumb)
+
 def pms_addPath(path=None):
 	pms._addPath(path)
 
@@ -111,6 +138,15 @@ def pms_setProperty(key, val):
 def pms_addPlayer(name, cmdline, supported, type=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None):
 	pms._addPlayer(name, cmdline, supported, type, purpose, desc)
 
+__builtin__.pms.addFolder = pms_addFolder
+__builtin__.pms.addAudio = pms_addAudio
+__builtin__.pms.addImage = pms_addImage
+__builtin__.pms.addVideo = pms_addVideo
+__builtin__.pms.addPlaylist = pms_addPlaylist
+__builtin__.pms.addISO = pms_addISO
+__builtin__.pms.addAudiofeed = pms_addAudiofeed
+__builtin__.pms.addImagefeed = pms_addImagefeed
+__builtin__.pms.addVideofeed = pms_addVideofeed
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath
 __builtin__.pms.setPath = pms_addPath # deprecated
