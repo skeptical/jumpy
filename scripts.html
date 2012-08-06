@@ -1,0 +1,862 @@
+<html>
+<head>
+<title>Jumpy - Scripts</title>
+<style type="text/css">
+.black {
+	color: black;
+}
+.orange {
+	color: #ff6600;
+}
+.comment {
+	color: dimgrey;
+}
+ul {
+	list-style-type: disc;
+}
+.comment a:link a:visited a:hover a:active {
+	text-decoration:none;
+}
+pre, code {
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+	/*color:darkblue;*/
+	color:#0000BB;
+	text-decoration: none;
+	/*font-weight: bold;*/
+}
+code {
+	white-space: pre;
+}
+kbd {
+	/*color:darkblue;*/
+	color:#0000BB;
+	text-decoration: none;
+	font-weight: bold;
+}
+body {
+	font-family: sans-serif;
+	padding-left: 2em;
+	width: 50em;
+}
+table {
+	border-collapse:collapse;
+}
+td {
+	vertical-align:top;
+	padding-right: 1em;
+}
+div.contents {
+	position: fixed;
+	height: auto;
+	width: 12em;
+	top: 2em;
+	left: 2em;
+	right: 5px;
+/*   text-align: right;*/
+	font-size: small;
+}
+div.main {
+	width: 45em;
+	margin-left: 15em;
+}
+</style>
+</head>
+<body>
+<div class="contents">
+<ul style="list-style-type:none;padding:0px;margin:10px;white-space:nowrap;">
+<center><a href="readme.html">BASICS</a></center><br/>
+<li><a href="readme.html#REQUIREMENTS">Requirements</a></li>
+<li><a href="readme.html#XBMC">XBMC Installation</a></li>
+<li><a href="readme.html#PHANTOMJS">PhantomJS Installation</a></li>
+<li><a href="readme.html#INSTALLATION">Plugin Installation</a></li>
+<li><a href="readme.html#BOOKMARKS">Bookmarks</a></li>
+<li><a href="readme.html#LOGCONF">Log and Conf</a></li>
+<li><a href="readme.html#BUGS">Bugs</a></li>
+<li><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></li>
+<li><a href="readme.html#WEBREADER">Webreader</a></li>
+<li><a href="readme.html#FEEDREADER">Feedreader</a></li>
+<br/>
+<center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
+<li><a href="#QUICKSTART">Quick Start</a></li>
+<li><a href="#QUICKSTARTPLAYER">Quick Start - Players</a></li>
+<li><a href="#API">API</a></li>
+<li><a href="#OTHERSCRIPTS">Other Languages</a></li>
+<!--<li><a href="#ARRAY">Array Notation</a></li>-->
+<li><a href="#PLAYERS">Players</a></li>
+<li><a href="#INTERPRETERS">Interpreters</a></li>
+<li><a href="#JUMPSTART">Jumpstarting Scripts</a></li>
+<li><a href="#EXAMPLES">Examples</a></li>
+<!--<ul>-->
+<!--<a href="#HELLOPY">py</a></li> <a href="#HELLOSH">sh</a>-->
+<!--<a href="#HELLOPL">pl</a> <a href="#HELLOBAT">bat</a</li>-->
+<!--</ul>-->
+<!--<center>LINKS</center><br/>-->
+<br/><br/><br/>
+<li><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">Download</a></li>
+<li><a href="http://www.ps3mediaserver.org/forum/viewtopic.php?f=12&t=12518" target="_blank">Forum</a></li>
+<li><a href="https://github.com/skeptical/jumpy" target="_blank">Code</a></li>
+</ul>
+</div>
+<div class="main">
+<a name="SCRIPTS"><H3 style="color:darkblue"><center><span class="orange">SCRIPTS</span></center></H3></a>
+Any arbitrary system command qualifies as a 'script' which jumpy will execute and listen for
+<a href="#API">API</a> calls while it's running. Generally your script does its thing, maybe adds
+some items to the xmb and exits. If your needs are simple and/or you prefer reading code, skip to <a href="#QUICKSTART">Quick Start</a> or
+<a href="#EXAMPLES">Examples</a>, otherwise here are a few basics:
+<br/><br/>
+<ul>
+<li>A script is always run in its own directory.
+</li>
+<li>A script doesn't necessarily need to interact with the API.
+</li>
+<li>Python scripts found inside '<i>plugins/jumpy</i>' are called automatically at startup
+with no arguments. You can only add folders during this first call.
+</li>
+<li>Other scripts can be located anywhere, and are registered with Jumpy by means of <a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a>.
+They can be called at startup, shutdown, or placed on the xmb for future use.
+</li>
+<li>Any folder item added with <a href="#ADDITEM"><kbd>addItem</kbd></a> will execute whatever command
+you've specified in the <code>cmd</code> parameter when the user clicks on it in the future. Usually you will want
+your future command to call the same script but with different arguments.
+</li>
+<li>Any media item you add will be passed along to PMS for normal processing.
+</li>
+<li>Python scripts communicate with Jumpy via internal <a href="#API">API</a> calls to the jumpy python module.
+</li>
+<li>Other scripts communicate with Jumpy by using an equivalent <i><a href="#OTHERSCRIPTS">command-line syntax</a></i>
+to make API calls on the system.
+</li>
+<li>The script's runtime environment is set such that PMS' standard binary tools
+<ul><code><i>ffmpeg mplayer vlc mencoder tsmuxer flac<br/>eac3to dcraw and convert (imagemagick)</i></code></ul>
+if present are in the system PATH and can be launched just by name.</li>
+</ul>
+<br/>
+
+<b><a name="QUICKSTART">Quick Start</a></b>
+<ul>If all you need is to run some arbitrary command, create a <i><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></i>
+inside your profile folder (wherever <i>PMS.conf</i> is) modeled on this:
+<ul>
+<pre>
+<i class="comment">; Create the folder "Jumpy > my scripts > testing > helloworld" on the xmb</i>
+<i class="comment">; and run the command 'echo "hello world"' when the user opens it.</i>
+[my scripts/testing/helloworld]
+cmd = echo "hello world"
+
+<i class="comment">; Run the command 'echo "foo"' at startup</i>
+<i class="comment">; (note the '+' which means 'execute at startup').</i>
+[+foo]
+cmd = echo "foo"
+
+<i class="comment">; Run the command 'echo "bar"' at shutdown</i>
+<i class="comment">; (note the '-' which means 'execute at shutdown').</i>
+[-bar]
+cmd = echo "bar"</pre>
+</ul>
+and restart PMS. Any output from your command will appear in <i><a href="#LOGCONF">jumpy.log</a></i>.
+</ul>
+<br/>
+
+
+<b><a name="QUICKSTARTPLAYER">Quick Start - Players</a></b>
+<ul>A player can be as simple as a single command.  Here's one to
+play your <i>mpegs</i> and <i>vobs</i> upside-down, defined as a one-liner in <i><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></i>:
+<ul><pre style="overflow:auto">
+[+flipflop]
+cmd = pms addPlayer flipflop <i><span class="orange">"ffmpeg -y -i '${filename}' -vf 'vflip,hflip' -target ntsc-dvd ${outfile}"</i></span> "f:mpg|vob m:video/mpeg"
+</pre>
+</ul>
+If you want to try it out add it to <i>jumpy-scripts.ini</i>, restart and look for <i>flipflop</i> items in
+the <i>#--TRANSCODE--#</i> folder, since mpegs are likely streamed as-is by default.
+<br/><br/>
+For details see <a href="#ADDPLAYER"><code>pms.addPlayer</code></a>, and
+<a href="#PLAYERS">Players</a>.
+</ul>
+<br/>
+
+<b><a name="API">API</a></b>
+<ul>
+The extremely basic python API is initialized on import
+<pre>import jumpy</pre>
+defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
+<br/><br/>
+<li><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addPlaylist</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addISO</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addAudiofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addImagefeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<kbd>pms.addVideofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<ul> Convenience functions for <code>pms.addItem</code> with the appropriate
+<code>type</code> built-in.</ul>
+</li><br/>
+<li><a name="ADDITEM"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>)</code></a></li>
+or<br/>
+<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>)</code><br/><br/>
+where
+<ul>
+<li><code>type</code> is one of these constants:
+<pre>
+<i class="comment"># media items           # folder items</i>
+PMS_AUDIO               PMS_FOLDER
+PMS_IMAGE               PMS_UNRESOLVED
+PMS_VIDEO
+PMS_ACTION
+PMS_MEDIA
+PMS_UNKNOWN
+PMS_PLAYLIST
+PMS_ISO
+PMS_AUDIOFEED
+PMS_IMAGEFEED
+PMS_VIDEOFEED
+</pre>
+</li>
+<li><code>name</code> is the item's label.
+<ul><li><a name="UNIXPATH"/>Using a unix-style path as the label (e.g. '<code>myscripts/perl/foo</code>')
+will create the specified path on the xmb, branching from the top folder if absolute or current
+folder if relative.
+</li></ul>
+</li>
+<br/>
+<li><code>cmd</code> is either a command or a uri depending on the given <code>type</code>:
+<ul>
+<br/>
+<li>For <b>folder items</b> <code>cmd</code> is the command
+to be executed in the future when the user opens the folder on the xmb. It can be either:
+<ol type=A>
+<li>a typical command string to be parsed according to the usual system rules.
+</li>
+<li>a python list of strings, i.e. a command array.
+</li>
+<li><a name="ARRAY"/>a special delimited string
+describing a flattened command array using the following <b><i>array notation syntax</i></b>:
+<ul>
+<code>"<span class="orange">[</span>command<span class="orange"> , </span>arg1<span class="orange"> , </span>arg2<span class="orange"> , </span>arg3<span class="orange"> , </span>arg4 ... <span class="orange">]</span>"</code>
+</ul>
+where the rules are:
+<ol>
+<li>enclose your array in square <code><span class="orange">[]</span></code> brackets.
+</li>
+<li>delimit your args using a comma with a space on both sides, i.e. '<code><span class="orange"> , </span></code>'.
+</li>
+</ol>
+for example <code>"<span class="orange">[</span>echo<span class="orange"> , </span>hello world<span class="orange">]</span>"</code>.
+This form avoids embedded quotes when your args contain spaces, and is useful for other languages making
+system calls to the API.
+</ol>
+</li>
+</li>
+<br/>
+<li>For <b>media items</b> <code>cmd</code> is a single resolved media path/url to be passed along to PMS for normal
+processing.
+</li>
+<br/>
+<li>as a command it can include the runtime variable <code>${home}</code> which expands to the jumpy home folder.</ul>
+</li>
+</li>
+<br/>
+<li><code>thumb</code> is a path or url to the item's thumbnail image.
+</li>
+</ul>
+<br/>
+
+<li><kbd>pms.addAction</kbd><code>(name, cmd, thumb<i>=None</i>, playback<i>=None</i>)</code></li>
+<ul>
+Add an mpeg video item to launch a command that ultimately generates video, where
+<ul>
+<li><code>name</code> is the item's label (or unix-style path), see <a href="#ADDITEM"><code>addItem</code></a>.
+</li>
+<li><code>cmd</code> is the command to be executed when the user clicks the item,
+and can include the <code>${filename}</code>, <code>${outfile}</code>, and <code>${home}</code>
+runtime variables.
+see <code>cmd</code> under <a href="#ADDPLAYER"><code>addPlayer</code></a>.
+</li>
+<li><code>thumb</code> is a path or url to the item's thumbnail image.</li>
+<li><code>playback</code> is a string to control delay and buffering, see <a href="#PLAYBACK">addPlayer</a>.</li>
+</ul>
+the video could be generated using <a href="#VMSG"><code>pms.ok()</code></a>, <code>pms.info()</code> and so on in your script.
+</ul>
+</li>
+<br/>
+
+<li><a name="ADDMEDIA"><kbd>pms.addMedia</kbd><code>(name, format, cmd, thumb<i>=None</i>)</code></a></li>
+<ul>
+Add a generic media item containing properties set by the user which will presumably
+be handled by a corresponding user-defined player, where
+<ul>
+<li><code>name</code> is the item's label (or unix-style path), see <a href="#ADDITEM"><code>addItem</code></a>.
+</li>
+<li><code>format</code> is a string specifying the item's media format, followed by optional
+user-defined properties in the form:
+<ul><code>media_format<span class="orange">:</span>delay_seconds<span class="orange">:</span>buffer_mb<span class="orange">+</span>userdata</code></ul>
+where
+<ul>
+<li><code></span>delay_seconds<span class="orange">:</span>buffer_mb</code> uses the syntax of
+<code>playback</code> in <a href="#PLAYBACK"><code>addplayer</code></a>.</li>
+<li><code>userdata</code> is any string defined by you (not containing '<span class="orange">+</span>' which is reserved).</li>
+</ul>
+e.g.
+<ul><code>foo
+foo<span class="orange"<span class="orange">+</span>myFooData
+foo<span class="orange">:</span>10<span class="orange">+</span>myFooData
+foo<span class="orange">:</span>-1<span class="orange">:</span>20<span class="orange">+</span>myFooData
+</code></ul>
+</li>
+<li><code>cmd</code> is the command to be executed when the user clicks the item,
+and can include the <code>${filename}</code>, <code>${outfile}</code>, <code>${format}</code>, <code>${userdata}</code>, and <code>${home}</code>
+runtime variables.
+see <code>cmd</code> under <a href="#ADDPLAYER"><code>addPlayer</code></a>.
+</li>
+<li><code>thumb</code> is a path or url to the item's thumbnail image.
+</li>
+</ul>
+</ul>
+<br/>
+
+<li><kbd>pms.addPath</kbd><code>(path<i>=None</i>)</code></li>
+<ul>
+<li><code>path</code> is a path segment to be prefixed to the system PATH when the item is executed in the future.
+</li>
+<li>You typically set this once at the beginning, after which any descendants will inherit it. Its value builds incrementally, and
+can be cleared to its initial value for the current folder using <code>pms.addPath()</code> with path omitted.
+</li>
+<li>For python scripts <code>path</code> will also be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a>.
+<code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
+</li>
+</ul>
+<br/>
+<li><kbd>pms.setEnv</kbd><code>(name<i>=None</i>, val<i>=None</i>)</code></li>
+<ul>
+Define an environment variable to be set when the current folder or its descendants are executed in the future.
+<code>pms.setEnv()</code> without args will clear the current folder's user-defined variables.
+</ul>
+<br/>
+<li><kbd>pms.version</kbd><code>()</code></li>
+<ul>Get jumpy's version.
+</ul>
+<br/>
+<li><kbd>pms.getHome</kbd><code>()</code></li>
+<ul>Get jumpy's home path.
+</ul>
+<br/>
+<li><kbd>pms.getFolderName</kbd><code>()</code></li>
+<ul>Get the name of the current xmb folder.
+</ul>
+<br/>
+<li><kbd>pms.getProfileDir</kbd><code>()</code></li>
+<ul>Get the PMS profile path (where confs can be read/written).
+</ul>
+<br/>
+<li><kbd>pms.getLogDir</kbd><code>()</code></li>
+<ul>Get the PMS log path (where logs can be written).
+</ul>
+<br/>
+<li><kbd>pms.getPluginJar</kbd><code>()</code></li>
+<ul>Get the path to the running <i>jumpy.jar</i>.
+</ul>
+<br/>
+<li><kbd>pms.restart</kbd><code>()</code></li>
+<ul>Restart PMS' http server.
+</ul>
+<br/>
+<li><kbd>pms.reboot</kbd><code>()</code></li>
+<ul>Restart PMS itself.
+</ul>
+<br/>
+<li><kbd>pms.getProperty</kbd><code>(key)</code></li>
+<ul>Get a property from <i>PMS.conf</i>.
+</ul>
+<br/>
+<li><kbd>pms.setProperty</kbd><code>(key, val)</code></li>
+<ul>Set a property in <i>PMS.conf</i>.
+</ul>
+
+<br/>
+<li><a name="ADDPLAYER"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, playback<i>=None</i>)</code></a></li>
+<br/>
+where
+<ul>
+<br/>
+<li><code>name</code> is the player's name.
+</li>
+<br/>
+<li><code>cmd</code> is the command PMS will invoke to play matching media with your
+player, and can include these runtime variables:
+<ul><li><code>${filename}</code> which expands to the media item's full path.
+</li>
+<li><code>${outfile}</code> which expands to the output file where your player's data stream should be written.
+</li>
+<li><code>${format}</code> which expands to the media item's format name.
+</li>
+<li><code>${userdata}</code> which expands to any userdata attached if the item was created
+using <a href="#ADDMEDIA"><code>pms.addMedia()</code></a>.
+</li>
+<li><code>${home}</code> which expands to the jumpy home folder.
+</li>
+</ul>
+for example:
+<ul><code>"c:\myplayer.bat ${filename} ${outfile}"</code></ul>
+</li>
+<br/>
+<li><code>supported</code> is a string specifying supported media in the same syntax used for configuring renderers
+(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L301" target="_blank"><i>PMS.conf</i></a>).
+For instance an "audio as video" player might use:
+<ul><code>"f:flac|wav m:video/mpeg"</code></ul>
+which means 'accept any <i>flac</i> or <i>wav</i> file and broadcast a <i>video/mpeg</i>
+mimetype for it'. Some things to keep in mind:
+<ul><li><code>f:</code> (format) is the only required parameter in the <code>supported</code> string.
+</li>
+<li> if omitted, <code>m:</code> (mimetype) will default to PMS' default mimetype for the primary format given by <code>f:</code>.
+</li>
+<li>If <code>f:</code> specifies known formats, your player will override PMS' default
+player for those formats.  In this case, since the media is known and can be parsed, you can
+further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L366" target="_blank">etc</a>).
+<li>If <code>f:</code> specifies unrecognised formats (real such as <code>f:txt</code> or
+imaginary such as <code>f:foo</code>), then only <code>m:</code> will be valid,
+since PMS obviously can't parse the media and presumably your player knows what to do
+anyway.
+</li>
+<li>If you need to specify several different <code>supported</code> lines separate them with commas
+in your string (this feature is as yet untested).
+</li>
+</li>
+</ul>
+</li>
+<br/>
+<li><code>type</code> is the general media type(s) handled by the player, given by these constants
+(which can be combined by bitwise OR):
+<pre>
+PMS_AUDIO
+PMS_IMAGE
+PMS_VIDEO
+PMS_UNKNOWN
+</pre>
+</li>
+<li><code>purpose</code> determines the player's category in the PMS transcode tab,
+and is one of these constants:
+<pre>
+PMS_VIDEO_SIMPLEFILE_PLAYER
+PMS_AUDIO_SIMPLEFILE_PLAYER
+PMS_VIDEO_WEBSTREAM_PLAYER
+PMS_AUDIO_WEBSTREAM_PLAYER
+PMS_MISC_PLAYER
+</pre>
+</li>
+<li><code>desc</code> is a description of the player to be included in the PMS transcode tab.
+<br/><br/>
+</li>
+<li><a name="PLAYBACK"></a><code>playback</code> is a string to modify the player's default playback behavior where
+<ul>
+<li>the format is <code>delay_seconds:buffer_mb</code>, e.g. <code>15:20</code> for a 15 second delay and 20mb buffer.</li>
+<li>you can omit buffer, e.g. just <code>15</code> for a 15 second delay</li>
+<li><code>-1</code> means 'default' for either variable, e.g. <code>-1:20</code> for default delay and 20mb buffer.</li>
+</ul>
+</li>
+</ul>
+
+<br/>
+<li><a name="VMSG"></a><kbd>pms.info</kbd><code>(msg)</code><br/>
+<kbd>pms.ok</kbd><code>(msg)</code><br/>
+<kbd>pms.warn</kbd><code>(msg)</code><br/>
+<kbd>pms.err</kbd><code>(msg)</code><br/>
+<ul>output an 10 second dvd-ntsc video showing <code>msg</code> printed under the relevant icon.
+These are convenience functions for <code>pms.vmsg()</code> and will automatically output
+to the current <code>${outfile}</code>.</ul>
+</li>
+
+<br/>
+<li><kbd>pms.vmsg</kbd><code>(
+		seconds <i>= 10</i>,                    <i class="comment"># duration</i>
+		msg <i>= ""</i>,                        <i class="comment"># message string</i>
+		file <i>= None</i>,                     <i class="comment"># (or) text file</i>
+		out <i>= </i><i class="comment">(automatic)</i>,               <i class="comment"># output file</i>
+		countdown <i>= False</i>,               <i class="comment"># whether to show a mm:ss countdown</i>
+		<i class="comment">                                 # ** see <a href="http://www.imagemagick.org/Usage/text/" target="_blank">imagemagick text docs</a></i>
+		fill <i>= 'white'</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill" target="_blank">-fill</a></i>
+		background <i>= 'black'</i>,            <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?background" target="_blank">-background</a></i>
+		pointsize <i>= 20</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?pointsize" target="_blank">-pointsize</a></i>
+		font <i>= "DejaVu-Sans-Mono-Book"</i>,  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?font" target="_blank">-font</a></i>
+		density <i>= 75</i>,                    <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?density" target="_blank">-density</a></i>
+		gravity <i>= None</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a></i>
+		rate <i>= '1'</i>,                      <i class="comment"># input rate (images/sec)</i>
+		img <i>= None</i>,                      <i class="comment"># background image file</i>
+		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a> for img</i>
+		resize <i>= False</i>                   <i class="comment"># whether to 'best fit' img</i>
+	)</code>
+<br/>
+<ul>output a custom dvd-ntsc video showing <code>msg</code> with an optional countdown and
+background image. This is a <i>variadic named argument</i> function which means the
+parameters are all optional and need to be specified by name, e.g.
+<ul><code>pms.vmsg(seconds=12, msg='hello ', countdown=True)</code></ul>
+or from the unix shell, for instance
+<ul><code>$pms vmsg seconds=12 msg='hello ' countdown=True</code></ul>
+Note that <code>out</code> doesn't actually need to be specified, it will be automatically
+resolved to the current <code>${outfile}</code>.
+For details please see the script <i>jumpy/lib/vmsg.py</i>, basically a front-end
+for <a href="http://www.imagemagick.org/script/command-line-options.php?">imagemagick convert</a>.</ul>
+</li>
+</ul>
+<br/>
+
+<b><a name="OTHERSCRIPTS">Scripts In Other Languages</a></b>
+<ul>
+Jumpy defines a <code><span class="orange">pms</span></code> environment variable which scripts in any
+language can use to make API calls via the system.  Any <a href="#API">API</a> call, for instance
+<br/>
+<ul>
+<code>pms.addFolder("Hello", "echo hello")</code>
+</ul>
+can be made using an equivalent <b><i>command-line syntax</i></b>:
+<br/><br/>
+<ul><li>unix shell:</li>
+<code><span class="orange">$pms</span> addFolder Hello "echo hello"</code>
+</ul><br/>
+<ul><li>Windows batch file:</li>
+<code><span class="orange">%pms%</span> addFolder Hello "echo hello"</code>
+</ul><br/>
+<ul><li>perl:</li>
+<code>`<span class="orange">$ENV{'pms'}</span> addFolder Hello "echo hello"`</code>
+</ul><br/>
+
+For API functions that return a string, such as <code>pms.getProperty("ffmpeg.path")</code>:
+<br/><br/>
+
+<ul><li>unix shell:</li>
+<code>ffmpeg=$(<span class="orange">$pms</span> getProperty ffmpeg.path)
+</code>
+</ul><br/>
+<ul><li>Windows batch file:</li>
+<code>for /f "delims=" %%i in ('<span class="orange">%pms%</span> getProperty ffmpeg.path') do set ffmpeg=%%i
+</code>
+</ul><br/>
+<ul><li>perl:</li>
+<code>my $ffmpeg = `<span class="orange">$ENV{'pms'}</span> getProperty ffmpeg.path`
+</code>
+</ul><br/>
+Keep in mind that these are system calls and you need to quote/escape your strings as appropriate.
+To avoid embedded quotes <a href="#ADDITEM"><kbd>addItem</kbd></a> also supports a special
+<i><a href="#ARRAY">array notation syntax</a></i> to describe
+your command array as a single string when your args contain spaces, for example:
+<br/><br/>
+<ul><li>Windows batch file:</li>
+<code><span class="orange">%pms%</span> addFolder Hello "<span class="orange">[</span>echo<span class="orange"> , </span>hello world<span class="orange">]</span>"</code>
+</ul><br/>
+Array notation syntax is useful when scripts are using some flavor of <code>$0</code>
+to call themselves back in the future. In general we don't automatically know whether <code>$0</code>
+contains spaces or not, and without array notation syntax would need to embed it in quotes to guard against
+spaces when making system calls to the API, e.g. <code>\"$0\"</code> or <code>""%~0""</code> and so on
+(see <a href="#EXAMPLES">Examples</a>).
+
+</ul>
+<br/>
+
+<b><a name="PLAYERS">Players</a></b>
+<ul>
+Players are scripts that define a set of supported media formats and output a media
+stream to the destination file designated by PMS when items matching these formats are
+sent to them.  This process, which we'll illustrate using the
+<a href="readme.html#WEBREADER">webreader</a> player (see <i>jumpy/webreader/webreader.py</i>)
+as an example, involves two phases:
+<br/><br/>
+<b>Setup</b>
+<br/><br/>
+<ul>
+The script is identified as a startup <code>[<span class="orange">+</span>]</code> item in
+<i><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></i> with a startup command defined by you
+<pre>
+[<span class="orange">+</span>webreader]
+cmd = "${home}/webreader/webreader.py" init
+</pre>
+which generates an initial call where the script registers itself as a player by calling
+<a href="readme.html#ADDPLAYER"><code>pms.addPlayer</code></a> to
+define what formats it accepts and what command to issue for playback. For instance
+<pre>
+<i class="comment"># create the player</i>
+pms.addPlayer(
+	name <i>= 'webreader'</i>,
+	<span style="background:#eeeeec">cmd <i>= [sys.argv[0], '${filename}', '${outfile}', '${format}:${userdata}'],</i></span>
+	<span style="background:#eeeeec">supported <i>= 'f:html|htm|webpage|rdb|readability m:video/mpeg',</i></span>
+	mediatype <i>= PMS_VIDEO</i>,
+	purpose <i>= PMS_MISC_PLAYER</i>,
+	desc <i>= 'Browse snapshots of your webpages.'</i>,
+	playback <i>= '-1' if len(sys.argv) < 3 else sys.argv[2]</i>)
+</pre>
+here the playback command <code>cmd</code> is a callback to the same script with runtime
+variables as arguments, and will produce calls such as
+<pre>webreader.py http://nytimes.com/ /tmp/ps3mediaserver/1346412874907webreader webpage:</pre>
+and <code>supported</code> declares that <code>video/mpeg</code> is the mimetype to be broadcast
+for items matching the formats <code><span class="orange">html</span>|<span class="orange">htm</span>|<span class="orange">webpage</span>|<span class="orange">rdb</span>|<span class="orange">readability</span></code>.
+Note that the last three are psuedo-formats meaningful only to the player itself, and represent
+custom items that can be added to the xmb by calls to <a href="#ADDMEDIA"><code>pms.addMedia</code></a> elsewhere
+in this or other scripts, e.g.
+<ul><code>pms.addMedia('NYT Front Page', '<span class="orange">webpage</span>', 'http://nytimes.com/')</code></ul>
+</ul>
+<br/>
+<b>Playback</b>
+<br/><br/>
+<ul>
+This phase is entirely up to you, the only requirement being that a media stream
+eventually be written to the designated <code>${outfile}</code>.  For instance given
+the example above <i>webreader.py</i> ends up doing something like
+<pre>convert ... | ffmpeg -y ... /tmp/ps3mediaserver/1346412874907webreader</pre>
+In Windows the <code>${outfile}</code> names are somewhat shell and escape unfriendly and
+may end up being mangled. As a workaround
+the environment variable <code>%OUTFILE%</code> (or <code>$OUTFILE</code> in unix) is also always
+set to this filename and the more robust method is to retrieve it there directly.
+</ul>
+<br/>
+Note that although the example given here is in python, players, like other scripts, can be
+written in any language using <a href="#OTHERSCRIPTS">command-line syntax</a></i>.
+</ul>
+<br/>
+
+<b><a name="INTERPRETERS">Interpreters</a></b>
+<ul>
+Jumpy has automatic support for these file-types:
+<br/><br/>
+<ul><code>py, sh, pl, rb, php, groovy, vbs, js</code></ul>
+<br/>
+which is to say it associates each with an interpreter, namely:
+<br/><br/>
+<ul><code style="	white-space:pre-wrap;">python, sh, perl, ruby, php, groovy, (windows:cscript), (windows:cscript mac:jsc unix:rhino)</code></ul>
+<br/>
+and checks to see if <i>PMS.conf</i> contains a <code>.path</code> for the interpreter's executable.
+The point of all this is to allow scripts to specify commands in a generic form, which is more
+conducive to script-sharing, and let jumpy resolve the details according to each user's settings.
+<br/><br/>
+To enable automatic support for one of these interpreters when it isn't installed system-wide, or to
+pick a specific installed version, add a <code>.path</code> setting for it in <i>PMS.conf</i>, for instance
+<ul>
+<pre>
+<span class="orange">perl</span>.path = /usr/local/lib/perl-5.10.1/bin/perl
+</pre>
+</ul>
+Enabling automatic support for a new language involves adding its filetype to <code>script.filetypes</code>
+(create it if it doesn't exist) and setting its <code>.interpreter</code> and <code>.path</code> in  <i>PMS.conf</i>.
+For a concrete example we'll pretend that perl isn't already supported and we're adding it as a new
+language. We add these settings in <i>PMS.conf</i>:
+<ul>
+<pre>
+script.filetypes = py,vbs,js,<span class="orange">pl</span>
+<span class="orange">pl</span>.interpreter = <span class="orange">perl</span>
+<span class="orange">perl</span>.path = /usr/local/lib/perl-5.10.1/bin/perl
+</pre>
+</ul>
+and now jumpy can resolve everything automatically. For example given the generic command
+<ul>
+<pre>
+<span class="orange">perl</span> foo.pl arg1 arg2
+</pre>
+</ul>
+Jumpy will look for '<i><code><span class="orange">perl</span>.path</code></i>' and
+substitute it if it's present, and if not it will try running the command as-is.
+If the given command omits the interpreter:
+<ul>
+<pre>
+foo.<span class="orange">pl</span> arg1 arg2
+</pre>
+</ul>
+(for instance as a result of using <code>$0</code>) jumpy will first look up the interpreter by file-type,
+i.e. '<i><code><span class="orange">pl</span>.interpreter</code></i>' and then proceed as above.
+</ul>
+<br/>
+
+<b><a name="JUMPSTART">Jumpstarting Scripts</a></b>
+<ul>
+<i>Jumpstart</i> is a console utility to speed up development by testing
+scripts and navigating folders outside of PMS. To see how it works first edit the 3 user-specific paths in
+<i>plugins/jumpy/jumpstart.bat</i> if necessary and then open up a console there and type
+<pre>jumpstart xbmc.py</pre>or
+<pre>jumpstart c:\somewhere\myscript.bat</pre>
+</ul>
+<br/>
+
+
+<b><a name="EXAMPLES">Examples</a></b>
+<br/>
+<ul>
+These examples are all equivalent, somewhat contrived, don't do anything very useful and employ a lot of fake
+videos, but hopefully they get the essential points across.  To try one out in PMS save it somewhere
+and add an entry like this to <i><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></i>:
+<ul>
+<pre>
+[+bat]
+cmd = c:\somewhere\helloworld.bat
+</pre>
+</ul>
+You can also try it in a console using <a href="#JUMPSTART">jumpstart</a> like so:
+<ul>
+<pre>jumpstart c:\somewhere\helloworld.bat</pre>
+</ul>
+</ul>
+<br/>
+<ul>
+<li><b><a name="HELLOPY">helloworld.py</a></b></li>
+<pre>
+import sys, os, jumpy
+from datetime import datetime
+
+<i class="comment"># initial call:</i>
+if len(sys.argv) == 1:
+	<i class="comment"># add some folders</i>
+	pms.addFolder('Examples/python/Hello', [sys.argv[0], 'hello'])
+	pms.addFolder('Examples/python/Date', [sys.argv[0], 'date'])
+	pms.addFolder('Examples/python/Version', [sys.argv[0], 'jumpy version'])
+	<i class="comment"># set an environment variable and add a folder to test it</i>
+	pms.setEnv('test', 'This is a test')
+	pms.addFolder('Examples/python/Test Env', [sys.argv[0], 'env'])
+
+<i class="comment"># callbacks:</i>
+elif sys.argv[1] == 'hello':
+	<i class="comment"># add a video item</i>
+	pms.addVideo('World', 'world.mpg')
+elif sys.argv[1] == 'date':
+	<i class="comment"># print the time and date as a video label</i>
+	pms.addVideo(str(datetime.now()), 'null.mpg')
+elif sys.argv[1] == 'jumpy version':
+	<i class="comment"># print jumpy's version as a video label</i>
+	pms.addVideo('Jumpy version %s' % pms.version(), 'null.mpg')
+elif sys.argv[1] == 'env':
+	<i class="comment"># print the environment variable 'test' as a video label</i>
+	pms.addVideo(os.getenv('test'), 'null.mpg')
+</pre>
+<br/>
+For a more practical example have a look at <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder.
+</ul>
+<br/><br/>
+
+<ul>
+<li><b><a name="HELLOSH">helloworld.sh</a></b></li>
+<pre>
+<i class="comment">#!/bin/sh</i>
+
+case "$1" in
+	<i class="comment"># initial call:</i>
+	("")
+		<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
+		$pms addFolder Examples/sh/Hello "'$0' hello"
+		$pms addFolder Examples/sh/Date "'$0' date"
+		<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i>
+		<i class="comment"># instead of embedded quotes</i>
+		$pms addFolder Examples/sh/Version "[$0 , jumpy version]"
+		<i class="comment"># set an environment variable and add a folder to test it</i>
+		$pms setEnv test "This is a test"
+		$pms addFolder "Examples/sh/Test Env" "'$0' env"
+		;;
+
+	<i class="comment"># callbacks:</i>
+	(hello)
+		<i class="comment"># add a video item</i>
+		$pms addVideo World world.mpg ;;
+	(date)
+		<i class="comment"># print the time and date as video labels</i>
+		t=$(date +'%I:%M %p')
+		d=$(date +'%a %d %b %Y')
+		$pms addVideo "$t" null.mpg
+		$pms addVideo "$d" null.mpg
+		;;
+	("jumpy version")
+		<i class="comment"># print jumpy's version as a video label</i>
+		$pms addVideo "Jumpy version $($pms version)" null.mpg ;;
+	(env)
+		<i class="comment"># print the environment variable $test as a video label</i>
+		$pms addVideo "$test" null.mpg ;;
+esac
+</pre>
+</ul>
+<br/><br/>
+
+<ul>
+<li><b><a name="HELLOPL">helloworld.pl</a></b></li>
+<pre>
+<i class="comment">#!/usr/bin/perl</i>
+
+our $pms = $ENV{"pms"};
+
+<i class="comment"># initial call:</i>
+if (not @ARGV) {
+	<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
+	`$pms addFolder Examples/perl/Hello "'$0' hello"`;
+	`$pms addFolder Examples/perl/Date "'$0' date"`;
+	<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i></i>
+	<i class="comment"># instead of embedded quotes</i>
+	`$pms addFolder Examples/perl/Version "[$0 , jumpy version]"`;
+	<i class="comment"># set an environment variable and add a folder to test it</i>
+	`$pms setEnv test "This is a test"`;
+	`$pms addFolder "Examples/perl/Test Env" "'$0' env"`;
+}
+
+<i class="comment"># callbacks:</i>
+elsif ($ARGV[0] eq 'hello') {
+	<i class="comment"># add a video item</i>
+	`$pms addVideo World world.mpg`;
+}
+elsif ($ARGV[0] eq 'date') {
+	<i class="comment"># print the time and date as a video label</i>
+	my $time = localtime;
+	`$pms addVideo "$time" null.mpg`;
+}
+elsif ($ARGV[0] eq 'jumpy version') {
+	<i class="comment"># print jumpy's version as a video label</i>
+	my $ver = `$pms version`;
+	`$pms addVideo "Jumpy version $ver" null.mpg`;
+}
+elsif ($ARGV[0] eq 'env') {
+	<i class="comment"># print the environment variable 'test' as a video label</i>
+	`$pms addVideo "$ENV{'test'}" null.mpg`;
+}
+</pre>
+</ul>
+<br/><br/>
+
+<ul>
+<li><b><a name="HELLOBAT">helloworld.bat</a></b></li>
+<pre>
+@echo off
+setlocal ENABLEDELAYEDEXPANSION
+
+<i class="comment">:: initial call:</i>
+if "%~1" == "" (
+	<i class="comment">:: add some folders (note the embedded quotes: ""%~0"")</i>
+	%pms% addFolder Examples/bat/Hello """%~0"" hello"
+	%pms% addFolder Examples/bat/Date """%~0"" date"
+	<i class="comment">:: add a folder using <a href="#ARRAY">array notation syntax</a> instead of embedded quotes</i>
+	%pms% addFolder Examples/bat/Version "[%~0 , jumpy version]"
+	<i class="comment">:: set an environment variable and add a folder to test it</i>
+	%pms% setEnv test "This is a test"
+	%pms% addFolder "Examples/bat/Test Env" """%~0"" env"
+	exit
+)
+
+<i class="comment">:: callbacks:</i>
+if "%~1" == "hello" (
+	<i class="comment">:: add a video item</i>
+	%pms% addVideo World world.mpg
+
+) else if "%~1" == "date" (
+	<i class="comment">:: print the time and date as video labels</i>
+	for /f "delims=" %%i in ('time /t') do set t=%%i
+	for /f "delims=" %%i in ('date /t') do set d=%%i
+	%pms% addVideo "!t!" null.mpg
+	%pms% addVideo "!d!" null.mpg
+
+) else if "%~1" == "jumpy version" (
+	<i class="comment">:: print jumpy's version as a video label.</i>
+	for /f "delims=" %%i in ('%pms% version') do set ver=%%i
+	%pms% addVideo "Jumpy version !ver!" null.mpg
+
+) else if "%~1" == "env" (
+	<i class="comment">:: print the environment variable 'test' as a video label</i>
+	%pms% addVideo "%test%" null.mpg
+)
+</pre>
+</ul>
+
+</div>
+</body>
+</html>
+
+<!--http://wiki.xbmc.org/index.php?title=Python_Development-->

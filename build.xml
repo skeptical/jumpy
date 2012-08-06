@@ -47,6 +47,7 @@
 		<mkdir dir="${dist}/jumpy/lib"/>
 		<copy file="${jumpy}.jar" todir="${dist}"/>
 		<copy file="readme.html" todir="${dist}/jumpy"/>
+		<copy file="scripts.html" todir="${dist}/jumpy"/>
 		<copy todir="${dist}/jumpy">
 			<fileset dir="script" excludes="**/*.pyc **/*log* **/*test* **/*.0 **/ignore/**"/>
 		</copy>
