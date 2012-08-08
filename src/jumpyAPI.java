@@ -6,7 +6,7 @@ public interface jumpyAPI {
 	// new constants:
 	public static final int UNRESOLVED = -2;
 	public static final int FOLDER = -1;
-	public static final int VIDEOACTION = -4;
+	public static final int ACTION = -4;
 
 	// constants from net.pms.formats.Format:
 	//	public static final int ISO = 32;

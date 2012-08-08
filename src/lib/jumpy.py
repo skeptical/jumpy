@@ -16,7 +16,7 @@ except NameError:
 	# new constants:
 	__builtin__.PMS_UNRESOLVED = -2
 	__builtin__.PMS_FOLDER = -1
-	__builtin__.PMS_VIDEOACTION = -4
+	__builtin__.PMS_ACTION = -4
 	# constants from net.pms.formats.Format:
 	__builtin__.PMS_AUDIO = 1
 	__builtin__.PMS_IMAGE = 2
@@ -86,6 +86,9 @@ def pms_addImagefeed(name, cmd, thumb=None):
 def pms_addVideofeed(name, cmd, thumb=None):
 	pms_addItem(PMS_VIDEOFEED, name, cmd, thumb)
 
+def pms_addAction(name, cmd, thumb=None):
+	pms_addItem(PMS_ACTION, name, cmd, thumb)
+
 def pms_addPath(path=None):
 	pms._addPath(path)
 
@@ -147,6 +150,7 @@ __builtin__.pms.addISO = pms_addISO
 __builtin__.pms.addAudiofeed = pms_addAudiofeed
 __builtin__.pms.addImagefeed = pms_addImagefeed
 __builtin__.pms.addVideofeed = pms_addVideofeed
+__builtin__.pms.addAction = pms_addAction
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath
 __builtin__.pms.setPath = pms_addPath # deprecated

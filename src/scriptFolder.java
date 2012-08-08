@@ -169,8 +169,8 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				media = "unresolved item";
 				folder.addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
 				break;
-			case VIDEOACTION:
-				media = "video action";
+			case ACTION:
+				media = "action";
 				folder.addChild(new mediaItem(name, "jump", uri, thumb));
 				break;
 			case Format.VIDEO:
