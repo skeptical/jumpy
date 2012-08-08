@@ -176,7 +176,9 @@ public class command {
 		}
 		addPath(null);
 		addPath(syspath);
-		env.put("PYTHONPATH", syspath);
+		if (syspath != null) {
+			env.put("PYTHONPATH", syspath);
+		}
 		env.put("pms", getpms());
 		startdir = absolute(this.argv.get(scriptarg)).getParentFile().getAbsoluteFile();
 	}
@@ -217,6 +219,13 @@ public class command {
 			args[i] = expand(argv.get(i));
 		}
 		return args;
+	}
+
+	public String envInfo() {
+		String e = env.toString();
+		return "\nin directory '" + startdir.getAbsolutePath() + "'\n"
+			+ (syspath != null ? ("PATH=" + syspath + "\n") : "")
+			+ e.substring(1, e.length()-1).replace(", ", "\n") + "\n";
 	}
 }
 

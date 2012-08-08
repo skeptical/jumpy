@@ -1,6 +1,7 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Date;
@@ -21,11 +22,11 @@ import net.pms.io.OutputParams;
 import net.pms.io.PipeProcess;
 import net.pms.io.ProcessWrapper;
 import net.pms.io.ProcessWrapperImpl;
+import net.pms.io.ProcessWrapperLiteImpl;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
-
 
 public class player extends Player {
 
@@ -166,11 +167,13 @@ public class player extends Player {
 		cmdline.substitutions = vars;
 		String[] argv = cmdline.toStrings();
 		params.workDir = cmdline.startdir;
+		params.env = cmdline.env;
 
-		jumpy.log(name() + " player: running " + Arrays.toString(argv));
-		jumpy.log("in directory '" + params.workDir.getAbsolutePath() + "'");
+		cmdline.startAPI(jumpy.top);
+		jumpy.log("%n");
+		jumpy.log("starting " + name() + " player.%n%nrunning " + Arrays.toString(argv)
+			+ cmdline.envInfo());
 
-		jumpy.log(params.toString());
 		ProcessWrapperImpl p = new ProcessWrapperImpl(argv, params);
 		params.maxBufferSize = 100;
 		params.input_pipes[0] = pipe;
@@ -178,6 +181,12 @@ public class player extends Player {
 		ProcessWrapper pipe_process = pipe.getPipeProcess();
 		p.attachProcess(pipe_process);
 		pipe_process.runInNewThread();
+		final player self = this;
+		p.attachProcess(new  ProcessWrapperLiteImpl(null) {
+			public void stopProcess() {
+				self.shutdown();
+			}
+		});
 		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e) { }
@@ -185,6 +194,10 @@ public class player extends Player {
 
 		p.runInNewThread();
 		return p;
+	}
+
+	public void shutdown() {
+		cmdline.stopAPI();
 	}
 
 	public void setCommand(String cmd) {

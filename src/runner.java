@@ -53,8 +53,7 @@ public class runner {
 
 		String[] argv = cmdline.toStrings();
 		int exitValue = 0;
-		log("Running " + Arrays.toString(argv));
-		log("in directory '" + cmdline.startdir.getAbsolutePath() + "'");
+		log("running " + Arrays.toString(argv) + cmdline.envInfo());
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder(argv);
@@ -63,15 +62,10 @@ public class runner {
 			Map<String,String> env = pb.environment();
 			if (cmdline.syspath != null ) {
 				env.put("PATH", cmdline.syspath + File.pathSeparator + env.get("PATH"));
-				log("PATH=" + env.get("PATH"));
 			}
 			if (cmdline.env != null && !cmdline.env.isEmpty()) {
-				for (Map.Entry<String,String> var : cmdline.env.entrySet()) {
-					log(var.getKey() + "=" + var.getValue());
-				}
 				env.putAll(cmdline.env);
 			}
-			out.println("");
 
 			p = pb.start();
 
