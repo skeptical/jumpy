@@ -32,6 +32,7 @@ public class player extends Player {
 
 	public String name;
 	public command cmdline;
+	public boolean dynamic;
 	public String id;
 	public int type = Format.UNKNOWN;
 	public int purpose = MISC_PLAYER;
@@ -73,6 +74,9 @@ public class player extends Player {
 		this.purpose = purpose;
 		if (!(cmdline == null || "".equals(cmdline))) {
 			this.cmdline = new command(cmdline, null);
+			this.dynamic = false;
+		} else {
+			this.dynamic = true;
 		}
 		final String[] fmts = fmt.split("\\|");
 		this.format = FormatFactory.getAssociatedExtension("." + fmts[0]);
@@ -177,15 +181,15 @@ public class player extends Player {
 		jumpy.log("starting " + name() + " player.%n%nrunning " + Arrays.toString(argv)
 			+ cmdline.envInfo());
 
-		ProcessWrapperImpl p = new ProcessWrapperImpl(argv, params);
+		ProcessWrapperImpl pw = new ProcessWrapperImpl(argv, params);
 		params.maxBufferSize = 100;
 		params.input_pipes[0] = pipe;
 		params.stdin = null;
 		ProcessWrapper pipe_process = pipe.getPipeProcess();
-		p.attachProcess(pipe_process);
+		pw.attachProcess(pipe_process);
 		pipe_process.runInNewThread();
 		final player self = this;
-		p.attachProcess(new  ProcessWrapperLiteImpl(null) {
+		pw.attachProcess(new ProcessWrapperLiteImpl(null) {
 			public void stopProcess() {
 				self.shutdown();
 			}
@@ -195,8 +199,8 @@ public class player extends Player {
 		} catch (InterruptedException e) { }
 		pipe.deleteLater();
 
-		p.runInNewThread();
-		return p;
+		pw.runInNewThread();
+		return pw;
 	}
 
 	public void shutdown() {
@@ -208,9 +212,9 @@ public class player extends Player {
 	}
 
 	public String finalize(String uri) {
-		if (cmdline == null) {
+		if (dynamic || cmdline == null) {
 			cmdline = new command(uri, null);
-	}
+		}
 		return uri;
 	}
 
