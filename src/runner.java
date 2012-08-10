@@ -61,7 +61,8 @@ public class runner {
 			pb.directory(cmdline.startdir);
 			Map<String,String> env = pb.environment();
 			if (cmdline.syspath != null ) {
-				env.put("PATH", cmdline.syspath + File.pathSeparator + env.get("PATH"));
+				String sysPathKey = cmdline.windows ? "Path" : "PATH";
+				env.put(sysPathKey, cmdline.syspath + File.pathSeparator + env.get(sysPathKey));
 			}
 			if (cmdline.env != null && !cmdline.env.isEmpty()) {
 				env.putAll(cmdline.env);

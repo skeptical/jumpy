@@ -167,6 +167,9 @@ public class player extends Player {
 		cmdline.substitutions = vars;
 		String[] argv = cmdline.toStrings();
 		params.workDir = cmdline.startdir;
+		if (cmdline.syspath != null ) {
+			cmdline.env.put("PATH", cmdline.syspath);
+		}
 		params.env = cmdline.env;
 
 		cmdline.startAPI(jumpy.top);
