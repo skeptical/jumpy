@@ -166,6 +166,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			refresh(false);
 		}
 
+		player.out = logger;
 		players = new ArrayList<player>();
 		players.add(new player(this,
 			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,

@@ -1,5 +1,6 @@
 package net.pms.external.infidel.jumpy;
 
+import java.io.PrintStream;
 import java.io.IOException;
 
 import java.util.Arrays;
@@ -42,6 +43,8 @@ public class player extends Player {
 	public String executable = "";
 	private FormatConfiguration supported;
 	public String desc, supportStr, cmdStr;
+	private ProcessWrapperImpl pw;
+	public static PrintStream out = System.out;
 
 	public jumpy jumpy;
 
@@ -181,7 +184,14 @@ public class player extends Player {
 		jumpy.log("starting " + name() + " player.%n%nrunning " + Arrays.toString(argv)
 			+ cmdline.envInfo());
 
-		ProcessWrapperImpl pw = new ProcessWrapperImpl(argv, params);
+//		final player self = this;
+//		pw = new ProcessWrapperImpl(argv, params, false, true) {
+//			public void stopProcess() {
+//				super.stopProcess();
+//				self.stop();
+//			}
+//		};
+		pw = new ProcessWrapperImpl(argv, params, false, true);
 		params.maxBufferSize = 100;
 		params.input_pipes[0] = pipe;
 		params.stdin = null;
@@ -191,20 +201,28 @@ public class player extends Player {
 		final player self = this;
 		pw.attachProcess(new ProcessWrapperLiteImpl(null) {
 			public void stopProcess() {
-				self.shutdown();
+				self.stop();
 			}
 		});
 		try {
 			Thread.sleep(50);
-		} catch (InterruptedException e) { }
+		} catch (InterruptedException e) {}
 		pipe.deleteLater();
 
 		pw.runInNewThread();
 		return pw;
 	}
 
-	public void shutdown() {
-		cmdline.stopAPI();
+	public void stop() {
+		if (! pw.isDestroyed()) {
+			cmdline.stopAPI();
+			List<String> results;
+			if ((results = pw.getResults()) != null) {
+				for (String line : results) {
+					out.println(line);
+				}
+			}
+		}
 	}
 
 	public void setCommand(String cmd) {
