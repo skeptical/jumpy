@@ -181,6 +181,9 @@ public class player extends Player {
 		}
 		params.env = cmdline.env;
 
+		params.waitbeforestart = 0; // no delay when the transcode is starting
+		params.minBufferSize = 1; // 1Mb of minimum buffer before sending the file
+
 		cmdline.startAPI(jumpy.top);
 		jumpy.log("%n");
 		jumpy.log("starting " + name() + " player.%n%nrunning " + Arrays.toString(argv)
