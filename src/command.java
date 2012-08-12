@@ -24,6 +24,7 @@ public class command {
 
 	public List<String> argv;
 	public static String pms = "lib/jumpy.py";
+	public static String jumpypy = pms;
 	public static String basepath = null;
 	public String syspath = null;
 	private static boolean pmsok = false;
@@ -59,6 +60,7 @@ public class command {
 
 	public static String getpms()  {
 		if (!pmsok) {
+			jumpypy = pms;
 //			if (windows) {
 //				WinUtils win = (WinUtils)(PMS.get().getRegistry());
 //				pms = win.getShortPathNameW(getexec("python")) + " " + win.getShortPathNameW(pms);
@@ -131,6 +133,11 @@ public class command {
 					return argv;
 				}
 			}
+		} else if (arg1.equals("pms")) {
+			argv.set(0, getexec("python"));
+			argv.set(1, jumpypy);
+			scriptarg = 1;
+			return argv;
 		}
 
 		// use the executable if we have one

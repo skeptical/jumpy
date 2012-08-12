@@ -180,9 +180,11 @@ public class config {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		c.insets = border;
 		c.gridx = 0; c.gridy = 0;
+		boolean notitle = p.isnative || !inibutton;
 		String about = "<html>"
-			+ (p.desc == null ? "Jumpy User-Defined Player" : p.desc)
-			+ "<br><br>Supported : <font color=blue>" + p.supportStr + "</font>"
+			+ (notitle ? "" : "Jumpy User-Defined Player<br><br>")
+			+ (p.desc == null ? "" : p.desc + "<br><br>")
+			+ "Supported : <font color=blue>" + p.supportStr + "</font>"
 			+ (p.cmdStr == null || "".equals(p.cmdStr) ? "" : ("<br>Command : <font color=blue>" + p.cmdStr + "</font>"))
 			+ "</html>";
 		JLabel label = new JLabel(about, SwingConstants.LEFT);
@@ -190,7 +192,10 @@ public class config {
 		panel.add(label, c);
 		if (p.cmdline != null) {
 			c.gridx = 0; c.gridy = 1;
-			panel.add(editButton(p.cmdline.argv.get(p.cmdline.scriptarg)), c);
+			String script = p.cmdline.argv.get(p.cmdline.scriptarg);
+			if (! p.cmdline.jumpypy.equals(script)) {
+				panel.add(editButton(script), c);
+			}
 			if (inibutton) {
 				c.gridx = 0; c.gridy = 2;
 				panel.add(editButton(p.jumpy.scriptsini), c);

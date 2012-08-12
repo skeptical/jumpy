@@ -33,6 +33,7 @@ public class player extends Player {
 
 	public String name;
 	public command cmdline;
+	public boolean isnative = false;
 	public boolean dynamic;
 	public String id;
 	public int type = Format.UNKNOWN;
@@ -49,6 +50,7 @@ public class player extends Player {
 	public jumpy jumpy;
 
 	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type, int purpose, String desc) {
+		isnative = true;
 		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc);
 	}
 

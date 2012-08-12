@@ -32,14 +32,9 @@ public class userscripts {
 		try {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
-		String path, alt;
 		for (Section section : ini.values()) {
 			String name = section.getName();
 			jumpy.log("Adding user script: " + name);
-
-			if ((alt = section.get("cmd")) != null && alt.startsWith("pms ")) {
-				section.put("cmd", command.getpms() + alt.substring(3));
-			}
 
 			if (! (name.startsWith("+") || name.startsWith("-"))) {
 				jumpy.top.addItem(jumpyAPI.FOLDER, name, section.remove("cmd"), section.remove("thumb")/*, section*/);
