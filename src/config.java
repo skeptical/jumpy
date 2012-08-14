@@ -85,7 +85,10 @@ public class config {
 		c.insets = none;
 		panel.add(top, c);
 
-		JPanel files = new JPanel(new GridBagLayout());
+		JToolBar files = new JToolBar();
+		files.setLayout(new GridBagLayout());
+		files.setFloatable(false);
+		files.setRollover(true);
 		c.insets = items;
 		c.gridwidth = 1;
 		c.gridx = 0; c.gridy = 0;
@@ -184,23 +187,30 @@ public class config {
 		String about = "<html>"
 			+ (notitle ? "" : "Jumpy User-Defined Player<br><br>")
 			+ (p.desc == null ? "" : p.desc + "<br><br>")
-			+ "Supported : <font color=blue>" + p.supportStr + "</font>"
-			+ (p.cmdStr == null || "".equals(p.cmdStr) ? "" : ("<br>Command : <font color=blue>" + p.cmdStr + "</font>"))
-			+ "</html>";
+			+ "<table width=500 align=left valign=top>"
+			+ "<tr><td width=80>Supported</td><td><font color=blue>" + p.supportStr + "</font></td></tr>"
+			+ (p.cmdStr == null || "".equals(p.cmdStr) ? "" :
+				("<tr><td>Command</td><td><font color=blue>" + p.cmdStr + "</font></td></tr>"))
+			+ "</table></html>";
 		JLabel label = new JLabel(about, SwingConstants.LEFT);
 		label.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(label, c);
 		if (p.cmdline != null) {
-			c.gridx = 0; c.gridy = 1;
+			JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+			toolBar.setFloatable(false);
+			toolBar.setRollover(true);
 			String script = p.cmdline.argv.get(p.cmdline.scriptarg);
 			if (! p.cmdline.jumpypy.equals(script)) {
-				panel.add(editButton(script), c);
+				toolBar.add(editButton(script));
 			}
 			if (inibutton) {
 				c.gridx = 0; c.gridy = 2;
-				panel.add(editButton(p.jumpy.scriptsini), c);
+				toolBar.add(editButton(p.jumpy.scriptsini));
 			}
+			c.gridx = 0; c.gridy = 1;
+			panel.add(toolBar, c);
 		}
+
 		JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		top.add(panel);
 		return top;
