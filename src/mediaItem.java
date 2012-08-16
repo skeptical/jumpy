@@ -5,7 +5,6 @@ import java.io.InputStream;
 
 import net.pms.network.HTTPResource;
 import net.pms.dlna.DLNAResource;
-import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 
 public class mediaItem extends DLNAResource {

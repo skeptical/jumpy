@@ -190,7 +190,7 @@ class item extends node implements jumpyAPI {
 		this.discovered = false;
 	}
 
-	public void addItem(int type, String filename, String uri, String thumb) {
+	public void addItem(int type, String filename, String uri, String thumb, String data) {
 		item folder = this;
 		String name = filename;
 		if (type == jumpyAPI.FOLDER && filename.contains("/")) {

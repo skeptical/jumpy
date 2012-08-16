@@ -135,8 +135,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		return (p == null ? "/" : "") + xmbpath.replace("//","").trim();
 	}
 
-	@Override
 	public void addItem(int type, String filename, String uri, String thumb) {
+		addItem(type, filename, uri, thumb, null);
+	}
+
+	@Override
+	public void addItem(int type, String filename, String uri, String thumb, String data) {
 
 		DLNAResource folder = this;
 
@@ -172,6 +176,10 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 			case ACTION:
 				media = "action";
 				folder.addChild(new mediaItem(name, "jump", uri, thumb));
+				break;
+			case MEDIA:
+				media = data + " item";
+				folder.addChild(new mediaItem(name, data, uri, thumb));
 				break;
 			case Format.VIDEO:
 				media = "video";

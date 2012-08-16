@@ -7,6 +7,7 @@ public interface jumpyAPI {
 	public static final int UNRESOLVED = -2;
 	public static final int FOLDER = -1;
 	public static final int ACTION = -4;
+	public static final int MEDIA = -8;
 
 	// constants from net.pms.formats.Format:
 	//	public static final int ISO = 32;
@@ -22,7 +23,7 @@ public interface jumpyAPI {
 	public static final int AUDIOFEED = 4097; // Format.AUDIO|FEED;
 	public static final int IMAGEFEED = 4098; // Format.IMAGE|FEED;
 
-	public void addItem(int type, String filename, String uri, String thumb);
+	public void addItem(int type, String filename, String uri, String thumb, String data);
 	public void addPath(String path);
 	public void setEnv(String name, String val);
 

@@ -17,6 +17,7 @@ except NameError:
 	__builtin__.PMS_UNRESOLVED = -2
 	__builtin__.PMS_FOLDER = -1
 	__builtin__.PMS_ACTION = -4
+	__builtin__.PMS_MEDIA = -8
 	# constants from net.pms.formats.Format:
 	__builtin__.PMS_AUDIO = 1
 	__builtin__.PMS_IMAGE = 2
@@ -50,13 +51,13 @@ except NameError:
 	__builtin__.PMS_NATIVE = "NATIVE"
 
 # wrapper to flatten the argv list into a tokenized string
-def pms_addItem(t, name, argv, thumb = None):
+def pms_addItem(t, name, argv, thumb = None, data = None):
 	if type(argv).__name__ == 'list':
 		a = []
 		for arg in argv:
 			a.append(arg.replace(' , ',' ,, '))
 		argv = '[%s]' % ' , '.join(a)
-	pms._addItem(t, name, argv, thumb)
+	pms._addItem(t, name, argv, thumb, data)
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
@@ -88,6 +89,9 @@ def pms_addVideofeed(name, cmd, thumb=None):
 
 def pms_addAction(name, cmd, thumb=None):
 	pms_addItem(PMS_ACTION, name, cmd, thumb)
+
+def pms_addMedia(name, format, cmd, thumb=None):
+	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
 
 def pms_addPath(path=None):
 	pms._addPath(path)
@@ -151,6 +155,7 @@ __builtin__.pms.addAudiofeed = pms_addAudiofeed
 __builtin__.pms.addImagefeed = pms_addImagefeed
 __builtin__.pms.addVideofeed = pms_addVideofeed
 __builtin__.pms.addAction = pms_addAction
+__builtin__.pms.addMedia = pms_addMedia
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath
 __builtin__.pms.setPath = pms_addPath # deprecated
