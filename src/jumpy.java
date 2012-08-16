@@ -211,14 +211,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	@Override
 	public JComponent config() {
-//log("%n");
-//for (Player p:PlayerFactory.getPlayers()) {
-//log("player: name="+p.name()+" id="+p.id()+" type="+p.type() +" "+p.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
-//}
-//log("%n");
-//for (Format f:FormatFactory.getExtensions()) {
-//log("format: name="+f+" id="+Arrays.asList(f.getId()).toString()+" type="+f.getType() +" "+f.getClass()/*+" super="+p.getClass().getSuperclass().getName()*/);
-//}
 		return config.mainPanel();
 	}
 

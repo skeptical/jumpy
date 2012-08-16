@@ -183,8 +183,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				break;
 			case Format.VIDEO:
 				media = "video";
-				DLNAResource vid2 = (f == null ? new WebVideoStream(name, uri, thumb) : new RealFile(f, name));
-				folder.addChild(vid2);
+				folder.addChild(f == null ? new WebVideoStream(name, uri, thumb) : new RealFile(f, name));
 				break;
 			case Format.AUDIO:
 				media = "audio";
