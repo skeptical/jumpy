@@ -54,7 +54,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public boolean debug, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
-	public String syspath;
 	private FileOutputStream logfile;
 	private quickLog logger;
 	private File[] scripts;
@@ -84,20 +83,21 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		logger.stdout = debug;
 
 		if (configuration.getCustomProperty("python.path") == null) {
-			log("%n%n%nWARNING: No 'python.path' setting found in PMS.conf.%n%n%n");
+			log("\n\n\nWARNING: No 'python.path' setting found in PMS.conf.\n\n\n");
 		}
 
 		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
-		command.basepath = utils.getBinPaths(configuration);
+		String bin = utils.getBinPaths(configuration);
+		command.basepath =
+			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
 
 		runner.out = logger;
 		runner.version = version;
-		syspath = home + "lib";
 
 		log(new Date().toString());
-		log("%n");
+		log("\n");
 		log("initializing jumpy " + version, true);
-		log("%n");
+		log("\n");
 
 		String scriptexts = (String)configuration.getCustomProperty("script.filetypes");
 		if (scriptexts != null) {
@@ -120,7 +120,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			}
 		}
 
-		log("%n");
+		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
 		log("conf=" + jumpyconf, true);
@@ -128,17 +128,16 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("userscripts=" + scriptsini, true);
 		log("refresh=" + refresh, true);
 		log("python=" + command.getexec("python"), true);
-		log("pypath=" + syspath, true);
-		if (command.basepath != null) {
-			log("binaries="+ command.basepath);
-		}
+		log("PATH=" + command.basepath, true);
 
+		log("\n");
 		log("Adding root folder.", true);
-		top = new scriptFolder(this, "Jumpy", null, null, syspath);
+		top = new scriptFolder(this, "Jumpy", null, null);
 
+		log("\n");
 		runner ex = new runner();
-		ex.quiet(top, "[" + command.pms + "]", syspath, null);
-		log("%n");
+		ex.quiet(top, "[" + command.pms + "]", null, null);
+		log("\n");
 
 		scripts = new File(home).listFiles(
 			new FilenameFilter() {
@@ -154,7 +153,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 
 		if (refresh != 0) {
-			util = new scriptFolder(this, "Util", null, null, syspath);
+			util = new scriptFolder(this, "Util", null, null);
 			top.addChild(util);
 			final jumpy me = this;
 			util.addChild(new VirtualVideoAction("Refresh", true) {
@@ -170,19 +169,19 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		players = new ArrayList<player>();
 		players.add(new player(this,
 			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
-			"Jumpy Video Action Player"));
+			"Jumpy Video Action Player", 0, 1));
 
 		userscripts = new userscripts(this);
 		userscripts.autorun(true);
 
-		log("%n");
+		log("\n");
 		log("Found " + scripts.length + " python scripts.", true);
 
 		for (File script:scripts) {
-			log("%n");
+			log("\n");
 			log("starting " + script.getName() + ".", true);
-			log("%n");
-			ex.run(top, "[" + script.getPath() + "]", syspath);
+			log("\n");
+			ex.run(top, "[" + script.getPath() + "]", null);
 			top.env.clear();
 		}
 
@@ -198,7 +197,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		return top;
 	}
 
-	public synchronized  void log(String msg) {
+	public synchronized void log(String msg) {
 		logger.log(msg);
 	}
 
@@ -302,8 +301,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		}
 	}
 
-	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
-		players.add(new player(this, name, cmdline, supported, type, purpose, desc));
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String playback) {
+		players.add(new player(this, name, cmd, supported, mediatype, purpose, desc, playback));
+		return players.size() - 1;
 	}
 
 	public Object dbgpack_cb() {
@@ -316,6 +316,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 class quickLog extends PrintStream {
 	private static String tag;
 	public static boolean stdout = false;
+	String CRLF = System.getProperty("line.separator");
 
 	public quickLog(FileOutputStream log, String tag) {
 		super(log);
@@ -323,7 +324,10 @@ class quickLog extends PrintStream {
 	}
 
 	public synchronized void log(String msg) {
-		printf(msg.trim().replaceAll("%n","").equals("") ? msg : tag + msg + "%n");
+		if (utils.windows) {
+			msg = msg.replaceAll("\n", CRLF);
+		}
+		print(msg.trim().equals("") ? msg : tag + msg + CRLF);
 	}
 
 	public synchronized void write(byte buf[], int off, int len) {

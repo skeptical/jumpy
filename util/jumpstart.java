@@ -190,7 +190,7 @@ class item extends node implements jumpyAPI {
 		this.discovered = false;
 	}
 
-	public void addItem(int type, String filename, String uri, String thumb, String data) {
+	public Object addItem(int type, String filename, String uri, String thumb, String data) {
 		item folder = this;
 		String name = filename;
 		if (type == jumpyAPI.FOLDER && filename.contains("/")) {
@@ -206,7 +206,9 @@ class item extends node implements jumpyAPI {
 //				folder = mkdirs(FilenameUtils.getPrefixLength(filename) == 0 ? this : jumpstart.root, path);
 //			}
 		}
-		folder.add(new item(type, name, uri, thumb, syspath, env));
+		item i = new item(type, name, uri, thumb, syspath, env);
+		folder.add(i);
+		return i;
 	}
 	public void addPath(String path) {
 		syspath = (path == null ? basepath : syspath + File.pathSeparator + path);
@@ -252,7 +254,8 @@ class item extends node implements jumpyAPI {
 		}
 		return parent;
 	}
-	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
+	public int addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc, String playback) {
+		return 0;
 	}
 }
 

@@ -189,6 +189,12 @@ public class config {
 			+ (p.desc == null ? "" : p.desc + "<br><br>")
 			+ "<table width=500 align=left valign=top>"
 			+ "<tr><td width=80>Supported</td><td><font color=blue>" + p.supportStr + "</font></td></tr>"
+			+ "<tr><td>Playback</td><td><font color=blue>"
+			+ (p.delay * p.buffersize == 1 ? " default" : ""
+				+ (p.delay == -1 ? "" : " delay: " + p.delay + "s")
+				+ (p.buffersize == -1 ? "" : " buffer: " + p.buffersize + "mb")
+				)
+			+ "</font></td></tr>"
 			+ (p.cmdStr == null || "".equals(p.cmdStr) ? "" :
 				("<tr><td>Command</td><td><font color=blue>" + p.cmdStr + "</font></td></tr>"))
 			+ "</table></html>";

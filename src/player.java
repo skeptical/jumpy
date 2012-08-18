@@ -46,15 +46,18 @@ public class player extends Player {
 	public String desc, supportStr, cmdStr;
 	private ProcessWrapperImpl pw;
 	public static PrintStream out = System.out;
+	public int delay, buffersize;
 
 	public jumpy jumpy;
 
-	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type, int purpose, String desc) {
+	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type, int purpose, String desc, int delay, int buffersize) {
 		isnative = true;
-		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc);
+		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc, null);
+		this.delay = delay;
+		this.buffersize = buffersize;
 	}
 
-	public player(jumpy jumpy, String name, String cmdline, String supported, int type, int purpose, String desc) {
+	public player(jumpy jumpy, String name, String cmdline, String supported, int type, int purpose, String desc, String playback) {
 		String fmt = null, mimetype = null;
 		if (supported.matches(".*f:\\w+.*")) {
 			fmt = supported.split("f:")[1].split("\\s")[0];
@@ -66,10 +69,10 @@ public class player extends Player {
 		if (supported.matches(".*m:\\w+.*")) {
 			mimetype = supported.split("m:")[1].split("\\s")[0];
 		}
-		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc);
+		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc, playback);
 	}
 
-	private void init(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, String supported, int type, int purpose, String desc) {
+	private void init(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, String supported, int type, int purpose, String desc, String playback) {
 
 		this.jumpy = jumpy;
 		this.name = name;
@@ -137,6 +140,9 @@ public class player extends Player {
 		this.supportStr = supported;
 		this.desc = desc;
 		this.cmdStr = cmdline;
+		String[] playvars = (playback != null ? playback.split(":") : new String[0]);
+		this.delay = playvars.length > 0 ? Integer.valueOf(playvars[0]) : -1;
+		this.buffersize = playvars.length > 1 ? Integer.valueOf(playvars[1]) : -1;
 
 		PlayerFactory.getAllPlayers().add(0, this);
 		PlayerFactory.getPlayers().add(0, this);
@@ -162,31 +168,54 @@ public class player extends Player {
 	}
 
 	@Override
-	public ProcessWrapper launchTranscode( String filename, DLNAResource dlna, DLNAMediaInfo media,
-				OutputParams params ) throws IOException {
+	public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
+			DLNAMediaInfo media, OutputParams params) throws IOException {
 
 		filename = finalize(filename);
+		boolean isMediaitem = dlna instanceof mediaItem;
+
+		int delay = isMediaitem && ((mediaItem)dlna).delay != -1 ?
+			((mediaItem)dlna).delay : this.delay;
+		int buffersize = isMediaitem && ((mediaItem)dlna).buffersize > 0 ?
+			((mediaItem)dlna).buffersize : this.buffersize;
+		if (delay > -1) {
+			params.waitbeforestart = delay * 1000;
+		}
+		if (buffersize > 0) {
+			params.minBufferSize = buffersize;
+		}
 
 		PipeProcess pipe = new PipeProcess(System.currentTimeMillis() + id);
 
 		HashMap<String,String> vars = new HashMap<String,String>();
+		vars.put("format", isMediaitem ?
+			((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
 		vars.put("filename", filename);
 		vars.put("outfile", pipe.getInputPipe());
-
+		vars.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
+			((mediaItem)dlna).userdata : "");
 		cmdline.substitutions = vars;
-		String[] argv = cmdline.toStrings();
-		params.workDir = cmdline.startdir;
-		if (cmdline.syspath != null ) {
-			cmdline.env.put("PATH", cmdline.syspath);
+
+		jumpy.log("\n");
+
+		if (! cmdline.startAPI(jumpy.top)) {
+			return null;
 		}
+
+		String[] argv = cmdline.toStrings();
+
+		params.workDir = cmdline.startdir;
 		params.env = cmdline.env;
+		params.env = new HashMap<String,String>();
+		params.env.putAll(cmdline.env);
+		params.env.put("OUTFILE", pipe.getInputPipe());
+		if (cmdline.syspath != null ) {
+			params.env.put("PATH", cmdline.syspath);
+		}
 
-		params.waitbeforestart = 0; // no delay when the transcode is starting
-		params.minBufferSize = 1; // 1Mb of minimum buffer before sending the file
-
-		cmdline.startAPI(jumpy.top);
-		jumpy.log("%n");
-		jumpy.log("starting " + name() + " player.%n%nrunning " + Arrays.toString(argv)
+		jumpy.log("starting " + name() + " player (" + (params.waitbeforestart/1000)
+			+ "s " + (int)params.minBufferSize
+			+ "mb).\n\nrunning " + Arrays.toString(argv)
 			+ cmdline.envInfo());
 
 //		final player self = this;
@@ -255,7 +284,7 @@ public class player extends Player {
 		}
 		if (add || remove) {
 			configuration.setEnginesAsList(new ArrayList(engines));
-			jumpy.log((on ? "en" : "dis") + "abling " + id + " player.");
+			jumpy.log((on ? "en" : "dis") + "abling " + id + " player.", true);
 			return true;
 		}
 		return false;

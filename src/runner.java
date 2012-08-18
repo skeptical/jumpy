@@ -14,6 +14,7 @@ public class runner {
 	public static String version = "";
 	public command cmdline;
 	private Process p = null;
+	public boolean running = false;
 
 	public runner() {
 		cmdline = new command();
@@ -53,6 +54,7 @@ public class runner {
 
 		String[] argv = cmdline.toStrings();
 		int exitValue = 0;
+		running = true;
 		log("running " + Arrays.toString(argv) + cmdline.envInfo());
 
 		try {
@@ -81,12 +83,13 @@ public class runner {
 
 			br.close();
 			shutdown();
-		} catch(Exception e) {e.printStackTrace();}
+		} catch(Exception e) {running = false; e.printStackTrace();}
 
 		return exitValue;
 	}
 
 	public int shutdown() {
+		running = false;
 		try {
 			if (p != null) {
 				p.destroy();

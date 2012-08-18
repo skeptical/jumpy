@@ -183,8 +183,8 @@ public class command {
 		}
 		addPath(null);
 		addPath(syspath);
-		if (syspath != null) {
-			env.put("PYTHONPATH", syspath);
+		if (this.syspath != null) {
+			env.put("PYTHONPATH", this.syspath);
 		}
 		env.put("pms", getpms());
 		startdir = absolute(this.argv.get(scriptarg)).getParentFile().getAbsoluteFile();
@@ -197,7 +197,12 @@ public class command {
 				server.start();
 				try {
 					env.put("JGATEWAY", InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort());
-				} catch(Exception e) {return false;}
+				} catch(Exception e) {
+					stopAPI();
+					e.printStackTrace();
+					System.err.println("Error: failed to start API.");
+					return false;
+				}
 				return true;
 			}
 			catch(Py4JNetworkException e) {
@@ -229,10 +234,13 @@ public class command {
 	}
 
 	public String envInfo() {
-		String e = env.toString();
+		String e = "";
+		for (Map.Entry<String,String> var : env.entrySet()) {
+			e += (var.getKey() + "=" + var.getValue() + "\n");
+		}
 		return "\nin directory '" + startdir.getAbsolutePath() + "'\n"
 			+ (syspath != null ? ("PATH=" + syspath + "\n") : "")
-			+ e.substring(1, e.length()-1).replace(", ", "\n") + "\n";
+			+ e;
 	}
 }
 

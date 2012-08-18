@@ -50,14 +50,16 @@ except NameError:
 	__builtin__.PMS_MISC_PLAYER = 4
 	__builtin__.PMS_NATIVE = "NATIVE"
 
-# wrapper to flatten the argv list into a tokenized string
-def pms_addItem(t, name, argv, thumb = None, data = None):
+def flatten(list):
+	a = []
+	for item in list:
+		a.append(item.replace(' , ',' ,, '))
+	return '[%s]' % ' , '.join(a)
+
+def pms_addItem(itemtype, name, argv, thumb = None, data = None):
 	if type(argv).__name__ == 'list':
-		a = []
-		for arg in argv:
-			a.append(arg.replace(' , ',' ,, '))
-		argv = '[%s]' % ' , '.join(a)
-	pms._addItem(t, name, argv, thumb, data)
+		argv = flatten(argv)
+	pms._addItem(itemtype, name, argv, thumb, data)
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
@@ -142,8 +144,10 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
-def pms_addPlayer(name, cmdline, supported, type=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None):
-	pms._addPlayer(name, cmdline, supported, type, purpose, desc)
+def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, playback=None):
+	if type(cmd).__name__ == 'list':
+		cmd = flatten(cmd)
+	pms._addPlayer(name, cmd, supported, mediatype, purpose, desc, playback)
 
 __builtin__.pms.addFolder = pms_addFolder
 __builtin__.pms.addAudio = pms_addAudio

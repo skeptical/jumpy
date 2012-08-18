@@ -8,16 +8,22 @@ import net.pms.dlna.DLNAResource;
 import net.pms.formats.FormatFactory;
 
 public class mediaItem extends DLNAResource {
-	public String name, fmt, uri, thumbnail, thumbtype;
+	public String name, fmt, uri, thumbnail, thumbtype, userdata;
+	public int delay, buffersize;
 
 	public mediaItem(String name, String format, String uri, String thumb) {
 		this.name = name;
-		this.fmt = format;
 		this.uri = uri;
 		this.thumbnail = thumb;
 		this.thumbtype = (thumb != null && thumb.toLowerCase().endsWith(".png") ?
 			HTTPResource.PNG_TYPEMIME : HTTPResource.JPEG_TYPEMIME);
-		setFormat(FormatFactory.getAssociatedExtension("." + fmt));
+		String[] settings = format.split("\\+");
+		this.userdata = settings.length > 1 ? settings[1] : null;
+		settings = settings[0].split(":");
+		this.fmt = settings[0];
+		this.delay = settings.length > 1 ? Integer.valueOf(settings[1]) : -1;
+		this.buffersize = settings.length > 2 ? Integer.valueOf(settings[2]) : -1;
+		setFormat(FormatFactory.getAssociatedExtension("." + this.fmt));
 	}
 
 	@Override

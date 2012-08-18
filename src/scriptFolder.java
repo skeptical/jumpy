@@ -87,8 +87,8 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				}
 			});
 		}
-		jumpy.log("%n");
-		jumpy.log("Opening folder: " + name + ".%n");
+		jumpy.log("\n");
+		jumpy.log("Opening folder: " + name + ".\n");
 		ex.run(this, uri, syspath, env);
 		refreshOnce = false;
 	}
@@ -135,12 +135,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		return (p == null ? "/" : "") + xmbpath.replace("//","").trim();
 	}
 
-	public void addItem(int type, String filename, String uri, String thumb) {
-		addItem(type, filename, uri, thumb, null);
+	public Object addItem(int type, String filename, String uri, String thumb) {
+		return addItem(type, filename, uri, thumb, null);
 	}
 
 	@Override
-	public void addItem(int type, String filename, String uri, String thumb, String data) {
+	public Object addItem(int type, String filename, String uri, String thumb, String data) {
 
 		DLNAResource folder = this;
 
@@ -224,6 +224,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				}
 		}
 		jumpy.log("Adding " + media +  ": " + filename + ".");
+		return ex.running ? null : folder.getChildren().get(folder.getChildren().size()-1);
 	}
 
 	@Override
@@ -288,8 +289,8 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	}
 
 	@Override
-	public void addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc) {
-		jumpy.addPlayer(name, cmdline, supported, type, purpose, desc);
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String playback) {
+		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, playback);
 	}
 }
 
