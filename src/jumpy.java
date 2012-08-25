@@ -137,6 +137,10 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("\n");
 		runner ex = new runner();
 		ex.quiet(top, "[" + command.pms + "]", null, null);
+		if (top.env.containsKey("imconvert")) {
+			command.putexec("imconvert", top.env.get("imconvert"));
+		}
+		top.setEnv(null, null);
 		log("\n");
 
 		scripts = new File(home).listFiles(

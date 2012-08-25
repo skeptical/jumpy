@@ -193,14 +193,25 @@ if __name__ == "__main__" and len(sys.argv) == 1:
 	sys.stderr.write("python %s.%s.%s\n" % (sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
 
 	if sys.platform.startswith('win32'):
-		# reset %pms% to short paths so we don't get into trouble with cmd /c
 		try:
+			# reset %pms% to short paths so we don't get into trouble with cmd /c
 			from ctypes import windll, create_unicode_buffer, sizeof
 			buf = create_unicode_buffer(512)
 			windll.kernel32.GetShortPathNameW(u'%s' % sys.executable, buf, sizeof(buf))
 			py = buf.value
 			windll.kernel32.GetShortPathNameW(u'%s' % sys.argv[0], buf, sizeof(buf))
 			pms_util(PMS_SETPMS, '%s %s' % (py, buf.value))
+
+			# note: in Windows 'convert.exe' has a name conflict with a system utility
+			# (ntfs partition converter) and python's underlying CreateProcess()
+			# invocation doesn't seem to search the current %path% to resolve
+			# the executable
+			for path in os.environ.get('Path').split(os.path.pathsep):
+				convert = os.path.join(path, 'convert.exe')
+				if os.path.exists(convert):
+					windll.kernel32.GetShortPathNameW(u'%s' % convert, buf, sizeof(buf))
+					pms_setEnv('imconvert', buf.value)
+					break;
 		except:
 			traceback.print_exc(file=sys.stderr)
 

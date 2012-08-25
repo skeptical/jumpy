@@ -187,6 +187,9 @@ public class command {
 			env.put("PYTHONPATH", this.syspath);
 		}
 		env.put("pms", getpms());
+		if (executables.containsKey("imconvert")) {
+			env.put("imconvert", executables.get("imconvert"));
+		}
 		startdir = absolute(this.argv.get(scriptarg)).getParentFile().getAbsoluteFile();
 	}
 
