@@ -177,6 +177,8 @@ public class command {
 		this.argv = fixArgs(argv);
 		if (env == null) {
 			env = new HashMap<String,String>();
+		} else {
+			env.clear();
 		}
 		if (myenv != null) {
 			env.putAll(myenv);
@@ -190,7 +192,6 @@ public class command {
 		if (executables.containsKey("imconvert")) {
 			env.put("imconvert", executables.get("imconvert"));
 		}
-		startdir = absolute(this.argv.get(scriptarg)).getParentFile().getAbsoluteFile();
 	}
 
 	public boolean startAPI(jumpyAPI obj) {
@@ -233,6 +234,8 @@ public class command {
 		for(int i=0; i<args.length; i++) {
 			args[i] = expand(argv.get(i));
 		}
+		args[scriptarg] = StringUtils.fixFileSeparatorChar(args[scriptarg]);
+		startdir = absolute(args[scriptarg]).getParentFile().getAbsoluteFile();
 		return args;
 	}
 

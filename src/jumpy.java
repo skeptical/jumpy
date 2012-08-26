@@ -50,7 +50,8 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	private PMS pms;
 	public PmsConfiguration configuration;
 	private Properties conf = null;
-	public String home, jumpylog, jumpyconf, bookmarksini, scriptsini, lasturi;
+	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini;
+	public String lasturi;
 	public boolean debug, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
@@ -67,7 +68,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		configuration = PMS.getConfiguration();
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)
-			.getAbsolutePath() + File.separatorChar;
+			.getAbsolutePath();
 		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
 		config.init(this);
@@ -86,13 +87,15 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			log("\n\n\nWARNING: No 'python.path' setting found in PMS.conf.\n\n\n");
 		}
 
+		runner.out = logger;
+		runner.version = version;
+		runner.home = home;
+
+		home += File.separatorChar;
 		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
 		String bin = utils.getBinPaths(configuration);
 		command.basepath =
 			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
-
-		runner.out = logger;
-		runner.version = version;
 
 		log(new Date().toString());
 		log("\n");

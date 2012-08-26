@@ -190,8 +190,9 @@ public class player extends Player {
 		HashMap<String,String> vars = new HashMap<String,String>();
 		vars.put("format", isMediaitem ?
 			((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
-		vars.put("filename", filename);
+		vars.put("filename", filename.replace("\\","\\\\"));
 		vars.put("outfile", pipe.getInputPipe());
+		vars.put("home", jumpy.home.replace("\\","\\\\"));
 		vars.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
 			((mediaItem)dlna).userdata : "");
 		cmdline.substitutions = vars;

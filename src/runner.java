@@ -3,6 +3,7 @@ package net.pms.external.infidel.jumpy;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.HashMap;
 
 import java.lang.Process;
 import java.lang.ProcessBuilder;
@@ -12,6 +13,7 @@ public class runner {
 	private static boolean quiet = false;
 	public static PrintStream out = System.out;
 	public static String version = "";
+	public static String home = null;
 	public command cmdline;
 	private Process p = null;
 	public boolean running = false;
@@ -51,6 +53,12 @@ public class runner {
 		if (! cmdline.startAPI(obj)) {
 			return -1;
 		}
+
+		HashMap<String,String> vars = new HashMap<String,String>();
+		if (home != null ) {
+			vars.put("home", home.replace("\\","\\\\"));
+		}
+		cmdline.substitutions = vars;
 
 		String[] argv = cmdline.toStrings();
 		int exitValue = 0;
