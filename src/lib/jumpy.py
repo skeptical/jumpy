@@ -1,6 +1,7 @@
 import os, os.path, sys, imp, traceback
 import __builtin__
 from py4j.java_gateway import GatewayClient, JavaGateway
+import vmsg
 
 try: pms
 except NameError:
@@ -176,6 +177,35 @@ __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
 __builtin__.pms.addPlayer = pms_addPlayer
 
+lib = os.path.dirname(os.path.realpath(__file__))
+resources = os.path.join(lib, 'resources')
+
+def pms_vmsg(**kwargs):
+	if not 'out' in kwargs:
+		kwargs['out'] = os.environ['OUTFILE']
+	vmsg.vmsg(**kwargs)
+
+def pms_info(msg):
+	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20)
+
+def pms_ok(msg):
+	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+		img='"%s"' % os.path.join(resources,'apply-160.png'), imggrav='north')
+
+def pms_warn(msg):
+	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+		img='"%s"' % os.path.join(resources,'messagebox_warning-160.png'), imggrav='north')
+
+def pms_err(msg):
+	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+		img='"%s"' % os.path.join(resources,'button_cancel-160.png'), imggrav='north')
+
+__builtin__.pms.vmsg = pms_vmsg
+__builtin__.pms.info = pms_info
+__builtin__.pms.ok = pms_ok
+__builtin__.pms.warn = pms_warn
+__builtin__.pms.err = pms_err
+
 # flush regularly to stay in sync with java output
 class flushed(object):
 	def __init__(self, s):
@@ -201,7 +231,7 @@ if __name__ == "__main__" and len(sys.argv) == 1:
 			windll.kernel32.GetShortPathNameW(u'%s' % sys.argv[0], buf, sizeof(buf))
 			pms_util(PMS_SETPMS, '%s %s' % (py, buf.value))
 
-			# note: in Windows 'convert.exe' has a name conflict with a system utility
+			# in Windows 'convert.exe' has a name conflict with a system utility
 			# (ntfs partition converter) and python's underlying CreateProcess()
 			# invocation doesn't seem to search the current %path% to resolve
 			# the executable
@@ -230,7 +260,10 @@ elif __name__ == "__main__":
 				continue
 			except: pass
 		# it must be a string
-		args.append(repr(arg))
+		if sys.argv[1] == 'vmsg':
+			args.append(arg)
+		else:
+			args.append(repr(arg))
 
 	code = 'output=pms_%s(%s)' % (sys.argv[1], ','.join(args))
 	sys.stderr.write("calling pms.%s\n" % code[11:])
