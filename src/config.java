@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.metal.MetalIconFactory;
 
+import org.apache.commons.io.FileUtils;
+
 import net.pms.PMS;
 import net.pms.io.SystemUtils;
 import net.pms.io.BasicSystemUtils;
@@ -206,7 +208,9 @@ public class config {
 			toolBar.setFloatable(false);
 			toolBar.setRollover(true);
 			String script = p.cmdline.argv.get(p.cmdline.scriptarg);
-			if (! p.cmdline.jumpypy.equals(script)) {
+			if (! (p.cmdline.jumpypy.equals(script)
+				|| command.executables.containsKey(script)
+				|| command.executables.containsValue(script) )) {
 				toolBar.add(editButton(script));
 			}
 			if (inibutton) {
@@ -266,7 +270,7 @@ public class config {
 		edit.setToolTipText(uri);
 		edit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean isnew = !exists && create(file);
+				boolean isnew = !exists && create(file, true);
 				if (! (exists || isnew)) {
 					return;
 				}
@@ -279,21 +283,34 @@ public class config {
 		return edit;
 	}
 
-	private static boolean create(File file) {
+	public static boolean create(File file, boolean confirm) {
 		if (file.exists()) {
 			return true;
 		}
-		if(JOptionPane.showConfirmDialog(null, "Create " + file.getName() + "?", "Create File", JOptionPane.YES_NO_OPTION) == 1) {
+		if(confirm && JOptionPane.showConfirmDialog(null, "Create " + file.getName() + "?", "Create File", JOptionPane.YES_NO_OPTION) == 1) {
 			return false;
 		}
-		if (file.getAbsolutePath().equals(jumpy.jumpyconf)) {
-			jumpy.writeconf();
-		} else {
+		if (file.getAbsolutePath().equals(jumpy.jumpyconf) && jumpy.writeconf()) {
+			jumpy.log("creating jumpy.conf");
+			return true;
+		} else if (file.getAbsolutePath().equals(jumpy.scriptsini)) {
 			try {
-				file.createNewFile();
+				File examples = new File(jumpy.home, "examples");
+				jumpy.log("creating jumpy-scripts.ini");
+				FileUtils.copyFile(new File(examples, "sample-jumpy-scripts.ini"), file);
+				for (File csv : FileUtils.listFiles(examples, new String[]{"csv"}, false)) {
+					jumpy.log("creating " + csv.getName());
+					FileUtils.copyFileToDirectory(csv, file.getParentFile());
+				}
+				return true;
 			}
-			catch (Exception e) { return false; }
+			catch (Exception e) { e.printStackTrace(); return false; }
 		}
+		try {
+			jumpy.log("creating " + file.getPath());
+			file.createNewFile();
+		}
+		catch (Exception e) { e.printStackTrace(); return false; }
 		return true;
 	}
 

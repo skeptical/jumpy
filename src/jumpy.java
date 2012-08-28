@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,6 +21,7 @@ import java.util.TimerTask;
 import javax.swing.JComponent;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import net.pms.PMS;
@@ -92,15 +94,19 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		runner.home = home;
 
 		home += File.separatorChar;
+
 		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
-		String bin = utils.getBinPaths(configuration);
+		String bin = utils.getBinPaths(configuration, command.executables);
 		command.basepath =
 			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
 
 		log(new Date().toString());
 		log("\n");
 		log("initializing jumpy " + version, true);
+		config.create(new File(jumpyconf), false);
+		config.create(new File(scriptsini), false);
 		log("\n");
+
 
 		String scriptexts = (String)configuration.getCustomProperty("script.filetypes");
 		if (scriptexts != null) {
@@ -122,7 +128,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 				command.putexec(interpreter, (String)path);
 			}
 		}
-
+for (Map.Entry<String,String> var : command.executables.entrySet()) {
+log(var.getKey() + "=" + var.getValue());
+}
 		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
@@ -253,7 +261,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
 	}
 
-	public void writeconf() {
+	public boolean writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
@@ -262,7 +270,8 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);
 			conf.store(conf_file, null);
 			conf_file.close();
-		} catch (IOException e) {}
+		} catch (IOException e) {return false;}
+		return true;
 	}
 
 	public void refreshChildren(scriptFolder folder) {

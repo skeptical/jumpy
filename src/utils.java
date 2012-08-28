@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashSet;
 
 import java.net.URI;
@@ -54,7 +55,7 @@ public final class utils {
 		System.exit(0);
 	}
 
-	public static String getBinPaths(PmsConfiguration configuration) {
+	public static String getBinPaths(PmsConfiguration configuration, final Map<String,String> executables) {
 		class pathHash extends HashSet<String> {
 			@Override
 			public boolean add(String s) {
@@ -66,6 +67,13 @@ public final class utils {
 			public boolean add(File f) {
 				return (f != null && f.exists() && f.isDirectory() ? super.add(f.getAbsolutePath()) : false);
 			}
+			public boolean addExec(String n, String s) {
+				if (s != null) {
+					executables.put(n, s);
+					return addParent(s);
+				}
+				return false;
+			}
 		}
 		pathHash paths = new pathHash();
 		String path;
@@ -74,15 +82,15 @@ public final class utils {
 				paths.add(p.trim());
 			}
 		}
-		paths.addParent(configuration.getFfmpegPath());
-		paths.addParent(configuration.getMplayerPath());
-		paths.addParent(configuration.getVlcPath());
-		paths.addParent(configuration.getMencoderPath());
-		paths.addParent(configuration.getTsmuxerPath());
-		paths.addParent(configuration.getFlacPath());
-		paths.addParent(configuration.getEac3toPath());
-		paths.addParent(configuration.getDCRawPath());
-		paths.addParent(configuration.getIMConvertPath());
+		paths.addExec("ffmpeg", configuration.getFfmpegPath());
+		paths.addExec("mplayer", configuration.getMplayerPath());
+		paths.addExec("vlc", configuration.getVlcPath());
+		paths.addExec("mencoder", configuration.getMencoderPath());
+		paths.addExec("tsmuxer", configuration.getTsmuxerPath());
+		paths.addExec("flac", configuration.getFlacPath());
+		paths.addExec("eac3to", configuration.getEac3toPath());
+		paths.addExec("dcraw", configuration.getDCRawPath());
+		paths.addExec("convert", configuration.getIMConvertPath());
 		paths.add(PropertiesUtil.getProjectProperties().get("project.binaries.dir"));
 //		paths.remove("");
 //		paths.remove(null);

@@ -141,7 +141,7 @@ public class command {
 		}
 
 		// use the executable if we have one
-		arg1 = getexec(arg1);
+		argv.set(1, getexec(arg1));
 		scriptarg = 0;
 		return argv.subList(1, argv.size());
 	}
