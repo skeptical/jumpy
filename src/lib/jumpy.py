@@ -178,11 +178,12 @@ __builtin__.pms.addPlayer = pms_addPlayer
 
 # flush regularly to stay in sync with java output
 class flushed(object):
-	 def __init__(self, s):
-		  self.s = s
-	 def write(self, x):
-		  self.s.write(x)
-		  self.s.flush()
+	def __init__(self, s):
+		self.s = s
+	def write(self, x):
+		try: self.s.write(x)
+		except UnicodeEncodeError: self.s.write(x.encode('ascii', 'ignore'))
+		self.s.flush()
 sys.stdout = flushed(sys.stdout)
 
 __builtin__.sys = sys
