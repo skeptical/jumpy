@@ -36,7 +36,7 @@ public class userscripts {
 			String name = section.getName();
 			jumpy.log("Adding user script: " + name);
 
-			if (! (name.startsWith("+") || name.startsWith("-"))) {
+			if (! (name.startsWith("+") || name.startsWith("-") || name.startsWith("#"))) {
 				scriptFolder folder =
 					(scriptFolder)jumpy.top.addItem(jumpyAPI.FOLDER, name, section.remove("cmd").split("\n")[0], section.remove("thumb"));
 				folder.env.putAll(section);
