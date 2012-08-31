@@ -62,25 +62,9 @@ public class bookmarker {
 		for (Section section : ini.values()) {
 			jumpy.log("Reading bookmark: " + section.getName());
 
-			// temporary old-style conversion support, to be removed
-			if (section.containsKey("pypath")) {
-				oldstyle = true;
-				section.put("syspath", section.get("pypath"));
-				section.remove("pypath");
-				section.put("uri", "[" + section.get("uri")
-					.replace(" , ", " ,, ")
-					.replace(" | ", " , ")
-					.replace("||", "|") + "]");
-			}
-
 			scriptFolder bookmark = new scriptFolder(jumpy, section.getName(), section);
 			bookmark.isBookmark = true;
 			bookmarks.addChild(bookmark);
-		}
-		// temporary old-style conversion support, to be removed
-		if (oldstyle) {
-			jumpy.log("Converted old-style bookmarks.");
-			store();
 		}
 	}
 
