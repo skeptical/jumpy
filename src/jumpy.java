@@ -128,9 +128,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 				command.putexec(interpreter, (String)path);
 			}
 		}
-for (Map.Entry<String,String> var : command.executables.entrySet()) {
-log(var.getKey() + "=" + var.getValue());
-}
 		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
@@ -138,20 +135,23 @@ log(var.getKey() + "=" + var.getValue());
 		log("bookmarks=" + bookmarksini, true);
 		log("userscripts=" + scriptsini, true);
 		log("refresh=" + refresh, true);
-		log("python=" + command.getexec("python"), true);
-		log("PATH=" + command.basepath, true);
+		log("PATH=" + command.basepath);
+
+		log("\n");
+		for (Map.Entry<String,String> var : command.executables.entrySet()) {
+			log(var.getKey() + "=" + var.getValue());
+		}
 
 		log("\n");
 		log("Adding root folder.", true);
 		top = new scriptFolder(this, "Jumpy", null, null);
 
-		log("\n");
 		runner ex = new runner();
 		ex.quiet(top, "[" + command.pms + "]", null, null);
 		if (top.env.containsKey("imconvert")) {
 			command.putexec("imconvert", top.env.get("imconvert"));
 		}
-		top.setEnv(null, null);
+		top.env.clear();
 		log("\n");
 
 		scripts = new File(home).listFiles(
