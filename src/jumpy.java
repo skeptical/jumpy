@@ -323,7 +323,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	}
 
 	public Object dbgpack_cb() {
-		return new String[] {jumpylog, jumpyconf};
+		return new String[] {jumpylog, jumpyconf, scriptsini};
 	}
 
 }
