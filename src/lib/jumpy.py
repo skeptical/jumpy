@@ -89,8 +89,8 @@ def pms_addImagefeed(name, cmd, thumb=None):
 def pms_addVideofeed(name, cmd, thumb=None):
 	pms_addItem(PMS_VIDEOFEED, name, cmd, thumb)
 
-def pms_addAction(name, cmd, thumb=None):
-	pms_addItem(PMS_ACTION, name, cmd, thumb)
+def pms_addAction(name, cmd, thumb=None, playback=None):
+	pms_addItem(PMS_ACTION, name, cmd, thumb, playback)
 
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
