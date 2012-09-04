@@ -2,6 +2,9 @@
 <head>
 <title>PMS-Jumpy</title>
 <style type="text/css">
+.black {
+	color: black;
+}
 .orange {
 	color: #ff6600;
 }
@@ -14,13 +17,12 @@ ul {
 .comment a:link a:visited a:hover a:active {
 	text-decoration:none;
 }
-pre {
+pre, code {
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
-}
-pre, code {
-	color: darkblue;
+	/*color:darkblue;*/
+	color:#0000BB;
 	text-decoration: none;
 	/*font-weight: bold;*/
 }
@@ -28,7 +30,8 @@ code {
 	white-space: pre;
 }
 kbd {
-	color: darkblue;
+	/*color:darkblue;*/
+	color:#0000BB;
 	text-decoration: none;
 	font-weight: bold;
 }
@@ -66,23 +69,28 @@ div.main {
 <center><a href="#TOP">BASICS</a></center><br/>
 <li><a href="#REQUIREMENTS">Requirements</a></li>
 <li><a href="#XBMC">XBMC Installation</a></li>
+<li><a href="#PHANTOMJS">PhantomJS Installation</a></li>
 <li><a href="#INSTALLATION">Plugin Installation</a></li>
 <li><a href="#BOOKMARKS">Bookmarks</a></li>
 <li><a href="#LOGCONF">Log and Conf</a></li>
 <li><a href="#BUGS">Bugs</a></li>
-<br/>
-<center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
-<li><a href="#QUICKSTART">Quick Start</a></li>
-<li><a href="#API">API</a></li>
-<li><a href="#OTHERSCRIPTS">Other Languages</a></li>
-<!--<li><a href="#ARRAY">Array Notation</a></li>-->
 <li><a href="#SCRIPTSINI">jumpy-scripts.ini</a></li>
-<li><a href="#INTERPRETERS">Interpreters</a></li>
-<li><a href="#JUMPSTART">Jumpstarting Scripts</a></li>
+<li><a href="#WEBREADER">Webreader</a></li>
+<li><a href="#FEEDREADER">Feedreader</a></li>
+<br/>
+<center><a href="scripts.html">SCRIPTS</a></center><br/>
+<li><a href="scripts.html#QUICKSTART">Quick Start</a></li>
+<li><a href="scripts.html#QUICKSTARTPLAYER">Quick Start - Players</a></li>
+<li><a href="scripts.html#API">API</a></li>
+<li><a href="scripts.html#OTHERSCRIPTS">Other Languages</a></li>
+<!--<li><a href="scripts.html#ARRAY">Array Notation</a></li>-->
+<li><a href="scripts.html#PLAYERS">Players</a></li>
+<li><a href="scripts.html#INTERPRETERS">Interpreters</a></li>
+<li><a href="scripts.html#JUMPSTART">Jumpstarting Scripts</a></li>
 <li><a href="#EXAMPLES">Examples</a></li>
 <!--<ul>-->
-<!--<a href="#HELLOPY">py</a></li> <a href="#HELLOSH">sh</a>-->
-<!--<a href="#HELLOPL">pl</a> <a href="#HELLOBAT">bat</a</li>-->
+<!--<a href="scripts.html#HELLOPY">py</a></li> <a href="scripts.html#HELLOSH">sh</a>-->
+<!--<a href="scripts.html#HELLOPL">pl</a> <a href="scripts.html#HELLOBAT">bat</a</li>-->
 <!--</ul>-->
 <!--<center>LINKS</center><br/>-->
 <br/><br/><br/>
@@ -94,8 +102,11 @@ div.main {
 <div class="main">
 <a name="TOP"><H3 style="color:darkblue"><span class="orange">PMS-Jumpy</span> - Jump into Python (and onto XBMC)</H3></a>
 
-PMS-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>), primarily to add folders and media items to the xmb.
-<br/><br/>
+PMS-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
+<ul>
+<li>add folders and media items to the xmb.</li>
+<li>act as user-defined external players.</li>
+</ul>
 The API is accessible from python via jumpy's python module, or from other languages via system calls. Interaction is through a localhost socket managed by <a href="http://py4j.sourceforge.net" target="_blank">py4j</a>.
 <br/><br/>
 Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org" target="_blank">xbmc</a> addons for use in PMS, and deciding to see if I could mock the xbmc plugin API itself so as to run these addons under PMS as-is. The result is Jumpy plus <a href="https://github.com/skeptical/jumpy-xbmc">jumpy-xbmc</a>, an included set of python modules to 'jump' the xbmc addons.
@@ -135,6 +146,25 @@ on the addon, and so on.
 </li>
 </ol>
 <br/>
+
+<b><a name="PHANTOMJS">PhantomJS Installation</a></b> (optional)
+<ul>
+To use the included <a href="#WEBREADER">webreader</a> browser install <a href="http://phantomjs.org/download.html" target="_blank">phantomjs</a>
+in one of these places:
+<br/><br/>
+<i>Windows or mac:</i>
+<ul>
+<li>inside your PMS installation's binaries folder (<i>win32</i> or <i>osx</i>).</li>
+<li>inside the <i>plugins/jumpy/webreader</i> folder.</li>
+</ul>
+<i>Windows, mac, or linux:</i>
+<ul>
+<li>anywhere, adding its binary folder path to the <code>bin.path</code> setting in <i>PMS.conf</i>
+(create it if it doesn't exist):
+<ul><code>bin.path = c:\\path\\to\\phantomjsFolder</code></ul></li>
+</ul>
+</ul>
+<br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
 <li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest version</a></i> to your pms <i>plugins</i> folder.
@@ -148,7 +178,7 @@ rtmpdump.path = c:\\rtmpdump\\rtmpdump.exe
 perl.path = c:\\perl\\bin\\perl.exe
 </pre>
 </li>
-<li>Restart PMS. You should see a 'Jumpy' folder on the xmb and any
+<li>Restart PMS. You should see a 'Jumpy' folder on the xmb containing the examples and any
 media addons found in your xbmc user directory.
 </li>
 </ol>
@@ -160,11 +190,11 @@ Press the <i>Add bookmark</i> button in any folder to create a bookmark inside <
 <br/>
 <b><a name="LOGCONF">Log and Conf</a></b>
 <ul>
-Locations are according to your PMS installation (see jumpy's init messages inside your <i>debug.log</i> for the specific paths):<br/><br/>
+Locations are according to your PMS installation (for quick access use the buttons on gui panel, otherwise see jumpy's init messages inside your <i>debug.log</i> for the specific paths):<br/><br/>
 <ul>
 <li><b><i>jumpy.log</i></b>: located wherever <i>debug.log</i> is.
 </li><br/>
-<li><b><i>jumpy.conf</i></b>: omitted by default, but should be located wherever <i>PMS.conf</i> is.
+<li><b><i>jumpy.conf</i></b>: located wherever <i>PMS.conf</i> is.
 The available settings are:
 <pre><i class="comment"># whether to activate bookmarks (true|false)</i>
 <b>bookmarks</b>=true
@@ -186,7 +216,16 @@ If you need to override the location where jumpy looks for xbmc set:
 <pre>
 <b>xbmc.path</b> = c:\\path\\to\\my\\XBMC
 </pre>
-See also <a href="#INTERPRETERS">Interpreters</a> for more <i>PMS.conf</i> settings.
+You can set paths where external binaries needed by your scripts can be found,
+separating them with '<code><span class="orange">;</span></code>' in Windows or '<code><span class="orange">:</span></code>' in linux/mac:
+<pre>
+<b>bin.path</b> = c:\somewhere\bin<span class="orange">;</span>c:\somewhere else
+</pre>
+You can also specify your preferred text editor for opening files from the gui:
+<pre>
+<b>text.editor</b> = c:\\path\\to\\my\\textEditor
+</pre>
+See also <a href="scripts.html#INTERPRETERS">Interpreters</a> for more <i>PMS.conf</i> settings.
 </li><br/>
 </ul>
 </ul>
@@ -198,249 +237,13 @@ When reporting bugs please <a href="http://www.ps3mediaserver.org/forum/viewtopi
 </ul>
 </ul>
 <br/>
-<a name="SCRIPTS"><H3 style="color:darkblue"><center><span class="orange">SCRIPTS</span></center></H3></a>
-Any arbitrary system command qualifies as a 'script' which jumpy will execute and listen for
-<a href="#API">API</a> calls while it's running. Generally your script does its thing, maybe adds
-some items to the xmb and exits. If your needs are simple and/or you prefer reading code, skip to <a href="#QUICKSTART">Quick Start</a> or
-<a href="#EXAMPLES">Examples</a>, otherwise here are a few basics:
-<br/><br/>
-<ul>
-<li>A script is always run in its own directory.
-</li>
-<li>A script doesn't necessarily need to interact with the API.
-</li>
-<li>Python scripts found inside '<i>plugins/jumpy</i>' are called automatically at startup
-with no arguments. You can only add folders during this first call.
-</li>
-<li>Other scripts can be located anywhere, and are registered with Jumpy by means of <a href="#SCRIPTSINI">jumpy-scripts.ini</a>.
-They can be called at startup, shutdown, or placed on the xmb for future use.
-</li>
-<li>Any folder item added with <a href="#ADDITEM"><kbd>addItem</kbd></a> will execute whatever command
-you've specified in the <code>cmd</code> parameter when the user clicks on it in the future. Usually you will want
-your future command to call the same script but with different arguments.
-</li>
-<li>Any media item you add will be passed along to PMS for normal processing.
-</li>
-<li>Python scripts communicate with Jumpy via internal <a href="#API">API</a> calls to the jumpy python module.
-</li>
-<li>Other scripts communicate with Jumpy by using an equivalent <i><a href="#OTHERSCRIPTS">command-line syntax</a></i>
-to make API calls on the system.
-</li>
-</ul>
-<br/>
-
-<b><a name="QUICKSTART">Quick Start</a></b>
-<ul>If all you need is to run some arbitrary command, create a <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>
-inside your profile folder (wherever <i>PMS.conf</i> is) modeled on this:
-<ul>
-<pre>
-<i class="comment">; Create the folder "Jumpy > my scripts > testing > helloworld" on the xmb</i>
-<i class="comment">; and run the command 'echo "hello world"' when the user opens it.</i>
-[my scripts/testing/helloworld]
-cmd = echo "hello world"
-
-<i class="comment">; Run the command 'echo "foo"' at startup</i>
-<i class="comment">; (note the '+' which means 'execute at startup').</i>
-[+foo]
-cmd = echo "foo"
-
-<i class="comment">; Run the command 'echo "bar"' at shutdown</i>
-<i class="comment">; (note the '-' which means 'execute at shutdown').</i>
-[-bar]
-cmd = echo "bar"</pre>
-</ul>
-and restart PMS. Any output from your command will appear in <i><a href="#LOGCONF">jumpy.log</a></i>.
-</ul>
-<br/>
-
-<b><a name="API">API</a></b>
-<ul>
-The extremely basic python API is initialized on import
-<pre>import jumpy</pre>
-defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
-<br/><br/>
-<li><a name="ADDITEM"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>)</code></a></li>
-or<br/>
-<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>)</code><br/><br/>
-where
-<ul>
-<li><code>type</code> is one of these constants:
-<pre>
-<i class="comment"># media items           # folder items</i>
-PMS_AUDIO               PMS_FOLDER
-PMS_IMAGE               PMS_UNRESOLVED
-PMS_VIDEO
-PMS_UNKNOWN
-PMS_PLAYLIST
-PMS_ISO
-PMS_AUDIOFEED
-PMS_IMAGEFEED
-PMS_VIDEOFEED
-</pre>
-</li>
-<li><code>name</code> is the item's label.
-<ul><li><a name="UNIXPATH"/>Using a unix-style path as the label (e.g. '<code>myscripts/perl/foo</code>')
-will create the specified path on the xmb, branching from the top folder if absolute or current
-folder if relative.
-</li></ul>
-</li>
-<br/>
-<li><code>cmd</code> is either a command or a uri depending on the given <code>type</code>:
-<ul>
-<br/>
-<li>For <b>folder items</b> <code>cmd</code> is the command
-to be executed in the future when the user opens the folder on the xmb. It can be either:
-<ol type=A>
-<li>a typical command string to be parsed according to the usual system rules.
-</li>
-<li>a python list of strings, i.e. a command array.
-</li>
-<li><a name="ARRAY"/>a special delimited string
-describing a flattened command array using the following <b><i>array notation syntax</i></b>:
-<ul>
-<code>"<span class="orange">[</span>command<span class="orange"> , </span>arg1<span class="orange"> , </span>arg2<span class="orange"> , </span>arg3<span class="orange"> , </span>arg4 ... <span class="orange">]</span>"</code>
-</ul>
-where the rules are:
-<ol>
-<li>enclose your array in square <code><span class="orange">[]</span></code> brackets.
-</li>
-<li>delimit your args using a comma with a space on both sides, i.e. '<code><span class="orange"> , </span></code>'.
-</li>
-</ol>
-for example <code>"<span class="orange">[</span>echo<span class="orange"> , </span>hello world<span class="orange">]</span>"</code>.
-This form avoids embedded quotes when your args contain spaces, and is useful for other languages making
-system calls to the API.
-</ol>
-</li>
-</li>
-<br/>
-<li>For <b>media items</b> <code>cmd</code> is a single resolved media path/url to be passed along to PMS for normal
-processing.
-</li>
-</ul>
-</li>
-<br/>
-<li><code>thumb</code> is a path or url to the item's thumbnail image.
-</li>
-</ul>
-<br/>
-<li><kbd>pms.addPath</kbd><code>(path<i>=None</i>)</code></li>
-<ul>
-<li><code>path</code> is a path segment to be prefixed to the system PATH when the item is executed in the future.
-</li>
-<li>You typically set this once at the beginning, after which any descendants will inherit it. Its value builds incrementally, and
-can be cleared to its initial value for the current folder using <code>pms.addPath()</code> with path omitted.
-</li>
-<li>For python scripts <code>path</code> will also be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a>.
-<code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
-</li>
-</ul>
-<br/>
-<li><kbd>pms.setEnv</kbd><code>(name<i>=None</i>, val<i>=None</i>)</code></li>
-<ul>
-Define an environment variable to be set when the current folder or its descendants are executed in the future.
-<code>pms.setEnv()</code> without args will clear the current folder's user-defined variables.
-</ul>
-<br/>
-<li><kbd>pms.version</kbd><code>()</code></li>
-<ul>Get jumpy's version.
-</ul>
-<br/>
-<li><kbd>pms.getHome</kbd><code>()</code></li>
-<ul>Get jumpy's home path.
-</ul>
-<br/>
-<li><kbd>pms.getFolderName</kbd><code>()</code></li>
-<ul>Get the name of the current xmb folder.
-</ul>
-<br/>
-<li><kbd>pms.getProfileDir</kbd><code>()</code></li>
-<ul>Get the PMS profile path (where confs can be read/written).
-</ul>
-<br/>
-<li><kbd>pms.getLogDir</kbd><code>()</code></li>
-<ul>Get the PMS log path (where logs can be written).
-</ul>
-<br/>
-<li><kbd>pms.getPluginJar</kbd><code>()</code></li>
-<ul>Get the path to the running <i>jumpy.jar</i>.
-</ul>
-<br/>
-<li><kbd>pms.restart</kbd><code>()</code></li>
-<ul>Restart PMS' http server.
-</ul>
-<br/>
-<li><kbd>pms.reboot</kbd><code>()</code></li>
-<ul>Restart PMS itself.
-</ul>
-<br/>
-<li><kbd>pms.getProperty</kbd><code>(key)</code></li>
-<ul>Get a property from <i>PMS.conf</i>.
-</ul>
-<br/>
-<li><kbd>pms.setProperty</kbd><code>(key, val)</code></li>
-<ul>Set a property in <i>PMS.conf</i>.
-</ul>
-</ul>
-<br/>
-
-<b><a name="OTHERSCRIPTS">Scripts In Other Languages</a></b>
-<ul>
-Jumpy defines a <code><span class="orange">pms</span></code> environment variable which scripts in any
-language can use to make API calls via the system.  Any <a href="#API">API</a> call, for instance
-<br/>
-<ul>
-<code>pms.addItem(PMS_FOLDER, "Hello", "echo hello")</code>
-</ul>
-can be made using an equivalent <b><i>command-line syntax</i></b>:
-<br/><br/>
-<ul><li>unix shell:</li>
-<code><span class="orange">$pms</span> addItem PMS_FOLDER Hello "echo hello"</code>
-</ul><br/>
-<ul><li>Windows batch file:</li>
-<code><span class="orange">%pms%</span> addItem PMS_FOLDER Hello "echo hello"</code>
-</ul><br/>
-<ul><li>perl:</li>
-<code>`<span class="orange">$ENV{'pms'}</span> addItem PMS_FOLDER Hello "echo hello"`</code>
-</ul><br/>
-
-For API functions that return a string, such as <code>pms.getProperty("ffmpeg.path")</code>:
-<br/><br/>
-
-<ul><li>unix shell:</li>
-<code>ffmpeg=$(<span class="orange">$pms</span> getProperty ffmpeg.path)
-</code>
-</ul><br/>
-<ul><li>Windows batch file:</li>
-<code>for /f "delims=" %%i in ('<span class="orange">%pms%</span> getProperty ffmpeg.path') do set ffmpeg=%%i
-</code>
-</ul><br/>
-<ul><li>perl:</li>
-<code>my $ffmpeg = `<span class="orange">$ENV{'pms'}</span> getProperty ffmpeg.path`
-</code>
-</ul><br/>
-Keep in mind that these are system calls and you need to quote/escape your strings as appropriate.
-To avoid embedded quotes <a href="#ADDITEM"><kbd>addItem</kbd></a> also supports a special
-<i><a href="#ARRAY">array notation syntax</a></i> to describe
-your command array as a single string when your args contain spaces, for example:
-<br/><br/>
-<ul><li>Windows batch file:</li>
-<code><span class="orange">%pms%</span> addItem PMS_FOLDER Hello "<span class="orange">[</span>echo<span class="orange"> , </span>hello world<span class="orange">]</span>"</code>
-</ul><br/>
-Array notation syntax is useful when scripts are using some flavor of <code>$0</code>
-to call themselves back in the future. In general we don't automatically know whether <code>$0</code>
-contains spaces or not, and without array notation syntax would need to embed it in quotes to guard against
-spaces when making system calls to the API, e.g. <code>\"$0\"</code> or <code>""%~0""</code> and so on
-(see <a href="#EXAMPLES">Examples</a>).
-
-</ul>
-<br/>
-
 <b><a name="SCRIPTSINI">jumpy-scripts.ini</a></b>
 <ul>
-Scripts are registered with jumpy via entries inside the user-created file <i>jumpy-scripts.ini</i>, which should be located wherever
-<i>PMS.conf</i> is in your setup. The section name <code>[...]</code> is the label, interpreted as a
-<a href="#UNIXPATH"/>unix-style path</a> branching from jumpy's top folder:
+Scripts are registered with jumpy via entries inside the user file <i>jumpy-scripts.ini</i>, which is located wherever
+<i>PMS.conf</i> is in your setup. For quick access use the button on the gui.
+<br/><br/>
+Each script has its own section, where the section name <code>[...]</code> is also the label, interpreted as a
+<a href="scripts.html#UNIXPATH"/>unix-style path</a> branching from jumpy's top folder:
 <ul>
 <pre>
 [My Scripts/foo]
@@ -459,258 +262,148 @@ cmd = c:\path\to\hello.bat
 cmd = c:\path\to\goodbye.bat
 </pre>
 </ul>
+To disable a script put a '<code><span class="orange">#</span></code>' at the beginning of
+the section name:
+<ul>
+<pre>
+[<span class="orange">#</span>+hi]
+cmd = c:\path\to\hello.bat
+</pre>
+</ul>
 If <code>cmd</code> begins with the keyword <code><span class="orange">pms</span></code> it will be
-interpreted as an API call using <i><a href="#OTHERSCRIPTS">command-line syntax</a></i>.  The entry
+interpreted as an API call using <i><a href="scripts.html#OTHERSCRIPTS">command-line syntax</a></i>.  The entry
 below is equivalent to the first example above:
 <ul>
 <pre>
 [<span class="orange">+</span>foo]
-cmd = <span class="orange">pms</span> addItem PMS_FOLDER "My Scripts/foo" "c:\path\to\foo.bat arg1 arg2"
+cmd = <span class="orange">pms</span> addFolder "My Scripts/foo" "c:\path\to\foo.bat arg1 arg2"
 </pre>
 </ul>
 </ul>
 <br/>
 
-<b><a name="INTERPRETERS">Interpreters</a></b>
+<b><a name="WEBREADER">Webreader</a></b>
 <ul>
-Jumpy has automatic support for these file-types:
+<i>Webreader</i> is a "poor man's" browser for PMS, which takes a snapshot of a given
+web page and streams it as video. The view pans left to right (or optionally
+right to left) and top to bottom in 4 second shots across the page. It requires <a href="#PHANTOMJS">PhantomJS</a>
+to be intalled.
 <br/><br/>
-<ul><code>py, sh, pl, rb, php, groovy, vbs, js</code></ul>
+Try one of the web pages
+in the <i>Examples/Web Reader</i> folder on the xmb to see how it works, but basically:
 <br/>
-which is to say it associates each with an interpreter, namely:
+<ul>
+<li>Press <b><i>pause</i></b> to stop panning and read, press again to continue.</li>
+<li>Pressing <b><i>back</i></b> takes you to the top of the page (on my Sony Bluray anyway,
+your renderer may behave differently).</li>
+</ul>
+<br/>
+To add web pages edit the <code>[+webreader]</code> section of
+<i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>, adding one page per line in this form:
+
+<ul><pre>data = <i>name, url, [style]</i></pre></ul>
+
+where
+<ul>
+<br/>
+<li><code>name</code> is the item's label (or <a href="scripts.html#UNIXPATH">unix-style path</a>).
+</li>
+<li><code>url</code> is the address of the web page.
+</li>
+<li><code>style</code> is an optional field to control presentation and playback using this syntax:
+<ul><i><code class="comment">format<span class="orange">:</span>delay_seconds<span class="orange">:</span>buffer_mb<span class="orange">+</span>pan<span class="orange">:</span>rdb_style<span class="orange">:</span>rdb_size<span class="orange">:</span>rdb_margin</code></i></ul>
+where
+<ul>
+<li><code class="comment"><i>format</i></code> is the only required part and is either:
+<ul>
+<li><code>webpage</code> which is the default.
+Here <code class="comment"><i>pan</i></code> can be
+<ul>
+<li><code>rtl</code> for right to left panning.</li>
+<li><code>graphics</code> which maximizes the vertical overlap and is better suited to
+viewing images as opposed to reading text.</li>
+<li>or both, e.g. <code>webpage<span class="orange">+</span>rtl<span class="orange">:</span>graphics</code>.</li>
+</ul>
+</li>
+</li>
+<li><code>readability</code> (or <code>rdb</code>) which uses the arc90labs
+<a href="http://code.google.com/p/arc90labs-readability/" target="_blank">readability</a>
+script to clean up web pages into stripped-down article-like versions for easy
+reading.
+<ul>
+<li><code class="comment"><i>rdb_style</i></code> is either <code>newspaper</code> (default), <code>novel</code>, <code>ebook</code>,
+<code>terminal</code>, <code>apertura</code>, or <code>athelas</code>.
+</li>
+<li><code class="comment"><i>rdb_size</i></code> (font) is either <code>x-small</code>, <code>small</code>, <code>medium</code> (default),
+<code>large</code>, or <code>x-large</code>.
+</li>
+<li><code class="comment"><i>rdb_margin</i></code> is either <code>x-narrow</code>, <code>narrow</code>, <code>medium</code> (default),
+<code>wide</code>, or <code>x-wide</code>.
+</li>
+</ul>
+see <i>jumpy/webreader/readability.css</i> (and edit it too if you like).
+</li>
+</ul>
+<li><code class="comment"><i>delay_seconds<span class="orange">:</span>buffer_mb</i></code> are <a href="scripts.html#PLAYBACK">playback</a> settings.
+</li>
+</ul>
+</ul>
+
+<br/>
+Some examples:
+<pre>
+	<i class="comment">; a typical page (webpage format by default)</i>
+	data = My Pages/p1, http://www.foo.org/index.html
+	<i class="comment">; a page in readabilty format</i>
+	data = My Pages/p2, http://www.foo.org/article.html, rdb
+	<i class="comment">; an rtl page in webpage format with a 10s delay</i>
+	data = My Pages/p3, http://www.foo.org/index.html, webpage<span class="orange">:</span>10<span class="orange">+</span>rtl
+	<i class="comment">; a page in readabilty novel format with a 10s delay and large font</i>
+	data = My Pages/p4, http://www.foo.org/article.html, rdb<span class="orange">:</span>10<span class="orange">+</span>novel<span class="orange">:</span>large
+</pre>
+you can also include a <i>csv</i> file
+<ul><pre>data = <i>name, filename.csv, [style]</i></pre></ul>
+where the <i>csv</i> file looks like this:
+<pre>
+<i class="comment"># csv columns are: label, url, [style]
+# default style is webpage
+# comments and blank lines are allowed</i>
+
+My Pages/p1, http://www.foo.org/index.html
+My Pages/p2, http://www.foo.org/article.html, rdb
+My Pages/p3, http://www.foo.org/index.html, webpage<span class="orange">:</span>10<span class="orange">+</span>rtl
+My Pages/p4, http://www.foo.org/article.html, rdb<span class="orange">:</span>10<span class="orange">+</span>novel<span class="orange">:</span>large
+</pre>
+
+
+</ul>
+<br/>
+
+<b><a name="FEEDREADER">Feedreader</a></b>
+<ul>
+<i>Feedreader</i> loads rss feeds for browsing with webreader. Usage is similar to webreader
+except that the default style is <code>readability</code>.
 <br/><br/>
-<ul><code style="	white-space:pre-wrap;">python, sh, perl, ruby, php, groovy, (windows:cscript), (windows:cscript mac:jsc unix:rhino)</code></ul>
-<br/>
-and checks to see if <i>PMS.conf</i> contains a <code>.path</code> for the interpreter's executable.
-The point of all this is to allow scripts to specify commands in a generic form, which is more
-conducive to script-sharing, and let jumpy resolve the details according to each user's settings.
-<br/><br/>
-To enable automatic support for one of these interpreters when it isn't installed system-wide, or to
-pick a specific installed version, add a <code>.path</code> setting for it in <i>PMS.conf</i>, for instance
-<ul>
+To add feeds edit the <code>[+feedreader]</code> section of
+<i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>, adding one feed per line in this form:
+
+<ul><pre>data = <i>name, feedurl, [style]</i></pre></ul>
+or a <i>csv</i> file containing feed urls
+<ul><pre>data = <i>name, filename.csv, [style]</i></pre></ul>
+where the <i>csv</i> file looks like this:
 <pre>
-<span class="orange">perl</span>.path = /usr/local/lib/perl-5.10.1/bin/perl
+<i class="comment"># csv columns are: label, url, [style]
+# default style is readability
+# comments and blank lines are allowed</i>
+
+World news/World news, http://www.guardian.co.uk/world/, webpage:10
+World news/World news, http://www.guardian.co.uk/world/rss
+World news/UK, http://www.guardian.co.uk/uk/rss
+World news/Europe, http://www.guardian.co.uk/world/europe/roundup/rss
 </pre>
-</ul>
-Enabling automatic support for a new language involves adding its filetype to <code>script.filetypes</code>
-(create it if it doesn't exist) and setting its <code>.interpreter</code> and <code>.path</code> in  <i>PMS.conf</i>.
-For a concrete example we'll pretend that perl isn't already supported and we're adding it as a new
-language. We add these settings in <i>PMS.conf</i>:
-<ul>
-<pre>
-script.filetypes = py,vbs,js,<span class="orange">pl</span>
-<span class="orange">pl</span>.interpreter = <span class="orange">perl</span>
-<span class="orange">perl</span>.path = /usr/local/lib/perl-5.10.1/bin/perl
-</pre>
-</ul>
-and now jumpy can resolve everything automatically. For example given the generic command
-<ul>
-<pre>
-<span class="orange">perl</span> foo.pl arg1 arg2
-</pre>
-</ul>
-Jumpy will look for '<i><code><span class="orange">perl</span>.path</code></i>' and
-substitute it if it's present, and if not it will try running the command as-is.
-If the given command omits the interpreter:
-<ul>
-<pre>
-foo.<span class="orange">pl</span> arg1 arg2
-</pre>
-</ul>
-(for instance as a result of using <code>$0</code>) jumpy will first look up the interpreter by file-type,
-i.e. '<i><code><span class="orange">pl</span>.interpreter</code></i>' and then proceed as above.
 </ul>
 <br/>
 
-<b><a name="JUMPSTART">Jumpstarting Scripts</a></b>
-<ul>
-<i>Jumpstart</i> is a console utility to speed up development by testing
-scripts and navigating folders outside of PMS. To see how it works first edit the 3 user-specific paths in
-<i>plugins/jumpy/jumpstart.bat</i> if necessary and then open up a console there and type
-<pre>jumpstart xbmc.py</pre>or
-<pre>jumpstart c:\somewhere\myscript.bat</pre>
-</ul>
-<br/>
-
-<b><a name="EXAMPLES">Examples</a></b>
-<br/>
-<ul>
-These examples are all equivalent, somewhat contrived, don't do anything very useful and employ a lot of fake
-videos, but hopefully they get the essential points across.  To try one out in PMS save it somewhere
-and add an entry like this to <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>:
-<ul>
-<pre>
-[+bat]
-cmd = c:\somewhere\helloworld.bat
-</pre>
-</ul>
-You can also try it in a console using <a href="#JUMPSTART">jumpstart</a> like so:
-<ul>
-<pre>jumpstart c:\somewhere\helloworld.bat</pre>
-</ul>
-</ul>
-<br/>
-<ul>
-<li><b><a name="HELLOPY">helloworld.py</a></b></li>
-<pre>
-import sys, os, jumpy
-from datetime import datetime
-
-<i class="comment"># initial call:</i>
-if len(sys.argv) == 1:
-	<i class="comment"># add some folders</i>
-	pms.addItem(PMS_FOLDER, 'Examples/python/Hello', [sys.argv[0], 'hello'])
-	pms.addItem(PMS_FOLDER, 'Examples/python/Date', [sys.argv[0], 'date'])
-	pms.addItem(PMS_FOLDER, 'Examples/python/Version', [sys.argv[0], 'jumpy version'])
-	<i class="comment"># set an environment variable and add a folder to test it</i>
-	pms.setEnv('test', 'This is a test')
-	pms.addItem(PMS_FOLDER, 'Examples/python/Test Env', [sys.argv[0], 'env'])
-
-<i class="comment"># callbacks:</i>
-elif sys.argv[1] == 'hello':
-	<i class="comment"># add a video item</i>
-	pms.addItem(PMS_VIDEO, 'World', 'world.mpg')
-elif sys.argv[1] == 'date':
-	<i class="comment"># print the time and date as a video label</i>
-	pms.addItem(PMS_VIDEO, str(datetime.now()), 'null.mpg')
-elif sys.argv[1] == 'jumpy version':
-	<i class="comment"># print jumpy's version as a video label</i>
-	pms.addItem(PMS_VIDEO, 'Jumpy version %s' % pms.version(), 'null.mpg')
-elif sys.argv[1] == 'env':
-	<i class="comment"># print the environment variable 'test' as a video label</i>
-	pms.addItem(PMS_VIDEO, os.getenv('test'), 'null.mpg')
-</pre>
-<br/>
-For a more practical example have a look at <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder.
-</ul>
-<br/><br/>
-
-<ul>
-<li><b><a name="HELLOSH">helloworld.sh</a></b></li>
-<pre>
-<i class="comment">#!/bin/sh</i>
-
-case "$1" in
-	<i class="comment"># initial call:</i>
-	("")
-		<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
-		$pms addItem PMS_FOLDER Examples/sh/Hello "'$0' hello"
-		$pms addItem PMS_FOLDER Examples/sh/Date "'$0' date"
-		<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i>
-		<i class="comment"># instead of embedded quotes</i>
-		$pms addItem PMS_FOLDER Examples/sh/Version "[$0 , jumpy version]"
-		<i class="comment"># set an environment variable and add a folder to test it</i>
-		$pms setEnv test "This is a test"
-		$pms addItem PMS_FOLDER "Examples/sh/Test Env" "'$0' env"
-		;;
-
-	<i class="comment"># callbacks:</i>
-	(hello)
-		<i class="comment"># add a video item</i>
-		$pms addItem PMS_VIDEO World world.mpg ;;
-	(date)
-		<i class="comment"># print the time and date as video labels</i>
-		t=$(date +'%I:%M %p')
-		d=$(date +'%a %d %b %Y')
-		$pms addItem PMS_VIDEO "$t" null.mpg
-		$pms addItem PMS_VIDEO "$d" null.mpg
-		;;
-	("jumpy version")
-		<i class="comment"># print jumpy's version as a video label</i>
-		$pms addItem PMS_VIDEO "Jumpy version $($pms version)" null.mpg ;;
-	(env)
-		<i class="comment"># print the environment variable $test as a video label</i>
-		$pms addItem PMS_VIDEO "$test" null.mpg ;;
-esac
-</pre>
-</ul>
-<br/><br/>
-
-<ul>
-<li><b><a name="HELLOPL">helloworld.pl</a></b></li>
-<pre>
-<i class="comment">#!/usr/bin/perl</i>
-
-our $pms = $ENV{"pms"};
-
-<i class="comment"># initial call:</i>
-if (not @ARGV) {
-	<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
-	`$pms addItem PMS_FOLDER Examples/perl/Hello "'$0' hello"`;
-	`$pms addItem PMS_FOLDER Examples/perl/Date "'$0' date"`;
-	<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i></i>
-	<i class="comment"># instead of embedded quotes</i>
-	`$pms addItem PMS_FOLDER Examples/perl/Version "[$0 , jumpy version]"`;
-	<i class="comment"># set an environment variable and add a folder to test it</i>
-	`$pms setEnv test "This is a test"`;
-	`$pms addItem PMS_FOLDER "Examples/perl/Test Env" "'$0' env"`;
-}
-
-<i class="comment"># callbacks:</i>
-elsif ($ARGV[0] eq 'hello') {
-	<i class="comment"># add a video item</i>
-	`$pms addItem PMS_VIDEO World world.mpg`;
-}
-elsif ($ARGV[0] eq 'date') {
-	<i class="comment"># print the time and date as a video label</i>
-	my $time = localtime;
-	`$pms addItem PMS_VIDEO "$time" null.mpg`;
-}
-elsif ($ARGV[0] eq 'jumpy version') {
-	<i class="comment"># print jumpy's version as a video label</i>
-	my $ver = `$pms version`;
-	`$pms addItem PMS_VIDEO "Jumpy version $ver" null.mpg`;
-}
-elsif ($ARGV[0] eq 'env') {
-	<i class="comment"># print the environment variable 'test' as a video label</i>
-	`$pms addItem PMS_VIDEO "$ENV{'test'}" null.mpg`;
-}
-</pre>
-</ul>
-<br/><br/>
-
-<ul>
-<li><b><a name="HELLOBAT">helloworld.bat</a></b></li>
-<pre>
-@echo off
-setlocal ENABLEDELAYEDEXPANSION
-
-<i class="comment">:: initial call:</i>
-if "%~1" == "" (
-	<i class="comment">:: add some folders (note the embedded quotes: ""%~0"")</i>
-	%pms% addItem PMS_FOLDER Examples/bat/Hello """%~0"" hello"
-	%pms% addItem PMS_FOLDER Examples/bat/Date """%~0"" date"
-	<i class="comment">:: add a folder using <a href="#ARRAY">array notation syntax</a> instead of embedded quotes</i>
-	%pms% addItem PMS_FOLDER Examples/bat/Version "[%~0 , jumpy version]"
-	<i class="comment">:: set an environment variable and add a folder to test it</i>
-	%pms% setEnv test "This is a test"
-	%pms% addItem PMS_FOLDER "Examples/bat/Test Env" """%~0"" env"
-	exit
-)
-
-<i class="comment">:: callbacks:</i>
-if "%~1" == "hello" (
-	<i class="comment">:: add a video item</i>
-	%pms% addItem PMS_VIDEO World world.mpg
-
-) else if "%~1" == "date" (
-	<i class="comment">:: print the time and date as video labels</i>
-	for /f "delims=" %%i in ('time /t') do set t=%%i
-	for /f "delims=" %%i in ('date /t') do set d=%%i
-	%pms% addItem PMS_VIDEO "!t!" null.mpg
-	%pms% addItem PMS_VIDEO "!d!" null.mpg
-
-) else if "%~1" == "jumpy version" (
-	<i class="comment">:: print jumpy's version as a video label.</i>
-	for /f "delims=" %%i in ('%pms% version') do set ver=%%i
-	%pms% addItem PMS_VIDEO "Jumpy version !ver!" null.mpg
-
-) else if "%~1" == "env" (
-	<i class="comment">:: print the environment variable 'test' as a video label</i>
-	%pms% addItem PMS_VIDEO "%test%" null.mpg
-)
-</pre>
-</ul>
 
 </div>
 </body>
