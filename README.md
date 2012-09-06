@@ -12,7 +12,7 @@ Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' 
 
 Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube</i>, and many more. Addons are 'mostly' functional in the sense that all content is shown, but interactive features that require user input are inactive.
 
-Jumpy itself is general-purpose, of course, and you can use it to plug <a href="http://skeptical.github.com/jumpy/readme.html#SCRIPTS" target="_blank">your own scripts/commands</a>, python or other, into PMS as well.
+Jumpy itself is general-purpose, of course, and you can use it to plug <a href="http://skeptical.github.com/jumpy/scripts.html" target="_blank">your own scripts/commands</a>, python or other, into PMS as well.
 
 <b style="color:black">Links</b>
 <ul>
