@@ -115,6 +115,21 @@ Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, P
 <br/><br/>
 Jumpy itself is general-purpose, of course, and you can use it to plug your own scripts, python or other, into PMS as well.
 <br/><br/>
+<b><a name="WIN32SETUP">Windows Quick Setup</a></b>
+<ol>
+<li>Shut down PMS.
+</li>
+<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.2.zip" target="_blank">pms-jumpy-0.2.2.zip</a></i> to your PMS <i>plugins</i> folder.
+</li>
+<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/win32-setup.zip" target="_blank">win32-setup.zip</a></i> to <i>plugins/jumpy</i>.
+</li>
+<li>Go to <i><span class="orange">plugins/jumpy/win32-setup</span></i> and double-click on <i><span class="orange">setup.bat</span></i> to auto-install everything else.
+</li>
+<br/>
+You should now have <i><code>python</code>, <code>py4j</code>, <code>XBMC</code>, <code>rtmpdump</code>, <code>phantomjs</code></i>,
+and an updated <i>PMS.conf</i> ready to go and can skip the next 4 sections ('mostly').
+</ol>
+<br/>
 <b><a name="REQUIREMENTS">Requirements</a></b>
 <ol>
 <li><a href="http://www.python.org/download/releases/2.7.3/#download" target="_blank">Python 2.7</a>.
@@ -123,12 +138,6 @@ and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-ins
 </li>
 <li><a href="http://py4j.sourceforge.net/download.html" target="_blank">py4j</a>.
 </li>
-<ul>
-<br/>
-<li>Windows Quick Setup: <i>unzip <a href="https://github.com/downloads/skeptical/jumpy/py27-py4j-install.zip">py27-py4j-install.zip</a> and double-click on 'py27chk.bat' to auto-install python 2.7 and py4j</i>.
-</li>
-</ul>
-<br/>
 <li><a href="https://github.com/chocolateboy/pmsencoder" target="_blank">PMSEncoder</a> and
 <a href="http://rtmpdump.mplayerhq.hu/" target="_blank">rtmpdump</a>, not required but indispensible as always.
 </li>
@@ -167,7 +176,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest version</a></i> to your pms <i>plugins</i> folder.
+<li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest version</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
