@@ -43,7 +43,6 @@
 	</target>
 
 	<target name="dist" depends="jar" >
-		<delete dir="${dist}"/>
 		<mkdir dir="${dist}/jumpy/lib"/>
 		<copy file="${jumpy}.jar" todir="${dist}"/>
 		<copy file="readme.html" todir="${dist}/jumpy"/>
