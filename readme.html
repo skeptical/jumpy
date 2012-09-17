@@ -117,17 +117,20 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <br/><br/>
 <b><a name="WIN32SETUP">Windows Quick Setup</a></b>
 <ol>
-<li>Shut down PMS.
+<li>Shut down PMS (very important).
 </li>
-<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.2.zip" target="_blank">pms-jumpy-0.2.2.zip</a></i> to your PMS <i>plugins</i> folder.
-</li>
-<li>Unzip <i><a href="https://github.com/downloads/skeptical/jumpy/win32-setup.zip" target="_blank">win32-setup.zip</a></i> to <i>plugins/jumpy</i>.
-</li>
-<li>Go to <i><span class="orange">plugins/jumpy/win32-setup</span></i> and double-click on <i><span class="orange">setup.bat</span></i> to auto-install everything else.
+<li>Put <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.3.exe" target="_blank">pms-jumpy-0.2.3.exe</a></i>
+in your <b>PMS <i>plugins</i> folder</b>.
+<li>
+Double-click it and follow through as usual with the Installers for Python and XBMC if they open up
+(yes, you can install to alternate locations if you want).
 </li>
 <br/>
-You should now have <i><code>python</code>, <code>py4j</code>, <code>XBMC</code>, <code>rtmpdump</code>, <code>phantomjs</code></i>,
-and an updated <i>PMS.conf</i> ready to go and can skip the next 4 sections ('mostly').
+You should end up with
+<i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>XBMC</code>, <code>rtmpdump</code>,
+<code>phantomjs</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
+the next 4 sections ('mostly').
+</li>
 </ol>
 <br/>
 <b><a name="REQUIREMENTS">Requirements</a></b>
@@ -221,9 +224,12 @@ The available settings are:
 </pre>
 </li>
 <li><b><i>PMS.conf</i></b>:
-If you need to override the location where jumpy looks for xbmc set:
+If you need to override the locations where jumpy looks for xbmc set:
 <pre>
+<i class="comment"># xbmc user folder</i>
 <b>xbmc.path</b> = c:\\path\\to\\my\\XBMC
+<i class="comment"># xbmc program folder</i>
+<b>xbmc.main.path</b> = c:\\path\\to\\program\\XBMC
 </pre>
 You can set paths where external binaries needed by your scripts can be found,
 separating them with '<code><span class="orange">;</span></code>' in Windows or '<code><span class="orange">:</span></code>' in linux/mac:
