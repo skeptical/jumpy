@@ -31,6 +31,9 @@
 
 	<target name="jar" depends="clean, compile, util" >
 		<copy file="${src}/plugin" todir="${build}"/>
+		<copy todir="${build}/resources">
+			<fileset dir="resources" excludes="**/*.pyc **/*log* **/*test* **/*.0 **/ignore/**"/>
+		</copy>
 		<jar jarfile="${jumpy}.jar" basedir="${build}">
 			<manifest>
 				<attribute name="Class-Path" value="jumpy/lib/py4j0.7.jar jumpy/lib/ini4j-0.5.2.jar jumpy/lib/commons-exec-1.1.jar"/>

@@ -7,10 +7,12 @@ import java.util.Arrays;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.metal.MetalIconFactory;
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 
@@ -21,7 +23,6 @@ import net.pms.io.MacSystemUtils;
 
 // convenience class to combine interfaces for inlining
 abstract class multiListener implements ItemListener, ChangeListener, ActionListener {}
-
 
 public class config {
 
@@ -82,7 +83,7 @@ public class config {
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		JPanel top = new JPanel();
 		top.add(new JLabel("<html><center>"
-			+ "<font size=+1 color=#0000a0><font color=#ff6600>Jumpy</font> - " + jumpy.version + "</font>"
+			+ "<font size=+1 color=blue>Jumpy <font color=#ffa050>" + jumpy.version + "</font></font>"
 			+ "<center></html>"));
 		c.insets = none;
 		panel.add(top, c);
@@ -162,9 +163,16 @@ public class config {
 		c.fill = GridBagConstraints.CENTER;
 		c.insets = border;
 
+		try {
+			BufferedImage logo = ImageIO.read(jumpy.getClass().getClassLoader()
+				.getResourceAsStream("resources/jumpy2-48.png"));
+			panel.add(new JLabel(new ImageIcon(logo)));
+			c.gridy++;
+		} catch (Exception e) { e.printStackTrace(); }
+
 		panel.add(new JLabel("<html><center>"
-			+ "Jumpy is a general purpose framework for<br>"
-			+ "scripts in any language and other external processes<br>"
+			+ "Jumpy is a general purpose framework<br>"
+			+ "for scripts in python and other languages<br>"
 			+ "to plug into PMS.<br><br>"
 			+ "Included is a set of python scripts to run xbmc addons.<br>"
 			+ "</center></html>"), c);
@@ -250,8 +258,11 @@ public class config {
 	}
 
 	public static JButton linkButton(String label, final String uri) {
-		JButton link = new JButton("<html><a href=''>" + label + "</a></html>");
+		JButton link = new JButton("<html><a href=''><font color=blue>" + label + "</font></a></html>");
+		link.setOpaque(false);
+		link.setContentAreaFilled(false);
 		link.setBorderPainted(false);
+		link.setFocusPainted(false);
 		link.setToolTipText(uri);
 		link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		link.addActionListener(new ActionListener() {
