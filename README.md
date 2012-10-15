@@ -17,7 +17,7 @@ Jumpy itself is general-purpose, of course, and you can use it to plug <a href="
 <b style="color:black">Links</b>
 <ul>
 <li><a href="http://skeptical.github.com/jumpy/readme.html" target="_blank">Documentation</a></li>
-<li><a href="http://www.ps3mediaserver.org/forum/viewtopic.php?f=12&t=12518" target="_blank">Forum</a></li>
+<li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288" target="_blank">Forum</a></li>
 </ul>
 
 <b style="color:black">Building</b>
