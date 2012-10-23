@@ -27,7 +27,7 @@ abstract class multiListener implements ItemListener, ChangeListener, ActionList
 public class config {
 
 	static final String websiteurl = "https://github.com/skeptical/jumpy";
-	static final String forumurl = 	"http://www.ps3mediaserver.org/forum/viewtopic.php?f=12&t=12518";
+	static final String forumurl = 	"http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288";
 	static final String xbmcurl = "http://xbmc.org";
 	static final String pythonuri = "http://www.python.org/download/releases/2.7.3";
 	static final String py4juri = "http://py4j.sourceforge.net";

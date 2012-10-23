@@ -47,7 +47,7 @@ import net.pms.external.dbgpack;
 public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.2.3";
+	public static final String version = "0.2.4";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	public PmsConfiguration configuration;
