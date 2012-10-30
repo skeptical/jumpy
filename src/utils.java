@@ -92,6 +92,7 @@ public final class utils {
 		paths.addExec("dcraw", configuration.getDCRawPath());
 		paths.addExec("convert", configuration.getIMConvertPath());
 		paths.add(PropertiesUtil.getProjectProperties().get("project.binaries.dir"));
+		paths.add(windows ? "win32" : mac ? "osx" : "linux");
 //		paths.remove("");
 //		paths.remove(null);
 		String s = StringUtils.join(paths, File.pathSeparator);
