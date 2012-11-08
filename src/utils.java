@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection ;
+import java.net.ConnectException;
 
 import java.lang.System;
 import java.lang.Process;
@@ -16,6 +20,9 @@ import java.lang.ProcessBuilder;
 import java.lang.management.ManagementFactory;
 
 import org.apache.commons.lang.StringUtils;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
@@ -29,30 +36,107 @@ public final class utils {
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
 	//http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
 
-	public static void restart() {
-		final ArrayList<String> command = new ArrayList<String>();
-		command.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+	public static ArrayList<String> PMS_cmd() {
+		ArrayList<String> restart = new ArrayList<String>();
+		restart.add(org.apache.commons.exec.util.StringUtils.quoteArgument(
+			 System.getProperty("java.home") + File.separator + "bin" + File.separator +
+			 ((windows && System.console() == null) ? "javaw" : "java")));
 		for (String jvmArg : ManagementFactory.getRuntimeMXBean().getInputArguments()) {
-			command.add(jvmArg);
+			restart.add(org.apache.commons.exec.util.StringUtils.quoteArgument(jvmArg));
 		}
-		command.add("-cp");
-		command.add(ManagementFactory.getRuntimeMXBean().getClassPath());
-		// can also use http://stackoverflow.com/questions/41894/0-program-name-in-java-discover-main-class
-		command.add(PMS.class.getName());
-		command.add("&");
-		String cmdString = "";
-		for (String s : command) {
-			cmdString += s + " ";
-		}
-		System.out.println("Launching: " + cmdString);
+		restart.add("-cp");
+		restart.add(ManagementFactory.getRuntimeMXBean().getClassPath());
+		// could also use generic main discovery instead:
+		// see http://stackoverflow.com/questions/41894/0-program-name-in-java-discover-main-class
+		restart.add(PMS.class.getName());
+		return restart;
+	}
 
-		final ProcessBuilder pb = new ProcessBuilder(command);
-		pb.directory(new File(System.getProperty("user.dir")));
-		System.out.println(pb.directory());
+	public static void restart() {
+		restart(null, null, null);
+	}
+
+	public static void restart(ArrayList<String> cmd, Map<String,String> env, String startdir) {
+		final ArrayList<String> restart = PMS_cmd();
+		if (cmd == null) {
+			cmd = restart;
+		} else {
+			if (env == null) {
+				env = new HashMap<String,String>();
+			}
+			env.put("RESTART", StringUtils.join(restart, " "));
+			env.put("RESTARTDIR", System.getProperty("user.dir"));
+		}
+		if (startdir == null) {
+			startdir = System.getProperty("user.dir");
+		}
+
+		System.out.println("starting: " + StringUtils.join(cmd, " "));
+
+		final ProcessBuilder pb = new ProcessBuilder(cmd);
+		if (env != null) {
+			pb.environment().putAll(env);
+		}
+		pb.directory(new File(startdir));
+		System.out.println("in directory: " + pb.directory());
 		try {
 			pb.start();
-		} catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { e.printStackTrace(); return; }
 		System.exit(0);
+	}
+
+	public static File download(String url, String destdir) {
+		System.out.println("downloading: " + url);
+		File dest=null, temp=null;
+		try {
+			URL src = new URL(url);
+			dest = new File(destdir, new File(src.getPath()).getName());
+			temp = new File(destdir, dest.getName() + ".part");
+			FileUtils.copyURLToFile(src, temp, 30000, 30000);
+			if (temp.exists()) {
+				temp.renameTo(dest);
+				return dest;
+			}
+		} catch (Exception e) {
+			if (temp != null && temp.exists()) temp.delete();
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static String gettext(String url) {
+		try {
+			URLConnection c = new URL(url).openConnection();
+			c.setConnectTimeout(10000);
+			c.setReadTimeout(10000);
+			return IOUtils.toString(c.getInputStream());
+		} catch (Exception e) { System.out.println(e.toString()); }
+		return null;
+	}
+
+	public static boolean isNewer(String v1, String v0) {
+		// expand and compare gnu-style major.minor.revision[suffix] version strings
+		String x1 = String.format("%3s%3s%3s%s",
+			(Object[])(v1.replaceFirst("([\\d.]+)","$1. ").split("\\.")));
+		String x0 = String.format("%3s%3s%3s%s",
+			(Object[])(v0.replaceFirst("([\\d.]+)","$1. ").split("\\.")));
+		return (x0.compareTo(x1) < 0);
+	}
+
+	public static boolean update(String url) {
+		File installer = download(url, "plugins");
+		if (installer != null) {
+			ArrayList<String> cmd = new ArrayList<String>();
+			cmd.add(installer.getAbsolutePath());
+			if (url.endsWith(".run")) {
+				cmd.add("--");
+			}
+			cmd.add("--selfupdate");
+			Map<String,String> env = new HashMap<String,String>();
+			env.put("PROFILE_PATH", PMS.getConfiguration().getProfilePath());
+			restart(cmd, env, installer.getParent());
+		}
+		return false;
 	}
 
 	public static String getBinPaths(PmsConfiguration configuration, final Map<String,String> executables) {

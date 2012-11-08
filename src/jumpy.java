@@ -52,9 +52,9 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	private PMS pms;
 	public PmsConfiguration configuration;
 	private Properties conf = null;
-	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini;
+	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini, host;
 	public String lasturi;
-	public boolean debug, showBookmarks, verboseBookmarks;
+	public boolean debug, check_update, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
 	private FileOutputStream logfile;
@@ -68,6 +68,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
+		host = new File(configuration.getProfilePath()).getName().split("\\.conf")[0];
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)
 			.getAbsolutePath();
@@ -103,6 +104,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log(new Date().toString());
 		log("\n");
 		log("initializing jumpy " + version, true);
+//		config.checkLatest();
 		config.create(new File(jumpyconf), false);
 		config.create(new File(scriptsini), false);
 		log("\n");
@@ -256,6 +258,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			} catch (IOException e) {}
 		}
 		debug = Boolean.valueOf(conf.getProperty("debug", "false"));
+		check_update = Boolean.valueOf(conf.getProperty("check_update", "true"));
 		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
 		verboseBookmarks = Boolean.valueOf(conf.getProperty("verbose_bookmarks", "true"));
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
@@ -263,6 +266,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 
 	public boolean writeconf() {
 		conf.setProperty("debug", String.valueOf(debug));
+		conf.setProperty("check_update", String.valueOf(check_update));
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
 		conf.setProperty("refresh", String.valueOf(refresh));

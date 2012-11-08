@@ -26,8 +26,9 @@ abstract class multiListener implements ItemListener, ChangeListener, ActionList
 
 public class config {
 
+	static final String updateurl = "http://skeptical.github.com/jumpy/";
 	static final String websiteurl = "https://github.com/skeptical/jumpy";
-	static final String forumurl = 	"http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288";
+	static final String forumurl = "http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288";
 	static final String xbmcurl = "http://xbmc.org";
 	static final String pythonuri = "http://www.python.org/download/releases/2.7.3";
 	static final String py4juri = "http://py4j.sourceforge.net";
@@ -37,6 +38,8 @@ public class config {
 	static final Insets none = new Insets(0,0,0,0);
 
 	public static jumpy jumpy;
+	public static String latest, latesturl;
+	static JPanel statusbar;
 
 	public static multiListener listener = new multiListener() {
 		public void stateChanged(ChangeEvent e) {
@@ -54,6 +57,9 @@ public class config {
 				jumpy.verboseBookmarks = (state == ItemEvent.DESELECTED ? false : true);
 			} else if (opt.equals("refresh")) {
 				jumpy.refresh = (Integer)(((JSpinner)c).getValue());
+			} else if (opt.equals("check_update")) {
+				jumpy.check_update = (state == ItemEvent.DESELECTED ? false : true);
+				checkLatest();
 			} else if (opt.equals("debug")) {
 				jumpy.debug = (state == ItemEvent.DESELECTED ? false : true);
 			}
@@ -67,6 +73,9 @@ public class config {
 				PMS.debug("Revert");
 				jumpy.readconf();
 				rebuild((JComponent)e.getSource());
+			} else if (cmd.equals("Update")) {
+				PMS.debug("Update");
+				update();
 			}
 		}
 	};
@@ -117,37 +126,70 @@ public class config {
 		c.insets = none;
 		panel.add(tabs, c);
 
+		// check for updates every time the panel appears
+		final JPanel main = panel;
+		panel.addHierarchyListener( new HierarchyListener() {
+			public void hierarchyChanged(HierarchyEvent e) {
+				if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == HierarchyEvent.SHOWING_CHANGED
+						&& main.isShowing()) {
+					checkLatest();
+				}
+			}
+		});
+
 		return panel;
 	}
 
 	public static JPanel options() {
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0; c.gridy = 0;
+		c.gridx = 0; c.gridy = -1;
 		c.fill = GridBagConstraints.BOTH;
 		c.gridwidth = GridBagConstraints.REMAINDER;
 
 		c.insets = items;
-		c.gridx = 0; c.gridy = 0;
+
+		c.gridx = 0; c.gridy++;
+		statusbar = new JPanel(new GridLayout(0,1)) {
+			@Override
+			public Component add(Component comp) {
+				super.removeAll();
+				comp = super.add(comp);
+				((Window)getTopLevelAncestor()).pack();
+				return comp;
+			}
+			@Override
+			public void removeAll() {
+				if (getComponents().length > 0) {
+					super.removeAll();
+					((Window)getTopLevelAncestor()).pack();
+				}
+			}
+		};
+		panel.add(statusbar, c);
+
+		c.gridx = 0; c.gridy++;
 		panel.add(checkbox("Enable bookmarks", jumpy.showBookmarks, "bookmarks"), c);
-		c.gridx = 0; c.gridy = 1;
+		c.gridx = 0; c.gridy++;
 		panel.add(checkbox("Qualify bookmark names (e.g. 'Live :ESPN' instead of just 'Live')", jumpy.verboseBookmarks, "verbose_bookmarks"), c);
-		c.gridx = 0; c.gridy = 2;
+		c.gridx = 0; c.gridy++;
 		c.gridwidth = GridBagConstraints.RELATIVE;
 		c.weightx = 1;
 		panel.add(new JLabel("Refresh folder content every (minutes) :", SwingConstants.LEFT), c);
-		c.gridx = 1; c.gridy = 2;
+		c.gridx = 1; /*c.gridy = 2;*/
 		c.weightx = 0;
 		c.gridwidth = GridBagConstraints.REMAINDER;
 		panel.add(numberBox(Integer.valueOf(jumpy.refresh), 0, 1000, 1, "refresh"), c);
-		c.gridx = 0; c.gridy = 3;
+		c.gridx = 0; c.gridy++;
+		panel.add(checkbox("Check for updates", jumpy.check_update, "check_update"), c);
+		c.gridx = 0; c.gridy++;
 		panel.add(checkbox("Print log messages to console", jumpy.debug, "debug"), c);
 
 		JPanel p = new JPanel();
 		p.add(actionButton("Revert", "Reload settings from disk."));
 		p.add(actionButton("Save", jumpy.jumpyconf));
 		c.insets = none;
-		c.gridx = 1; c.gridy = 4;
+		c.gridx = 1; c.gridy++;
 		panel.add(p, c);
 
 		JPanel frame = new JPanel(new GridBagLayout());
@@ -323,6 +365,63 @@ public class config {
 		}
 		catch (Exception e) { e.printStackTrace(); return false; }
 		return true;
+	}
+
+	public static void statusRun(String msg, final Runnable r) {
+		final JProgressBar progressBar = new JProgressBar();
+		progressBar.setIndeterminate(true);
+		UIManager.put("ProgressBar.cycleTime", new Integer(5000));
+		progressBar.setBorderPainted(false);
+		progressBar.setStringPainted(true);
+		progressBar.setString(msg);
+		statusbar.add(progressBar);
+		new Thread(new Runnable() {
+			public void run() {
+				try { r.run();	}
+				finally {
+					if (statusbar.getComponents()[0] == progressBar) {	statusbar.removeAll(); }
+				}
+			}
+		}).start();
+	}
+
+	public static void checkLatest() {
+		latest = latesturl = null;
+		if (jumpy.check_update) {
+			statusRun("Checking for updates", new Runnable() {
+				public void run() {
+					String text = utils.gettext(updateurl + "LATEST");
+					if (text != null) {
+						latest = text.split("version=")[1].split("\\r?\\n")[0].trim();
+						latesturl = text.split((utils.windows ? "win32" : utils.mac ? "osx" : "linux") + "=")[1]
+							.split("\\r?\\n")[0].trim();
+						jumpy.log("latest version is " + latest);
+						if (utils.isNewer(latest, jumpy.version)) {
+							JButton btn = actionButton(
+								"<html><font color=blue>Update available:  Jumpy " + latest + "</font></html>",
+								"Install Jumpy " + latest);
+							btn.setActionCommand("Update");
+							btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+							statusbar.add(btn);
+						}
+					}
+				}
+			});
+		} else statusbar.removeAll();
+	}
+
+	private static void update() {
+		int opt = JOptionPane.showConfirmDialog(null,
+			"Install Jumpy " + latest + " and restart " + jumpy.host + "?", "Update", JOptionPane.YES_NO_OPTION);
+		if (opt == JOptionPane.YES_OPTION) {
+			statusRun("Installing Jumpy " + latest, new Runnable() {
+				public void run() {
+					if (! utils.update(latesturl)) {
+						JOptionPane.showMessageDialog(null, "Couldn't update to " + latest, "Error", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+		}
 	}
 
 	private static void rebuild(JComponent c) {
