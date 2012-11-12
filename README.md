@@ -1,6 +1,6 @@
-<H3 style="color:black">PMS-<span style="color:#ff6600">Jumpy</span> - Jump into Python (and onto XBMC)</H3>
+<H3 style="color:black"><span style="color:#ff6600">Jumpy</span> - Jump into Python (and onto XBMC)</H3>
 
-PMS-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
+Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
 <ul>
 <li>add folders and media items to the xmb.</li>
 <li>act as user-defined external players.</li>
@@ -24,7 +24,7 @@ Jumpy itself is general-purpose, of course, and you can use it to plug <a href="
 <ul>
 Place or symlink the following dependencies in 'lib' before running ant:
 <ul>
-<li><i>pms.jar</i> (<a href="http://www.ps3mediaserver.org/" target="_blank">ps3mediaserver.org</a>)</li>
+<li><i>pms.jar</i> (<a href="http://www.ps3mediaserver.org/" target="_blank">ps3mediaserver.org</a>) or <i>ums.jar</i> (<a href="http://www.universalmediaserver.com/" target="_blank">universalmediaserver.com</a>)</li>
 <li><i>py4j0.7.jar</i> (<a href="http://py4j.sourceforge.net" target="_blank">py4j.sourceforge.net</a>)</li>
 <li><i>ini4j-0.5.2.jar</i> (<a href="http://ini4j.sourceforge.net" target="_blank">ini4j.sourceforge.net</a>)</li>
 <li><i>commons-exec-1.1.jar</i> (<a href="http://commons.apache.org/exec/" target="_blank">commons.apache.org/exec</a>)</li>
