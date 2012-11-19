@@ -1,0 +1,4 @@
+version=0.2.4
+win32=https://github.com/downloads/skeptical/jumpy/jumpy-0.2.4.exe
+linux=https://github.com/downloads/skeptical/jumpy/jumpy-0.2.4.run
+osx=https://github.com/downloads/skeptical/jumpy/jumpy-0.2.4.run
