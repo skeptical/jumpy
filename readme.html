@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>PMS-Jumpy</title>
+<title>Jumpy</title>
 <style type="text/css">
 .black {
 	color: black;
@@ -67,6 +67,7 @@ div.main {
 <div class="contents">
 <ul style="list-style-type:none;padding:0px;margin:10px;white-space:nowrap;">
 <center><a href="#TOP">BASICS</a></center><br/>
+<li><a href="#QUICKSETUP">Quick Setup</a></li>
 <li><a href="#REQUIREMENTS">Requirements</a></li>
 <li><a href="#XBMC">XBMC Installation</a></li>
 <li><a href="#PHANTOMJS">PhantomJS Installation</a></li>
@@ -100,9 +101,9 @@ div.main {
 </ul>
 </div>
 <div class="main">
-<a name="TOP"><H3 style="color:darkblue"><span class="orange">PMS-Jumpy</span> - Jump into Python (and onto XBMC)</H3></a>
+<a name="TOP"><H3 style="color:darkblue"><span class="orange">Jumpy</span> - Jump into Python (and onto XBMC)</H3></a>
 
-PMS-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
+Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
 <ul>
 <li>add folders and media items to the xmb.</li>
 <li>act as user-defined external players.</li>
@@ -115,24 +116,42 @@ Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, P
 <br/><br/>
 Jumpy itself is general-purpose, of course, and you can use it to plug your own scripts, python or other, into PMS as well.
 <br/><br/>
-<b><a name="WIN32SETUP">Windows Quick Setup</a></b>
+<!--<div style="border-style: dotted;border-width:1px;margin:-8;padding:8">-->
+<b><a name="QUICKSETUP">Quick Setup</a></b>
+<!--<ul>-->
+<!--<b><a name="INSTALLERS">Using the Installer</a></b>-->
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put <i><a href="https://github.com/downloads/skeptical/jumpy/pms-jumpy-0.2.3c.exe" target="_blank">pms-jumpy-0.2.3c.exe</a></i>
+<li>Put <i><a href="https://github.com/downloads/skeptical/jumpy/Jumpy-0.2.4.exe" target="_blank">Jumpy-0.2.4.exe</a></i> (Windows)
+or <i><a href="https://github.com/downloads/skeptical/jumpy/Jumpy-0.2.4.run" target="_blank">Jumpy-0.2.4.run</a></i> (Linux/OS-X)
 in your PMS <b><i>plugins</i> folder</b>.
+</li>
 <li>
-Double-click it and follow through as usual with the Installers for Python and XBMC if they open up
-(yes, you can install to alternate locations if you want).
+Launch it and follow through as usual with external package installers if prompted
+(yes, you can install to alternate locations or skip packages if you want).
 </li>
 <br/>
+<div style="text-indent:-1.5em;">
+<b><a name="QUICKER">Even Quicker</a></b>
+<br/>
+<b><a name="UMSSETUP">UMS</b> <i>(2.0.1+)</i> <b>users</a></b> : install/update from the <i>Plugin Management</i> tab.
+<br/>
+<b><a name="UPDATE">Future updates</a></b> can be installed directly from the <i>jumpy gui</i> panel.
+</div>
+<br/>
+<div style="margin-left:-1.5em;">
 You should end up with
 <i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>XBMC</code>, <code>rtmpdump</code>,
 <code>phantomjs</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
-the next 4 sections ('mostly').
-</li>
+the grey section below ('mostly', i.e. don't forget to install
+<a href="https://github.com/chocolateboy/pmsencoder" target="_blank"><i>PMSEncoder</i></a>
+and maybe some <a href="#ADDONS"><i>xbmc addons</i></a>).
+</div>
 </ol>
+<!--</div>-->
 <br/>
+<div style="background-color:#f7f7f1;margin:-8;padding:8;padding-bottom:2">
 <b><a name="REQUIREMENTS">Requirements</a></b>
 <ol>
 <li><a href="http://www.python.org/download/releases/2.7.3/#download" target="_blank">Python 2.7</a>.
@@ -151,7 +170,7 @@ and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-ins
 <li>Install <a href="http://xbmc.org/download/" target="_blank">xbmc</a> using the default configuration
 for your platform.
 </li>
-<li><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories" target="_blank">Install and configure</a>
+<li><a name="ADDONS"></a><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories" target="_blank">Install and configure</a>
 some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons" target="_blank">addons</a>
 inside xbmc (and of course test them too, some are broken). You may need to configure username/password depending
 on the addon, and so on.
@@ -163,15 +182,11 @@ on the addon, and so on.
 <ul>
 To use the included <a href="#WEBREADER">webreader</a> browser install <a href="http://phantomjs.org/download.html" target="_blank">phantomjs</a>
 in one of these places:
-<br/><br/>
-<i>Windows or mac:</i>
+<br/>
 <ul>
-<li>inside your PMS installation's binaries folder (<i>win32</i> or <i>osx</i>).</li>
-<li>inside the <i>plugins/jumpy/webreader</i> folder.</li>
-</ul>
-<i>Windows, mac, or linux:</i>
-<ul>
-<li>anywhere, adding its binary folder path to the <code>bin.path</code> setting in <i>PMS.conf</i>
+<li>inside your PMS installation's binaries folder (i.e. in <i>win32</i>, <i>linux</i> or <i>osx</i>).</li>
+<li>or inside the <i>plugins/jumpy/webreader</i> folder.</li>
+<li>or anywhere, adding its binary folder path to the <code>bin.path</code> setting in <i>PMS.conf</i>
 (create it if it doesn't exist):
 <ul><code>bin.path = c:\\path\\to\\phantomjsFolder</code></ul></li>
 </ul>
@@ -179,7 +194,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest version</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -194,7 +209,8 @@ perl.path = c:\\perl\\bin\\perl.exe
 media addons found in your xbmc user directory.
 </li>
 </ol>
-<br/>
+</div>
+<br/><br/>
 <b><a name="BOOKMARKS">Bookmarks</a></b>
 <ul>
 Press the <i>Add bookmark</i> button in any folder to create a bookmark inside <i> Jumpy > Bookmarks</i>. These are saved to <b><i>jumpy-bookmarks.ini</i></b> in your PMS profile folder (wherever <i>PMS.conf</i> is). You can edit this file, for instance to change the labels or reorder the items.
@@ -218,6 +234,9 @@ The available settings are:
 <i class="comment"># how often to refresh folder content in minutes
 # (-1=never|0=always|1=one minute)</i>
 <b>refresh</b>=60
+
+<i class="comment"># whether to check for updates (true|false)</i>
+<b>check_update</b>=true
 
 <i class="comment"># whether to copy log output to the console (true|false)</i>
 <b>debug</b>=false
@@ -424,3 +443,4 @@ World news/Europe, http://www.guardian.co.uk/world/europe/roundup/rss
 </body>
 </html>
 
+<!--http://wiki.xbmc.org/index.php?title=Python_Development-->
