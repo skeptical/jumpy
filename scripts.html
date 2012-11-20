@@ -403,7 +403,7 @@ for example:
 </li>
 <br/>
 <li><code>supported</code> is a string specifying supported media in the same syntax used for configuring renderers
-(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L301" target="_blank"><i>PMS.conf</i></a>).
+(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L335" target="_blank"><i>PMS.conf</i></a>).
 For instance an "audio as video" player might use:
 <ul><code>"f:flac|wav m:video/mpeg"</code></ul>
 which means 'accept any <i>flac</i> or <i>wav</i> file and broadcast a <i>video/mpeg</i>
@@ -414,7 +414,7 @@ mimetype for it'. Some things to keep in mind:
 </li>
 <li>If <code>f:</code> specifies known formats, your player will override PMS' default
 player for those formats.  In this case, since the media is known and can be parsed, you can
-further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L366" target="_blank">etc</a>).
+further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L399" target="_blank">etc</a>).
 <li>If <code>f:</code> specifies unrecognised formats (real such as <code>f:txt</code> or
 imaginary such as <code>f:foo</code>), then only <code>m:</code> will be valid,
 since PMS obviously can't parse the media and presumably your player knows what to do
