@@ -34,8 +34,9 @@ public class command {
 	public Map<String,String> env = null;
 	public Map substitutions = null;
 	private GatewayServer server = null;
-	public int scriptarg = 0;
+	public int scriptarg = 0, arg0 = 0;
 	private boolean delims = false;
+	public boolean async = false;
 
 	public static HashMap<String,String> interpreters = new HashMap<String,String>() {{
 		put("py", "python");
@@ -106,10 +107,20 @@ public class command {
 		// Arrays.asList() is fixed-size, so allocate an extra interpreter slot now
 		// TODO: check if arg1 is an interpreter first
 		cmd = " , " + cmd;
+		arg0 = 1;
 		return Arrays.asList((delims ? cmd.split(" , ") : CommandLine.parse(cmd).toStrings()));
 	}
 
 	public List<String> fixArgs(List<String> argv) {
+
+		if (async = argv.get(argv.size()-1).equals("&")) {
+			argv = argv.subList(0, argv.size()-1);
+		} else if (windows) {
+			async = argv.get(arg0).toLowerCase().startsWith("cmd") &&
+				argv.get(arg0 + 1).toLowerCase().equals("/c") &&
+				argv.get(arg0 + 2).toLowerCase().equals("start");
+		}
+
 		for (int i=0; i<argv.size(); i++) {
 			String arg = argv.get(i).trim();
 			if (StringUtils.isQuoted(arg)) {
@@ -120,6 +131,7 @@ public class command {
 			argv.set(i, arg);
 		}
 
+		arg0 = 0;
 		String arg1 = argv.get(1);
 		String filename = new File(arg1).getName();
 		int i = filename.lastIndexOf('.') + 1;

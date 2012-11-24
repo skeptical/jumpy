@@ -14,15 +14,16 @@ import net.pms.external.infidel.jumpy.jumpyAPI;
 
 public class jumpstart {
 
-	static runner ex;
 	public static item root = null;
 
 	public static void main(String[] argv) {
 
 		if (argv.length == 0) usage();
 
-		ex = new runner();
-		ex.version = "0.2.0";
+		runner ex = new runner();
+
+		runner.version = "0.2.1";
+		System.out.println("jumpstart " + runner.version);
 
 		Console c = System.console();
 		if (c == null) {
@@ -70,7 +71,7 @@ public class jumpstart {
 
 		while (true) {
 			if (! current.discovered) {
-				ex.run(current, current.uri, current.syspath, current.env);
+				new runner().run(current, current.uri, current.syspath, current.env);
 				current.discovered = true;
 			}
 			int size = current.children.size();
@@ -190,6 +191,10 @@ class item extends node implements jumpyAPI {
 		this.discovered = false;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	public Object addItem(int type, String filename, String uri, String thumb, String data) {
 		item folder = this;
 		String name = filename;
@@ -221,7 +226,7 @@ class item extends node implements jumpyAPI {
 		System.out.println("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
 		switch (action) {
 			case VERSION:
-				return jumpstart.ex.version;
+				return runner.version;
 			case PLUGINJAR:
 				return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 			case FOLDERNAME:

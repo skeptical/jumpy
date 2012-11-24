@@ -64,7 +64,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		if (env != null && !env.isEmpty()) {
 			this.env.putAll(env);
 		}
-		this.ex = new runner();
+		this.ex = null;
 		this.refreshAlways = (jumpy.refresh == 0);
 	}
 
@@ -89,6 +89,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		}
 		jumpy.log("\n");
 		jumpy.log("Opening folder: " + name + ".\n");
+		ex = new runner();
 		ex.run(this, uri, syspath, env);
 		refreshOnce = false;
 	}
@@ -225,7 +226,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				}
 		}
 		jumpy.log("Adding " + media +  ": " + filename + ".");
-		return ex.running ? null : folder.getChildren().get(folder.getChildren().size()-1);
+		return (ex != null && ex.running) ? null : folder.getChildren().get(folder.getChildren().size()-1);
 	}
 
 	@Override

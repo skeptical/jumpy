@@ -3,6 +3,8 @@ package net.pms.external.infidel.jumpy;
 
 public interface jumpyAPI {
 
+	public String getName();
+
 	// new constants:
 	public static final int UNRESOLVED = -2;
 	public static final int FOLDER = -1;

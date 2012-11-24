@@ -2,6 +2,7 @@ package net.pms.external.infidel.jumpy;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -17,6 +18,8 @@ public class runner {
 	public command cmdline;
 	private Process p = null;
 	public boolean running = false;
+	public static ArrayList<runner> active = new ArrayList<runner>();
+	public String name;
 
 	public runner() {
 		cmdline = new command();
@@ -50,6 +53,10 @@ public class runner {
 
 	private int run(jumpyAPI obj) {
 
+		if (name == null) {
+			name = obj.getName();
+		}
+
 		if (! cmdline.startAPI(obj)) {
 			return -1;
 		}
@@ -63,7 +70,7 @@ public class runner {
 		String[] argv = cmdline.toStrings();
 		int exitValue = 0;
 		running = true;
-		log("running " + Arrays.toString(argv) + cmdline.envInfo());
+		log("running " + (cmdline.async ? "(async) " : "") + Arrays.toString(argv) + cmdline.envInfo());
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder(argv);
@@ -80,6 +87,11 @@ public class runner {
 
 			p = pb.start();
 
+			if (cmdline.async) {
+				active.add(this);
+				return 0;
+			}
+
 			String line;
 			BufferedReader br;
 			br = new BufferedReader (new InputStreamReader(p.getInputStream()));
@@ -93,7 +105,13 @@ public class runner {
 			shutdown();
 		} catch(Exception e) {running = false; e.printStackTrace();}
 
+		name = null;
 		return exitValue;
+	}
+
+	public static void stop (runner r) {
+		r.log("stopping '" + r.name + "'");
+		r.shutdown();
 	}
 
 	public int shutdown() {

@@ -148,8 +148,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("Adding root folder.", true);
 		top = new scriptFolder(this, "Jumpy", null, null);
 
-		runner ex = new runner();
-		ex.quiet(top, "[" + command.pms + "]", null, null);
+		new runner().quiet(top, "[" + command.pms + "]", null, null);
 		if (top.env.containsKey("imconvert")) {
 			command.putexec("imconvert", top.env.get("imconvert"));
 		}
@@ -198,7 +197,7 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 			log("\n");
 			log("starting " + script.getName() + ".", true);
 			log("\n");
-			ex.run(top, "[" + script.getPath() + "]", null);
+			new runner().run(top, "[" + script.getPath() + "]", null);
 			top.env.clear();
 		}
 
@@ -239,6 +238,11 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	public void shutdown () {
 		userscripts.autorun(false);
 
+		if (runner.active.size() > 0) {
+			for (runner r : runner.active) {
+				runner.stop(r);
+			}
+		}
 		if (players.size() > 0) {
 			boolean changed = false;
 			for (player p : players) {
@@ -331,7 +335,6 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 	}
 
 }
-
 
 class quickLog extends PrintStream {
 	private static String tag;

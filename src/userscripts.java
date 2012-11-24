@@ -45,7 +45,6 @@ public class userscripts {
 	}
 
 	public void autorun(boolean startup) {
-		runner ex = new runner();
 		String flag = (startup ? "+" : "-");
 		String context = (startup ? "starting " : "finishing ");
 		for (Section section : ini.values()) {
@@ -54,7 +53,7 @@ public class userscripts {
 				jumpy.log("\n");
 				jumpy.log(context + name + ".", true);
 				jumpy.log("\n");
-				ex.run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
+				new runner().run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
 				jumpy.top.env.clear();
 			}
 		}
