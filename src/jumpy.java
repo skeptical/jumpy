@@ -37,6 +37,9 @@ import net.pms.formats.FormatFactory;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
 import net.pms.external.ExternalListener;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.io.OutputParams;
+import net.pms.io.ProcessWrapper;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -185,7 +188,25 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		players = new ArrayList<player>();
 		players.add(new player(this,
 			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
-			"Jumpy Video Action Player", 0, 1));
+			"Jumpy Video Action Player", 0, 1) {
+				public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
+						DLNAMediaInfo media, OutputParams params) throws IOException {
+					xmbAction action = (xmbAction)dlna;
+					if (action.userdata != null && action.userdata.startsWith("CMD")) {
+						finalize(filename, dlna);
+						int exitcode = action.run(jumpy.top, cmdline);
+						if (action.userdata.startsWith("CMD : ")) {
+							String[] msg = action.userdata.split(" : ");
+							filename = "[pms , " + (exitcode == 0 ? ("ok , " + msg[1]) : ("err , " + msg[2])) + "]";
+						} else if (action.userdata.startsWith("CMDCONSOLE")) {
+							filename = "[pms , vmsg , rate=0.25 , fill='white' , background='black' , pointsize=16 , gravity='NorthWest' , file='"
+								+ action.ex.output.replace("\n", "\\n") + "']";
+						}
+						cmdline = null;
+					}
+					return super.launchTranscode(filename, dlna, media, params);
+				}
+			});
 
 		userscripts = new userscripts(this);
 		userscripts.autorun(true);

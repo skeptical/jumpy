@@ -93,6 +93,12 @@ def pms_addVideofeed(name, cmd, thumb=None):
 def pms_addAction(name, cmd, thumb=None, playback=None):
 	pms_addItem(PMS_ACTION, name, cmd, thumb, playback)
 
+def pms_addCmd(name, cmd, ok='Success', fail='Failed', thumb=None):
+	pms_addItem(PMS_ACTION, name, cmd, thumb, '+CMD : %s : %s' % (ok, fail))
+
+def pms_addConsoleCmd(name, cmd, thumb=None):
+	pms_addItem(PMS_ACTION, name, cmd, thumb, '+CMDCONSOLE')
+
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
 
@@ -160,6 +166,8 @@ __builtin__.pms.addAudiofeed = pms_addAudiofeed
 __builtin__.pms.addImagefeed = pms_addImagefeed
 __builtin__.pms.addVideofeed = pms_addVideofeed
 __builtin__.pms.addAction = pms_addAction
+__builtin__.pms.addCmd = pms_addCmd
+__builtin__.pms.addConsoleCmd = pms_addConsoleCmd
 __builtin__.pms.addMedia = pms_addMedia
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath

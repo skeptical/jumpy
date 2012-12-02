@@ -20,7 +20,7 @@ public class jumpstart {
 
 		if (argv.length == 0) usage();
 
-		runner ex = new runner();
+		runner ex = new runner(new command());
 
 		runner.version = "0.2.1";
 		System.out.println("jumpstart " + runner.version);

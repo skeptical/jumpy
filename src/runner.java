@@ -18,11 +18,16 @@ public class runner {
 	public command cmdline;
 	private Process p = null;
 	public boolean running = false;
+	public boolean cache = false;
+	public String output = null;
 	public static ArrayList<runner> active = new ArrayList<runner>();
 	public String name;
 
 	public runner() {
-		cmdline = new command();
+	}
+
+	public runner(command cmd) {
+		cmdline = cmd;
 	}
 
 	public void log(String str) {
@@ -43,7 +48,15 @@ public class runner {
 	}
 
 	public int run(jumpyAPI obj, String cmd, String syspath, Map<String,String> myenv) {
+		if (cmdline == null) {
+			cmdline = new command();
+		}
 		cmdline.init(cmd, syspath, myenv);
+		return run(obj);
+	}
+
+	public int run(jumpyAPI obj, command cmd) {
+		cmdline = cmd;
 		return run(obj);
 	}
 
@@ -94,8 +107,10 @@ public class runner {
 
 			String line;
 			BufferedReader br;
+			output = "";
 			br = new BufferedReader (new InputStreamReader(p.getInputStream()));
 			while ((line = br.readLine()) != null) {
+				if (cache) output += line + "\n";
 				out.println(line);
 			}
 			p.waitFor();

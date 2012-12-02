@@ -34,7 +34,7 @@ public class player extends Player {
 	public String name;
 	public command cmdline;
 	public boolean isnative = false;
-	public boolean dynamic;
+	public boolean dynamic, isMediaitem = false;
 	public String id;
 	public int type = Format.UNKNOWN;
 	public int purpose = MISC_PLAYER;
@@ -171,8 +171,9 @@ public class player extends Player {
 	public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
 			DLNAMediaInfo media, OutputParams params) throws IOException {
 
-		filename = finalize(filename);
-		boolean isMediaitem = dlna instanceof mediaItem;
+		if (! finalize(filename, dlna)) {
+			return null;
+		}
 
 		int delay = isMediaitem && ((mediaItem)dlna).delay != -1 ?
 			((mediaItem)dlna).delay : this.delay;
@@ -186,16 +187,7 @@ public class player extends Player {
 		}
 
 		PipeProcess pipe = new PipeProcess(System.currentTimeMillis() + id);
-
-		HashMap<String,String> vars = new HashMap<String,String>();
-		vars.put("format", isMediaitem ?
-			((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
-		vars.put("filename", filename.replace("\\","\\\\"));
-		vars.put("outfile", pipe.getInputPipe());
-		vars.put("home", jumpy.home.replace("\\","\\\\"));
-		vars.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
-			((mediaItem)dlna).userdata : "");
-		cmdline.substitutions = vars;
+		cmdline.substitutions.put("outfile", pipe.getInputPipe());
 
 		jumpy.log("\n");
 
@@ -264,11 +256,23 @@ public class player extends Player {
 		this.cmdline = new command(cmd, null);
 	}
 
-	public String finalize(String uri) {
-		if (dynamic || cmdline == null) {
-			cmdline = new command(uri, null);
+	public boolean finalize(String filename, DLNAResource dlna) {
+		isMediaitem = dlna instanceof mediaItem;
+		if (filename != null) {
+			if (dynamic || cmdline == null) {
+				cmdline = new command(filename, null);
+			}
+			HashMap<String,String> vars = new HashMap<String,String>();
+			vars.put("format", isMediaitem ?
+				((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
+			vars.put("filename", filename.replace("\\","\\\\"));
+			vars.put("home", jumpy.home.replace("\\","\\\\"));
+			vars.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
+				((mediaItem)dlna).userdata : "");
+			cmdline.substitutions = vars;
+			return true;
 		}
-		return uri;
+		return false;
 	}
 
 	public boolean enable(boolean on) {

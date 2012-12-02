@@ -30,9 +30,12 @@ class vmsg:
 		filemode = False if file == None else True
 		tmp = ''
 		if filemode:
-			msg = open(file).read().expandtabs(3)
+			try:
+				msg = open(file).read()
+			except:
+				msg = file
 			tmp = os.path.join(tempfile.gettempdir(), 'tmp.txt')
-			open(tmp, 'w').write(msg)
+			open(tmp, 'w').write(msg.expandtabs(3).replace('\\n', '\n'))
 			img = None
 		else:
 			msg = msg.replace('\n', '\\n')

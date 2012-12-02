@@ -10,6 +10,7 @@ import net.pms.formats.FormatFactory;
 public class mediaItem extends DLNAResource {
 	public String name, fmt, uri, thumbnail, thumbtype, userdata;
 	public int delay, buffersize;
+	public boolean valid;
 
 	public mediaItem(String name, String format, String uri, String thumb) {
 		this.name = name;
@@ -24,6 +25,7 @@ public class mediaItem extends DLNAResource {
 		this.delay = settings.length > 1 ? Integer.valueOf(settings[1]) : -1;
 		this.buffersize = settings.length > 2 ? Integer.valueOf(settings[2]) : -1;
 		setFormat(FormatFactory.getAssociatedExtension("." + this.fmt));
+		this.valid = true;
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class mediaItem extends DLNAResource {
 
 	@Override
 	public boolean isValid() {
-		return true;
+		return valid;
 	}
 
 	@Override
