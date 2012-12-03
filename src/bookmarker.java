@@ -78,12 +78,15 @@ public class bookmarker {
 				String name = bookmark.getName();
 				Section section = ini.add(name);
 				section.put("uri", bookmark.uri);
-				section.put("thumbnail", bookmark.thumbnail);
-				section.put("syspath", bookmark.syspath);
+				if (! (bookmark.thumbnail == null || bookmark.thumbnail.isEmpty()))
+					section.put("thumbnail", bookmark.thumbnail);
+				if (! (bookmark.syspath == null || bookmark.syspath.isEmpty()))
+					section.put("syspath", bookmark.syspath);
 				if (bookmark.env != null && !bookmark.env.isEmpty()) {
 					for (Map.Entry<String,String> var : bookmark.env.entrySet()) {
 						String key = var.getKey();
-						if (! temporal.contains(key)) {
+						String val = var.getValue();
+						if (! temporal.contains(key) && ! (val == null || val.isEmpty())) {
 							section.put(key, var.getValue());
 						}
 					}
@@ -94,7 +97,8 @@ public class bookmarker {
 	}
 
 	public String topName(scriptFolder folder) {
-		return folder.getXMBPath(folder, jumpy.top).split("/")[0].replace("[xbmc]","").trim();
+		String[] dirs = utils.getXMBPath(folder, jumpy.top.getParent()).split("/");
+		return dirs[dirs.length > 1 ? 1 : 0].replace("[xbmc]","").trim();
 	}
 }
 

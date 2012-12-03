@@ -141,6 +141,19 @@ public final class utils {
 		return parent;
 	}
 
+	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
+		DLNAResource p = folder;
+		String xmbpath = "/";
+		while (true) {
+			p = p.getParent();
+			if (p == null || p == ancestor) {
+				break;
+			}
+			xmbpath = p.getName().trim() + "/" + xmbpath;
+		}
+		return (p == null ? "/" : "") + xmbpath.replace("//","").trim();
+	}
+
 	public static File download(String url, String destdir) {
 		System.out.println("downloading: " + url);
 		File dest=null, temp=null;

@@ -108,19 +108,6 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		return true;
 	}
 
-	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
-		DLNAResource p = folder;
-		String xmbpath = "/";
-		while (true) {
-			p = p.getParent();
-			if (p == null || p == ancestor) {
-				break;
-			}
-			xmbpath = p.getName().trim() + "/" + xmbpath;
-		}
-		return (p == null ? "/" : "") + xmbpath.replace("//","").trim();
-	}
-
 	public Object addItem(int type, String filename, String uri, String thumb) {
 		return addItem(type, filename, uri, thumb, null);
 	}
@@ -221,9 +208,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 
 	@Override
 	public void setEnv(String name, String val) {
-		if (name == null) {
+		if (name == null || name.isEmpty()) {
 			jumpy.log("setEnv: clear all.");
 			env.clear();
+		} else if (val == null || val.isEmpty()) {
+			jumpy.log("setEnv: remove '" + name + "'");
+			env.remove(name);
 		} else {
 			jumpy.log("setEnv: " + name + "=" + val);
 			env.put(name, val);
