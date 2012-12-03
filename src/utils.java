@@ -18,6 +18,7 @@ import java.lang.System;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Field;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -26,12 +27,20 @@ import org.apache.commons.io.IOUtils;
 
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.RendererConfiguration;
 import net.pms.util.PropertiesUtil;
+import net.pms.dlna.DLNAResource;
+import net.pms.dlna.RootFolder;
+import net.pms.dlna.virtual.VirtualFolder;
 
 public final class utils {
 
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
+	public static DLNAResource fakeroot = new VirtualFolder("fakeroot", null);
+	public static DLNAResource home = null;
+	static ArrayList<RendererConfiguration> foundRenderers = null;
+	public static boolean startup = true;
 
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
 	//http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
@@ -83,6 +92,53 @@ public final class utils {
 			pb.start();
 		} catch (Exception e) { e.printStackTrace(); return; }
 		System.exit(0);
+	}
+
+	public static ArrayList<RendererConfiguration> getFoundRenderers() {
+		// reflect upon (private final) PMS.foundRenderers
+		try {
+			PMS instance = PMS.get();
+			Field field = instance.getClass().getDeclaredField("foundRenderers");
+			field.setAccessible(true);
+			return (ArrayList<RendererConfiguration>)field.get(instance);
+		} catch (Exception e) {
+			// shouldn't happen
+			PMS.debug(e.toString());
+			return null;
+		}
+	}
+
+	public static void refreshRoot() {
+		if (foundRenderers == null) {
+			foundRenderers = getFoundRenderers();
+		}
+		for (RendererConfiguration r : foundRenderers) {
+			RootFolder root = r.getRootFolder();
+			root.getChildren().clear();
+			root.reset();
+		}
+	}
+
+	public static DLNAResource mkdirs(String path, DLNAResource pwd) {
+		boolean exists = true, atroot=path.startsWith("/"), rootchanged=false;
+		DLNAResource child, parent = atroot ? fakeroot : path.startsWith("~/") ? home : pwd;
+		for (String dir : path.split("/")) {
+			if (dir.equals("") || dir.equals("~")) continue;
+			if (! (exists && (child = parent.searchByName(dir)) != null)) {
+				if (atroot) {
+					rootchanged = true;
+					atroot = false;
+				}
+				child = new VirtualFolder(dir, null);
+				parent.addChild(child);
+				exists = false;
+			}
+			parent = child;
+		}
+		if (! startup && (rootchanged || atroot)) {
+			refreshRoot();
+		}
+		return parent;
 	}
 
 	public static File download(String url, String destdir) {
@@ -249,5 +305,4 @@ public final class utils {
 			return false;
 		}
 	}
-
 }

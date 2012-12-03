@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import java.util.Properties;
 import java.util.List;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.virtual.VirtualVideoAction;
-import net.pms.external.AdditionalFolderAtRoot;
+import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.formats.Format;
@@ -47,7 +48,7 @@ import net.pms.io.ProcessWrapper;
 import net.pms.external.dbgpack;
 
 
-public class jumpy implements AdditionalFolderAtRoot, dbgpack {
+public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 
 	public static final String appName = "jumpy";
 	public static final String version = "0.2.5";
@@ -150,6 +151,8 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 		log("\n");
 		log("Adding root folder.", true);
 		top = new scriptFolder(this, "Jumpy", null, null);
+		utils.fakeroot.addChild(top);
+		utils.home = top;
 
 		new runner().quiet(top, "[" + command.pms + "]", null, null);
 		if (top.env.containsKey("imconvert")) {
@@ -227,11 +230,12 @@ public class jumpy implements AdditionalFolderAtRoot, dbgpack {
 				((scriptFolder)item).canBookmark = false;
 			}
 		}
+		utils.startup = false;
 	}
 
 	@Override
-	public DLNAResource getChild() {
-		return top;
+	public Iterator<DLNAResource> getChildren() {
+		return utils.fakeroot.getChildren().iterator();
 	}
 
 	public synchronized void log(String msg) {

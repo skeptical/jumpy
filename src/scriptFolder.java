@@ -108,21 +108,6 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		return true;
 	}
 
-	public static DLNAResource mkdirs(DLNAResource root, String path) {
-		DLNAResource parent = root, child;
-		boolean exists = true;
-		for (String dir:path.split("/")) {
-			if (exists && (child = parent.searchByName(dir)) != null) {
-				parent = child;
-			} else {
-				parent.addChild(new VirtualFolder(dir, null));
-				parent = parent.searchByName(dir);
-				exists = false;
-			}
-		}
-		return parent;
-	}
-
 	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
 		DLNAResource p = folder;
 		String xmbpath = "/";
@@ -148,9 +133,9 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		String name = filename;
 		if (filename.contains("/")) {
 			name = FilenameUtils.getName(filename);
-			String path = FilenameUtils.getPath(filename);
+			String path = FilenameUtils.getFullPath(filename);
 			if (path != null) {
-				folder = mkdirs(FilenameUtils.getPrefixLength(filename) == 0 ? this : jumpy.top, path);
+				folder = utils.mkdirs(path, this);
 			}
 		}
 

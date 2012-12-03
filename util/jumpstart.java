@@ -203,7 +203,7 @@ class item extends node implements jumpyAPI {
 			name = f.getName();
 			String path = f.getParent();
 			if (path != null) {
-				folder = mkdirs(f.isAbsolute() ? jumpstart.root : this, path);
+				folder = mkdirs(path, this);
 			}
 //			name = FilenameUtils.getName(filename);
 //			String path = FilenameUtils.getPath(filename);
@@ -244,15 +244,16 @@ class item extends node implements jumpyAPI {
 		}
 		return "";
 	}
-	public static item mkdirs(item root, String path) {
-		item parent = root, child;
+	public static item mkdirs(String path, item pwd) {
+		item child, parent = path.startsWith("/") || path.startsWith("~/") ? jumpstart.root : pwd;
 		boolean exists = true;
 		for (String dir:path.replace("\\", "/").split("/")) {
-			if (exists && (child = (item)parent.get(dir)) != null) {
-				parent = child;
-			} else {
-				parent.add(new item(-1, dir, "", "", "", parent.env));
-				parent = (item)parent.get(dir);
+			if (dir.equals("") || dir.equals("~")) {
+				continue;
+			}
+			if (! (exists && (child = (item)parent.get(dir)) != null)) {
+				child = new item(-1, dir, "", "", "", parent.env);
+				parent.add(child);
 				parent.discovered = true;
 				exists = false;
 			}
