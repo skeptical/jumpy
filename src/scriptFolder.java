@@ -13,7 +13,6 @@ import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
-import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.dlna.VideosFeed;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.ImagesFeed;
@@ -79,11 +78,12 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		}
 		getChildren().clear();
 		if (jumpy.showBookmarks && canBookmark) {
-			final scriptFolder me = this;
-			addChild(new VirtualVideoAction((isBookmark ? "Delete" : "Add") + " bookmark", true) {
-				public boolean enable() {
-					jumpy.bookmark(me);
-					return true;
+			final scriptFolder self = this;
+			addChild(new xmbAction((isBookmark ? "Delete" : "Add") + " bookmark",
+					"jump+CMD : Bookmark " + (isBookmark ? "deleted" : "added") + " :  ", null, null) {
+				public int run(scriptFolder folder, command cmdline) {
+					jumpy.bookmark(self);
+					return 0;
 				}
 			});
 		}

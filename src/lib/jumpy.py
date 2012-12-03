@@ -193,19 +193,19 @@ def pms_vmsg(**kwargs):
 		kwargs['out'] = os.environ['OUTFILE']
 	vmsg.vmsg(**kwargs)
 
-def pms_info(msg):
-	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20)
+def pms_info(msg, seconds=4):
+	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20)
 
-def pms_ok(msg):
-	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+def pms_ok(msg, seconds=4):
+	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
 		img='"%s"' % os.path.join(resources,'apply-160.png'), imggrav='north')
 
-def pms_warn(msg):
-	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+def pms_warn(msg, seconds=4):
+	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
 		img='"%s"' % os.path.join(resources,'messagebox_warning-160.png'), imggrav='north')
 
-def pms_err(msg):
-	pms_vmsg(msg=msg, fill='white', background='#3465a4', pointsize=20,
+def pms_err(msg, seconds=4):
+	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
 		img='"%s"' % os.path.join(resources,'button_cancel-160.png'), imggrav='north')
 
 __builtin__.pms.vmsg = pms_vmsg

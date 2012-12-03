@@ -29,7 +29,6 @@ import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.virtual.VirtualFolder;
-import net.pms.dlna.virtual.VirtualVideoAction;
 import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
@@ -174,19 +173,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 		}
 
 
-		if (refresh != 0) {
-			util = new scriptFolder(this, "Util", null, null);
-			top.addChild(util);
-			final jumpy me = this;
-			util.addChild(new VirtualVideoAction("Refresh", true) {
-				public boolean enable() {
-					me.refresh(false);
-					return true;
-				}
-			});
-			refresh(false);
-		}
-
 		player.out = logger;
 		players = new ArrayList<player>();
 		players.add(new player(this,
@@ -210,6 +196,20 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 					return super.launchTranscode(filename, dlna, media, params);
 				}
 			});
+
+		if (refresh != 0) {
+			util = new scriptFolder(this, "Util", null, null);
+			top.addChild(util);
+			final jumpy self = this;
+			util.addChild(new xmbAction("Refresh",
+					"jump+CMD : Marking folders for refresh :  ", null, null) {
+				public int run(scriptFolder folder, command cmdline) {
+					self.refresh(false);
+					return 0;
+				}
+			});
+			refresh(false);
+		}
 
 		userscripts = new userscripts(this);
 		userscripts.autorun(true);
@@ -341,7 +341,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 
 	public void bookmark(scriptFolder folder) {
 		if (!folder.isBookmark) {
-			// if the renderer can't play the VirtualVideoAction it may send repeated requests
+			// if the renderer can't play the xmbAction it may send repeated requests
 			if (folder.uri.equals(lasturi)) return;
 			lasturi = folder.uri;
 			bookmarks.add(folder);
