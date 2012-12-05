@@ -251,6 +251,8 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				break;
 			case FOLDERNAME:
 				return this.getName();
+			case XMBPATH:
+				return ("/" + utils.getXMBPath(this, jumpy.top.getParent()) + "/" + this.name).replace("//", "/");
 			case GETPROPERTY:
 				Object obj = PMS.get().getConfiguration().getCustomProperty(arg1);
 				// return last occurrence
