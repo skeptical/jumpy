@@ -3,6 +3,7 @@ package net.pms.external.infidel.jumpy;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -76,8 +77,13 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		if (uri == null || uri.equals("")) {
 			return;
 		}
-		getChildren().clear();
-		if (jumpy.showBookmarks && canBookmark) {
+		List<DLNAResource> children = getChildren();
+		children.clear();
+		jumpy.log("\n");
+		jumpy.log("Opening folder: " + name + ".\n");
+		ex = new runner();
+		ex.run(this, uri, syspath, env);
+		if (jumpy.showBookmarks && canBookmark && children.size() > 0) {
 			final scriptFolder self = this;
 			addChild(new xmbAction((isBookmark ? "Delete" : "Add") + " bookmark",
 					"jump+CMD : Bookmark " + (isBookmark ? "deleted" : "added") + " :  ", null, null) {
@@ -86,11 +92,9 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 					return 0;
 				}
 			});
+			// put the action first (note: this breaks id=index correspondence in the children)
+			children.add(0, children.remove(children.size() - 1));
 		}
-		jumpy.log("\n");
-		jumpy.log("Opening folder: " + name + ".\n");
-		ex = new runner();
-		ex.run(this, uri, syspath, env);
 		refreshOnce = false;
 	}
 
