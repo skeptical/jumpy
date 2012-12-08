@@ -6,10 +6,10 @@ public interface jumpyAPI {
 	public String getName();
 
 	// new constants:
-	public static final int UNRESOLVED = -2;
-	public static final int FOLDER = -1;
-	public static final int ACTION = -4;
-	public static final int MEDIA = -8;
+	public static final int UNRESOLVED = -64;
+	public static final int FOLDER = -32;
+	public static final int ACTION = -2;
+	public static final int MEDIA = -1;
 
 	// constants from net.pms.formats.Format:
 	//	public static final int ISO = 32;

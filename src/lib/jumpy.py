@@ -15,10 +15,10 @@ except NameError:
 	__builtin__.pms._setEnv = pms.setEnv
 	__builtin__.pms._addPlayer = pms.addPlayer
 	# new constants:
-	__builtin__.PMS_UNRESOLVED = -2
-	__builtin__.PMS_FOLDER = -1
-	__builtin__.PMS_ACTION = -4
-	__builtin__.PMS_MEDIA = -8
+	__builtin__.PMS_UNRESOLVED = -64
+	__builtin__.PMS_FOLDER = -32
+	__builtin__.PMS_ACTION = -2
+	__builtin__.PMS_MEDIA = -1
 	# constants from net.pms.formats.Format:
 	__builtin__.PMS_AUDIO = 1
 	__builtin__.PMS_IMAGE = 2
