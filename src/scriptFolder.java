@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
@@ -119,16 +120,10 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	@Override
 	public Object addItem(int type, String filename, String uri, String thumb, String data) {
 
-		DLNAResource folder = this;
-
-		String name = filename;
-		if (filename.contains("/")) {
-			name = FilenameUtils.getName(filename);
-			String path = FilenameUtils.getFullPath(filename);
-			if (path != null) {
-				folder = utils.mkdirs(path, this);
-			}
-		}
+		String path = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
+		String label = FilenameUtils.getName(path);
+		path = FilenameUtils.getFullPath(path);
+		DLNAResource folder = path == null ? this : utils.mkdirs(path, this);
 
 		// see if target is a local file
 		File f = null;
@@ -144,32 +139,32 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		switch (type) {
 			case FOLDER:
 				media = "folder";
-				folder.addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
+				folder.addChild(new scriptFolder(jumpy, label, uri, thumb, syspath, env));
 				break;
 			case UNRESOLVED:
 				media = "unresolved item";
-				folder.addChild(new scriptFolder(jumpy, name, uri, thumb, syspath, env));
+				folder.addChild(new scriptFolder(jumpy, label, uri, thumb, syspath, env));
 				break;
 			case ACTION:
 				data = (data == null ? "" : data);
 				media = data + " action";
-				folder.addChild(new xmbAction(name, "jump:" + data, uri, thumb));
+				folder.addChild(new xmbAction(label, "jump:" + data, uri, thumb));
 				break;
 			case MEDIA:
 				media = data + " item";
-				folder.addChild(new mediaItem(name, data, uri, thumb));
+				folder.addChild(new mediaItem(label, data, uri, thumb));
 				break;
 			case Format.VIDEO:
 				media = "video";
-				folder.addChild(f == null ? new WebVideoStream(name, uri, thumb) : new RealFile(f, name));
+				folder.addChild(f == null ? new WebVideoStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.AUDIO:
 				media = "audio";
-				folder.addChild(f == null ? new WebAudioStream(name, uri, thumb) : new RealFile(f, name));
+				folder.addChild(f == null ? new WebAudioStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.IMAGE:
 				media = "image";
-				folder.addChild(f == null ? new FeedItem(name, uri, thumb, null, Format.IMAGE) : new RealFile(f, name));
+				folder.addChild(f == null ? new FeedItem(label, uri, thumb, null, Format.IMAGE) : new RealFile(f, label));
 				break;
 			case Format.PLAYLIST:
 				media = "playlist";
@@ -198,7 +193,7 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 			case Format.UNKNOWN:
 			default:
 				if (f != null ) {
-					folder.addChild(new RealFile(f, name));
+					folder.addChild(new RealFile(f, label));
 				}
 		}
 		jumpy.log("Adding " + media +  ": " + filename + ".");
