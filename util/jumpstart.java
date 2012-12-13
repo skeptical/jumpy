@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.net.URLDecoder;
 
 import org.apache.commons.exec.util.StringUtils;
-//import org.apache.commons.io.FilenameUtils;
 
 import net.pms.external.infidel.jumpy.command;
 import net.pms.external.infidel.jumpy.runner;
@@ -82,8 +81,10 @@ public class jumpstart {
 				item x = (item)current.get(i);
 				String type = "";
 				switch (x.type) {
-					case   -2: type = " (UNRESOLVED)"; break;
-					case   -1: type = ""; break;
+					case  -64: type = " (UNRESOLVED)"; break;
+					case  -32: type = ""; break;
+					case   -2: type = " (ACTION)"; break;
+					case   -1: type = " (MEDIA)"; break;
 					case    1: type = " (AUDIO)"; break;
 					case    2: type = " (IMAGE)"; break;
 					case    4: type = " (VIDEO)"; break;
@@ -205,11 +206,6 @@ class item extends node implements jumpyAPI {
 			if (path != null) {
 				folder = mkdirs(path, this);
 			}
-//			name = FilenameUtils.getName(filename);
-//			String path = FilenameUtils.getPath(filename);
-//			if (path != null) {
-//				folder = mkdirs(FilenameUtils.getPrefixLength(filename) == 0 ? this : jumpstart.root, path);
-//			}
 		}
 		item i = new item(type, name, uri, thumb, syspath, env);
 		folder.add(i);
@@ -231,15 +227,19 @@ class item extends node implements jumpyAPI {
 				return new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 			case FOLDERNAME:
 				return this.name;
+			case SETPMS:
+				command.pms = arg1;
+				break;
 			case HOME:
 			case PROFILEDIR:
 			case LOGDIR:
 			case RESTART:
+			case REBOOT:
+			case XMBPATH: //TODO
 			case GETPROPERTY:
 			case SETPROPERTY:
-				break;
-			case SETPMS:
-				command.pms = arg1;
+			case ICON:
+			default:
 				break;
 		}
 		return "";
