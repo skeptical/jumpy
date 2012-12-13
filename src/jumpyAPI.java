@@ -25,13 +25,13 @@ public interface jumpyAPI {
 	public static final int AUDIOFEED = 4097; // Format.AUDIO|FEED;
 	public static final int IMAGEFEED = 4098; // Format.IMAGE|FEED;
 
-	public Object addItem(int type, String filename, String uri, String thumb, String data);
+	public Object addItem(int type, String filename, String uri, String thumbnail, String data);
 	public void addPath(String path);
 	public void setEnv(String name, String val);
 
 	public static final String[] apiName = {"",
 		"VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART", "FOLDERNAME",
-		"GETPROPERTY", "SETPROPERTY", "SETPMS", "REBOOT", "XMBPATH"};
+		"GETPROPERTY", "SETPROPERTY", "SETPMS", "REBOOT", "XMBPATH", "ICON"};
 	public static final int VERSION = 1;
 	public static final int HOME = 2;
 	public static final int PROFILEDIR = 3;
@@ -44,6 +44,7 @@ public interface jumpyAPI {
 	public static final int SETPMS = 10;
 	public static final int REBOOT = 11;
 	public static final int XMBPATH = 12;
+	public static final int ICON = 13;
 
 	public String util(int action, String arg1, String arg2);
 

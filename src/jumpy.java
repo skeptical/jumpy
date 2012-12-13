@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -61,12 +62,15 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 	public int refresh;
 	private Timer timer;
 	private FileOutputStream logfile;
-	private quickLog logger;
+	private static quickLog logger;
+	private static HashSet<String> logspam = new HashSet<String>();
 	private File[] scripts;
-	public scriptFolder top, util;
+	public static scriptFolder top, util;
 	private bookmarker bookmarks;
 	private userscripts userscripts;
 	public List<player> players;
+	public static Map<String,String> icons = new HashMap<String,String>();
+	public static File cache;
 
 	public jumpy() {
 		pms = PMS.get();
@@ -92,6 +96,16 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 		if (configuration.getCustomProperty("python.path") == null) {
 			log("\n\n\nWARNING: No 'python.path' setting found in PMS.conf.\n\n\n");
 		}
+
+
+		try {
+			cache = new File(PMS.getConfiguration().getTempFolder(), "jumpy");
+			if (! cache.isDirectory()) {
+				if (! cache.mkdir()) {
+					log("Can't create cache: " + cache.getAbsolutePath());
+				}
+			}
+		} catch(Exception e) {e.printStackTrace();}
 
 		runner.out = logger;
 		runner.version = version;
@@ -196,13 +210,14 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 					return super.launchTranscode(filename, dlna, media, params);
 				}
 			});
+		setIcon("jump", "icon.ok");
 
 		if (refresh != 0) {
 			util = new scriptFolder(this, "Util", null, null);
 			top.addChild(util);
 			final jumpy self = this;
 			util.addChild(new xmbAction("Refresh",
-					"jump+CMD : Marking folders for refresh :  ", null, null) {
+					"jump+CMD : Marking folders for refresh :  ", null, "#refresh") {
 				public int run(scriptFolder folder, command cmdline) {
 					self.refresh(false);
 					return 0;
@@ -238,11 +253,18 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 		return utils.fakeroot.getChildren().iterator();
 	}
 
-	public synchronized void log(String msg) {
+	public static void logonce(String msg, String id) {
+		if (! logspam.contains(id)) {
+			log(msg);
+			logspam.add(id);
+		}
+	}
+
+	public static synchronized void log(String msg) {
 		logger.log(msg);
 	}
 
-	public synchronized void log(String msg, boolean minimal) {
+	public static synchronized void log(String msg, boolean minimal) {
 		if (minimal) {
 			PMS.minimal(msgtag + msg);
 		}
@@ -347,6 +369,39 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 			bookmarks.add(folder);
 		} else {
 			bookmarks.remove(folder);
+		}
+	}
+
+	public static String getResource(String name) {
+		if (name != null && name.startsWith("#")) {
+			String[] val = name.substring(1).split(":");
+			String src = home + "lib" + File.separatorChar + "resources" + File.separatorChar
+				+ "icon" + File.separatorChar + val[0] + ".png";
+			if (val.length > 1) {
+				File f = new File(cache, val[0] + "-" + val[1] + ".png");
+				if (! f.exists()) {
+					new runner().run(top,
+						"[convert , " + src + " , -alpha , set , -channel , RGB , -fill , " + val[1] + " , +opaque , none , " + f.getAbsolutePath() + "]", null
+					);
+				}
+				return f.getAbsolutePath();
+			}
+			return src;
+//			return "http://0.0.0.0:8000/"
+//			return home + "lib" + File.separatorChar + "resources" + File.separatorChar
+//				+ "icon" + File.separatorChar + name.substring(1) + ".png";
+		}
+		return name;
+	}
+
+	public static String getIcon(String fmt) {
+		return icons.get(fmt);
+	}
+
+	public static void setIcon(String fmt, String img) {
+		for (String f : fmt.split("\\|")) {
+			log("setting '" + f + "' icon to '" + img + "'");
+			icons.put(f, img);
 		}
 	}
 

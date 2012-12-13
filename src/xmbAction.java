@@ -7,7 +7,7 @@ public class xmbAction extends mediaItem {
 	public xmbAction alt;
 
 	public xmbAction(String name, String format, String uri, String thumb) {
-		super(name, format, uri, thumb);
+		super(name, format, uri, thumb == null ? "#checkmark" : thumb);
 		this.ex = null;
 		this.alt = null;
 	}
@@ -21,7 +21,7 @@ public class xmbAction extends mediaItem {
 			exitcode = ex.run(folder, cmdline);
 			if (ex.running) {
 				alt = new xmbAction("[STOP] " + name,
-					"jump:-1+CMD : Stopping Process : Error Stopping Process", null, this.thumbnail);
+					"jump+CMD : Stopping Process : Error Stopping Process", null, "#x");
 				alt.alt = this;
 			}
 		} else {

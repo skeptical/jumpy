@@ -2,6 +2,7 @@ package net.pms.external.infidel.jumpy;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
-import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.VideosFeed;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.ImagesFeed;
@@ -27,9 +27,8 @@ import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.DVDISOFile;
 
 
-public class scriptFolder extends VirtualFolder implements jumpyAPI {
-	public String uri, thumbnail;
-	public String basepath = null, syspath = null;
+public class scriptFolder extends xmbObject implements jumpyAPI {
+	public String uri, basepath = null, syspath = null;
 	public Map<String,String> env;
 	private jumpy jumpy;
 	private runner ex;
@@ -39,26 +38,25 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 	public boolean refreshOnce = true;
 	public boolean refreshAlways = false;
 
-	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon) {
-		this(jumpy, name, uri, thumbnailIcon, null, null);
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumb) {
+		this(jumpy, name, uri, thumb, null, null);
 	}
 
-	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String syspath) {
-		this(jumpy, name, uri, thumbnailIcon, syspath, null);
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumb, String syspath) {
+		this(jumpy, name, uri, thumb, syspath, null);
 	}
 
 	public scriptFolder(scriptFolder other) {
-		this(other.jumpy, other.name, other.uri, other.thumbnailIcon, other.syspath, other.env);
+		this(other.jumpy, other.name, other.uri, other.thumbnail, other.syspath, other.env);
 	}
 
 	public scriptFolder(jumpy jumpy, String name, Map<String,String> m) {
 		this(jumpy, name, m.remove("uri"), m.remove("thumbnail"), m.remove("syspath"), m);
 	}
 
-	public scriptFolder(jumpy jumpy, String name, String uri, String thumbnailIcon, String syspath, Map<String,String> env) {
-		super(name, thumbnailIcon);
+	public scriptFolder(jumpy jumpy, String name, String uri, String thumb, String syspath, Map<String,String> env) {
+		super(name, thumb);
 		this.jumpy = jumpy;
-		this.thumbnail = thumbnailIcon;
 		this.uri = uri;
 		this.basepath = this.syspath = syspath;
 		this.env = new HashMap<String,String>();
@@ -69,8 +67,14 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		this.refreshAlways = (jumpy.refresh == 0);
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public boolean isFolder() {
+		return true;
+	}
+
+	@Override
+	public long length() {
+		return 0;
 	}
 
 	@Override
@@ -84,10 +88,11 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		jumpy.log("Opening folder: " + name + ".\n");
 		ex = new runner();
 		ex.run(this, uri, syspath, env);
-		if (jumpy.showBookmarks && canBookmark && children.size() > 0) {
+		if (jumpy.showBookmarks && canBookmark && (children.size() > 0 || isBookmark)) {
 			final scriptFolder self = this;
 			addChild(new xmbAction((isBookmark ? "Delete" : "Add") + " bookmark",
-					"jump+CMD : Bookmark " + (isBookmark ? "deleted" : "added") + " :  ", null, null) {
+					"jump+CMD : Bookmark " + (isBookmark ? "deleted" : "added") + " :  ", null,
+					isBookmark ? "#x" : "#plus") {
 				public int run(scriptFolder folder, command cmdline) {
 					jumpy.bookmark(self);
 					return 0;
@@ -113,17 +118,19 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 		return true;
 	}
 
-	public Object addItem(int type, String filename, String uri, String thumb) {
-		return addItem(type, filename, uri, thumb, null);
+	public Object addItem(int type, String filename, String uri, String thumbnail) {
+		return addItem(type, filename, uri, thumbnail, null);
 	}
 
 	@Override
-	public Object addItem(int type, String filename, String uri, String thumb, String data) {
+	public Object addItem(int type, String filename, String uri, String thumbnail, String data) {
 
 		String path = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
 		String label = FilenameUtils.getName(path);
 		path = FilenameUtils.getFullPath(path);
 		DLNAResource folder = path == null ? this : utils.mkdirs(path, this);
+
+		String thumb = jumpy.getResource(thumbnail);
 
 		// see if target is a local file
 		File f = null;
@@ -258,6 +265,9 @@ public class scriptFolder extends VirtualFolder implements jumpyAPI {
 				return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
 			case SETPROPERTY:
 				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
+				break;
+			case ICON:
+				jumpy.setIcon(arg1, arg2);
 				break;
 			case SETPMS:
 				command.pms = arg1;

@@ -44,6 +44,7 @@ except NameError:
 	__builtin__.PMS_SETPMS = 10;
 	__builtin__.PMS_REBOOT = 11;
 	__builtin__.PMS_XMBPATH = 12;
+	__builtin__.PMS_ICON = 13;
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -98,7 +99,7 @@ def pms_addCmd(name, cmd, ok='Success', fail='Failed', thumb=None):
 	pms_addItem(PMS_ACTION, name, cmd, thumb, '+CMD : %s : %s' % (ok, fail))
 
 def pms_addConsoleCmd(name, cmd, thumb=None):
-	pms_addItem(PMS_ACTION, name, cmd, thumb, '+CMDCONSOLE')
+	pms_addItem(PMS_ACTION, name, cmd, '#console' if thumb is None else thumb, '+CMDCONSOLE')
 
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
@@ -155,6 +156,9 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
+def pms_setIcon(fmt, img):
+	pms_util(PMS_ICON, fmt, img)
+
 def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, playback=None):
 	if type(cmd).__name__ == 'list':
 		cmd = flatten(cmd)
@@ -188,6 +192,7 @@ __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getXmbPath = pms_getXmbPath
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
+__builtin__.pms.setIcon = pms_setIcon
 __builtin__.pms.addPlayer = pms_addPlayer
 
 lib = os.path.dirname(os.path.realpath(__file__))
