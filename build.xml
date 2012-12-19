@@ -57,6 +57,7 @@
 		</copy>
 		<copy file="${src}/lib/jumpy.py" todir="${dist}/jumpy/lib"/>
 		<copy file="${src}/lib/vmsg.py" todir="${dist}/jumpy/lib"/>
+		<copy file="${src}/lib/imgfx.py" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/py4j0.7.jar" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/ini4j-0.5.2.jar" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/commons-exec-1.1.jar" todir="${dist}/jumpy/lib"/>

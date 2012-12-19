@@ -63,7 +63,7 @@ class vmsg:
 		]
 
 		if not img == None:
-			convert.extend([img, '-gravity', imggrav])
+			convert.extend(['"%s"' % img, '-gravity', imggrav])
 			if resize:
 				convert.extend(['-resize', size])
 			convert.append('-composite')

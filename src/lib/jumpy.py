@@ -1,7 +1,7 @@
 import os, os.path, sys, imp, traceback
 import __builtin__
 from py4j.java_gateway import GatewayClient, JavaGateway
-import vmsg
+import vmsg, imgfx
 
 try: pms
 except NameError:
@@ -45,6 +45,7 @@ except NameError:
 	__builtin__.PMS_REBOOT = 11;
 	__builtin__.PMS_XMBPATH = 12;
 	__builtin__.PMS_ICON = 13;
+	__builtin__.PMS_RESOURCE = 14;
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -156,6 +157,9 @@ def pms_getProperty(key):
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
 
+def pms_getResource(src):
+	return pms_util(PMS_RESOURCE, src)
+
 def pms_setIcon(fmt, img):
 	pms_util(PMS_ICON, fmt, img)
 
@@ -192,32 +196,40 @@ __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getXmbPath = pms_getXmbPath
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
+__builtin__.pms.getResource = pms_getResource
 __builtin__.pms.setIcon = pms_setIcon
 __builtin__.pms.addPlayer = pms_addPlayer
 
 lib = os.path.dirname(os.path.realpath(__file__))
 resources = os.path.join(lib, 'resources')
 
+def pms_imgfx(imgfile, fx, dir=None):
+	imgfx.render(imgfile, fx=fx, outdir=dir)
+
 def pms_vmsg(**kwargs):
+	if 'img' in kwargs:
+		kwargs['img'] = pms_getResource(kwargs['img'])
 	if not 'out' in kwargs:
 		kwargs['out'] = os.environ['OUTFILE']
 	vmsg.vmsg(**kwargs)
 
-def pms_info(msg, seconds=4):
-	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20)
-
-def pms_ok(msg, seconds=4):
+def pms_info(msg, seconds=7):
 	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
-		img='"%s"' % os.path.join(resources,'apply-160.png'), imggrav='north')
+		img='#info+t=0,0_.675,.75_0;c=160x184-26-60;s;3', imggrav='north')
 
-def pms_warn(msg, seconds=4):
+def pms_ok(msg, seconds=7):
 	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
-		img='"%s"' % os.path.join(resources,'messagebox_warning-160.png'), imggrav='north')
+		img='#checkmark+f=#99ff00;c=160x184-0-24;s;3', imggrav='north')
 
-def pms_err(msg, seconds=4):
+def pms_warn(msg, seconds=7):
 	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
-		img='"%s"' % os.path.join(resources,'button_cancel-160.png'), imggrav='north')
+		img='#warning+f=orange;t=0,0_.675,.75_0;c=160x184-26-60;s;3', imggrav='north')
 
+def pms_err(msg, seconds=7):
+	pms_vmsg(msg=msg, seconds=seconds, fill='white', background='#3465a4', pointsize=20,
+		img='#x+f=#ff3300;c=160x184-0-24;s;3', imggrav='north')
+
+__builtin__.pms.imgfx = pms_imgfx
 __builtin__.pms.vmsg = pms_vmsg
 __builtin__.pms.info = pms_info
 __builtin__.pms.ok = pms_ok

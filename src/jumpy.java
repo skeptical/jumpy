@@ -25,6 +25,7 @@ import javax.swing.JComponent;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.io.FilenameUtils;
 
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
@@ -210,7 +211,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 					return super.launchTranscode(filename, dlna, media, params);
 				}
 			});
-		setIcon("jump", "icon.ok");
+		setIcon("jump", "#checkmark");
 
 		if (refresh != 0) {
 			util = new scriptFolder(this, "Util", null, null);
@@ -373,25 +374,27 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 	}
 
 	public static String getResource(String name) {
-		if (name != null && name.startsWith("#")) {
-			String[] val = name.substring(1).split(":");
-			String src = home + "lib" + File.separatorChar + "resources" + File.separatorChar
-				+ "icon" + File.separatorChar + val[0] + ".png";
-			if (val.length > 1) {
-				File f = new File(cache, val[0] + "-" + val[1] + ".png");
-				if (! f.exists()) {
-					new runner().run(top,
-						"[convert , " + src + " , -alpha , set , -channel , RGB , -fill , " + val[1] + " , +opaque , none , " + f.getAbsolutePath() + "]", null
-					);
-				}
-				return f.getAbsolutePath();
-			}
-			return src;
-//			return "http://0.0.0.0:8000/"
-//			return home + "lib" + File.separatorChar + "resources" + File.separatorChar
-//				+ "icon" + File.separatorChar + name.substring(1) + ".png";
+		if (name == null) {
+			return null;
 		}
-		return name;
+		String[] val = name.split("\\+", 2);
+		String src = val[0];
+		if (src != null && src.startsWith("#")) {
+			src = home + "lib" + File.separatorChar + "resources" + File.separatorChar
+				+ "icon" + File.separatorChar + src.substring(1) + ".png";
+		}
+		if (! new File(src).exists()) {
+			return name;
+		}
+		if (val.length > 1) {
+			String dest = cache.getAbsolutePath() + File.separatorChar +
+				FilenameUtils.getBaseName(src) + "+" + val[1] + "." + FilenameUtils.getExtension(src);
+			if (! new File(dest).exists()) {
+				new runner().run(top, "[pms , imgfx , " + src + " , " + val[1] + " , " + cache + "]", null);
+			}
+			src = dest;
+		}
+		return src;
 	}
 
 	public static String getIcon(String fmt) {

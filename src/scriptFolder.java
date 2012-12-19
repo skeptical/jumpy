@@ -269,6 +269,8 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			case ICON:
 				jumpy.setIcon(arg1, arg2);
 				break;
+			case RESOURCE:
+				return jumpy.getResource(arg1);
 			case SETPMS:
 				command.pms = arg1;
 				break;
