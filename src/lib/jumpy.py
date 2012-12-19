@@ -270,17 +270,15 @@ elif __name__ == "__main__":
 	# interpret the args as a function call and see what happens
 
 	args = []
+	named = sys.argv[1] == 'vmsg'
+
 	for arg in sys.argv[2:]:
-		# check if it's a constant
-		if arg[0:4] == "PMS_":
-			try:
-				args.append(str(eval(arg)))
-				continue
-			except: pass
-		# it must be a string
-		if sys.argv[1] == 'vmsg':
+		try:
+			# filter named args, constants or numbers
+			named or arg[0:4] == "PMS_" or float(arg)
 			args.append(arg)
-		else:
+		except:
+			# it must be a string
 			args.append(repr(arg))
 
 	code = 'output=pms_%s(%s)' % (sys.argv[1], ','.join(args))

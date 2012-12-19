@@ -1,6 +1,6 @@
 #!/bin/python
 
-import getopt, sys, os, tempfile
+import sys, os, tempfile
 from subprocess import Popen, PIPE
 
 class vmsg:
@@ -103,6 +103,8 @@ class vmsg:
 
 
 if __name__ == "__main__":
+
+	import getopt
 
 	def usage(err=None):
 		if err: sys.stderr.write('%s\n' % err)
