@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
@@ -15,46 +16,53 @@ import net.pms.dlna.virtual.VirtualFolder;
 public class userscripts {
 	private jumpy jumpy;
 	private String scriptsini;
-	public Wini ini;
+	public ArrayList<Wini> inis;
 
 	public userscripts(jumpy jumpy) {
 		this.jumpy = jumpy;
+		inis = new ArrayList<Wini>();
 		scriptsini = jumpy.scriptsini;
-		load();
+		load(scriptsini);
 	}
 
-	public void load() {
-		ini = new Wini();
+	public void load(String inifile) {
+		jumpy.log("loading " + inifile);
+		Wini ini = new Wini();
 		ini.getConfig().setMultiSection(true);
 		ini.getConfig().setMultiOption(true);
-		ini.setFile(new File(scriptsini));
+		ini.setFile(new File(inifile));
 		try {
 			ini.load();
-		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
 			aggregate(section);
 			String name = section.getName();
 			jumpy.log("Adding user script: " + name);
 
-			if (! (name.startsWith("+") || name.startsWith("-") || name.startsWith("#"))) {
+			if (section.containsKey("ini")) {
+				load(section.get("ini"));
+			} else if (! (name.startsWith("+") || name.startsWith("-") || name.startsWith("#"))) {
 				scriptFolder folder =
 					(scriptFolder)jumpy.top.addItem(jumpyAPI.FOLDER, name, section.remove("cmd").split("\n")[0], section.remove("thumb"));
 				folder.env.putAll(section);
 			}
 		}
+		inis.add(ini);
 	}
 
 	public void autorun(boolean startup) {
 		String flag = (startup ? "+" : "-");
 		String context = (startup ? "starting " : "finishing ");
-		for (Section section : ini.values()) {
-			String name = section.getName();
-			if (name.startsWith(flag)) {
-				jumpy.log("\n");
-				jumpy.log(context + name + ".", true);
-				jumpy.log("\n");
-				new runner().run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
-				jumpy.top.env.clear();
+		for (Wini ini : inis) {
+			for (Section section : ini.values()) {
+				String name = section.getName();
+				if (name.startsWith(flag)) {
+					jumpy.log("\n");
+					jumpy.log(context + name + ".", true);
+					jumpy.log("\n");
+					new runner().run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
+					jumpy.top.env.clear();
+				}
 			}
 		}
 	}
