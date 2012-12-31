@@ -114,11 +114,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 
 		home += File.separatorChar;
 
-		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
-		String bin = utils.getBinPaths(configuration, command.executables);
-		command.basepath =
-			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
-
 		log(new Date().toString());
 		log("\n");
 		log("initializing jumpy " + version, true);
@@ -148,6 +143,12 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 				command.putexec(interpreter, (String)path);
 			}
 		}
+
+		command.pms = home + "lib" + File.separatorChar + "jumpy.py";
+		String bin = utils.getBinPaths(configuration, command.executables);
+		command.basepath =
+			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
+
 		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);

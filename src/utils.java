@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
@@ -212,6 +213,8 @@ public final class utils {
 
 	public static String getBinPaths(PmsConfiguration configuration, final Map<String,String> executables) {
 		class pathHash extends HashSet<String> {
+			public List syspath = Arrays.asList(
+				System.getenv(windows ? "Path" : "PATH").split(File.pathSeparator));
 			@Override
 			public boolean add(String s) {
 				return add(new File(s));
@@ -220,7 +223,8 @@ public final class utils {
 				return add(new File(s).getParentFile());
 			}
 			public boolean add(File f) {
-				return (f != null && f.exists() && f.isDirectory() ? super.add(f.getAbsolutePath()) : false);
+				return (f != null && f.exists() && f.isDirectory() && ! syspath.contains(f.getAbsolutePath()) ?
+					super.add(f.getAbsolutePath()) : false);
 			}
 			public boolean addExec(String n, String s) {
 				if (s != null) {
@@ -236,6 +240,9 @@ public final class utils {
 			for (String p : path.split(",")) {
 				paths.add(p.trim());
 			}
+		}
+		for (String s : executables.values()) {
+			paths.addParent(s);
 		}
 		paths.addExec("ffmpeg", configuration.getFfmpegPath());
 		paths.addExec("mplayer", configuration.getMplayerPath());
