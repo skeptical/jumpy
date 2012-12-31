@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Date;
 import java.util.List;
@@ -260,7 +261,9 @@ public class player extends Player {
 		isMediaitem = dlna instanceof mediaItem;
 		if (filename != null) {
 			if (dynamic || cmdline == null) {
-				cmdline = new command(filename, null);
+				cmdline = new command(filename,
+					dlna instanceof xmbAction ? ((xmbAction)dlna).syspath : null,
+					dlna instanceof xmbAction ? ((xmbAction)dlna).env : null);
 			}
 			HashMap<String,String> vars = new HashMap<String,String>();
 			vars.put("format", isMediaitem ?

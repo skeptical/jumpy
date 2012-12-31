@@ -1,13 +1,28 @@
 package net.pms.external.infidel.jumpy;
 
+import java.util.Map;
+import java.util.HashMap;
 import net.pms.dlna.DLNAResource;
 
 public class xmbAction extends mediaItem {
 	public runner ex;
 	public xmbAction alt;
+	public String syspath;
+	public Map<String,String> env;
 
 	public xmbAction(String name, String format, String uri, String thumb) {
+		this(name, format, uri, thumb, null, null);
+	}
+
+	public xmbAction(String name, String format, String uri, String thumb, String syspath, Map<String,String> env) {
 		super(name, format, uri, thumb == null ? "#checkmark" : thumb);
+		this.syspath = syspath;
+		if (env != null && !env.isEmpty()) {
+			this.env = new HashMap<String,String>();
+			this.env.putAll(env);
+		} else {
+			this.env = null;
+		}
 		this.ex = null;
 		this.alt = null;
 	}
