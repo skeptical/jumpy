@@ -162,15 +162,15 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				folder.addChild(new mediaItem(label, data, uri, thumb));
 				break;
 			case Format.VIDEO:
-				media = "video";
+				media = (f == null ? "web " : "") + "video";
 				folder.addChild(f == null ? new WebVideoStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.AUDIO:
-				media = "audio";
+				media = (f == null ? "web " : "") + "audio";
 				folder.addChild(f == null ? new WebAudioStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.IMAGE:
-				media = "image";
+				media = (f == null ? "web " : "") + "image";
 				folder.addChild(f == null ? new FeedItem(label, uri, thumb, null, Format.IMAGE) : new RealFile(f, label));
 				break;
 			case Format.PLAYLIST:
