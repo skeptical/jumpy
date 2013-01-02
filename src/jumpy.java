@@ -375,7 +375,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 	}
 
 	public static String getResource(String name) {
-		if (name == null) {
+		if (StringUtils.isBlank(name)) {
 			return null;
 		}
 		String[] val = name.split("\\+", 2);

@@ -158,8 +158,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				folder.addChild(new xmbAction(label, "jump:" + data, uri, thumb, syspath, env));
 				break;
 			case MEDIA:
-				media = data + " item";
-				folder.addChild(new mediaItem(label, data, uri, thumb));
+				mediaItem item = new mediaItem(label, data, uri, thumb);
+				media = item.fmt + " item";
+				folder.addChild(item);
 				break;
 			case Format.VIDEO:
 				media = (f == null ? "web " : "") + "video";
