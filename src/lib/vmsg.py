@@ -33,7 +33,14 @@ class vmsg:
 			try:
 				msg = open(file).read()
 			except:
-				msg = file
+				try:
+					from urllib2 import urlopen
+					msg = urlopen(file).read()
+#					f = urlopen(file)
+#					if f.headers['content-type'].startswith('text'):
+#						msg = f.read()
+				except:
+					msg = file
 			tmp = os.path.join(tempfile.gettempdir(), 'tmp.txt')
 			open(tmp, 'w').write(msg.expandtabs(3).replace('\\n', '\n'))
 			img = None
@@ -71,7 +78,7 @@ class vmsg:
 		convert.extend([
 			'-gravity', 'none' if filemode else 'center' if gravity == None else gravity,
 			'-density', str(density),
-			'-font', font, '-pointsize', str(pointsize), '-fill', fill,
+			'-font', font, '-pointsize', str(pointsize), '-fill', '"%s"' % fill,
 			'+insert' # insert a throwaway initial frame for ffmpeg
 		])
 
