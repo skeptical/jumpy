@@ -193,7 +193,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 		players = new ArrayList<player>();
 		players.add(new player(this,
 			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
-			"Jumpy Video Action Player", 0, 1) {
+			"Jumpy Video Action Player", "#checkmark", 0, 1) {
 				public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
 						DLNAMediaInfo media, OutputParams params) throws IOException {
 					xmbAction action = (xmbAction)dlna;
@@ -212,7 +212,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 					return super.launchTranscode(filename, dlna, media, params);
 				}
 			});
-		setIcon("jump", "#checkmark");
 
 		if (refresh != 0) {
 			util = new scriptFolder(this, "Util", null, null);
@@ -403,14 +402,14 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 	}
 
 	public static void setIcon(String fmt, String img) {
+		log("setting icon '" + img + "'  for " + fmt);
 		for (String f : fmt.split("\\|")) {
-			log("setting '" + f + "' icon to '" + img + "'");
 			icons.put(f, img);
 		}
 	}
 
-	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String playback) {
-		players.add(new player(this, name, cmd, supported, mediatype, purpose, desc, playback));
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback) {
+		players.add(new player(this, name, cmd, supported, mediatype, purpose, desc, icon, playback));
 		return players.size() - 1;
 	}
 

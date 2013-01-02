@@ -163,10 +163,10 @@ def pms_getResource(src):
 def pms_setIcon(fmt, img):
 	pms_util(PMS_ICON, fmt, img)
 
-def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, playback=None):
+def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, icon=None, playback=None):
 	if type(cmd).__name__ == 'list':
 		cmd = flatten(cmd)
-	pms._addPlayer(name, cmd, supported, mediatype, purpose, desc, playback)
+	pms._addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback)
 
 __builtin__.pms.addFolder = pms_addFolder
 __builtin__.pms.addAudio = pms_addAudio

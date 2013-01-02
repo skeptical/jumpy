@@ -56,7 +56,7 @@ public interface jumpyAPI {
 	// public static final int AUDIO_WEBSTREAM_PLAYER = 3;
 	// public static final int MISC_PLAYER = 4;
 	// public static final String NATIVE = "NATIVE";
-	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String playback);
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback);
 }
 
 

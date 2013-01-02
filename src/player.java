@@ -51,14 +51,16 @@ public class player extends Player {
 
 	public jumpy jumpy;
 
-	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type, int purpose, String desc, int delay, int buffersize) {
+	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type,
+			int purpose, String desc, String icon, int delay, int buffersize) {
 		isnative = true;
-		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc, null);
+		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc, icon, null);
 		this.delay = delay;
 		this.buffersize = buffersize;
 	}
 
-	public player(jumpy jumpy, String name, String cmdline, String supported, int type, int purpose, String desc, String playback) {
+	public player(jumpy jumpy, String name, String cmdline, String supported, int type,
+			int purpose, String desc, String icon, String playback) {
 		String fmt = null, mimetype = null;
 		if (supported.matches(".*f:\\w+.*")) {
 			fmt = supported.split("f:")[1].split("\\s")[0];
@@ -70,10 +72,11 @@ public class player extends Player {
 		if (supported.matches(".*m:\\w+.*")) {
 			mimetype = supported.split("m:")[1].split("\\s")[0];
 		}
-		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc, playback);
+		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc, icon, playback);
 	}
 
-	private void init(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, String supported, int type, int purpose, String desc, String playback) {
+	private void init(jumpy jumpy, String name, String cmdline, String fmt, String mimetype,
+			String supported, int type, int purpose, String desc, String icon, String playback) {
 
 		this.jumpy = jumpy;
 		this.name = name;
@@ -147,6 +150,9 @@ public class player extends Player {
 
 		PlayerFactory.getAllPlayers().add(0, this);
 		PlayerFactory.getPlayers().add(0, this);
+		if (icon != null) {
+			jumpy.setIcon(fmt, icon);
+		}
 		enable(true);
 	}
 

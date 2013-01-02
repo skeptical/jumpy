@@ -280,8 +280,8 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	}
 
 	@Override
-	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String playback) {
-		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, playback);
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback) {
+		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback);
 	}
 }
 
