@@ -15,6 +15,7 @@ import javax.swing.plaf.metal.MetalIconFactory;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.WordUtils;
 
 import net.pms.PMS;
 import net.pms.io.SystemUtils;
@@ -239,8 +240,10 @@ public class config {
 		String about = "<html>"
 			+ (notitle ? "" : "Jumpy User-Defined Player<br><br>")
 			+ (p.desc == null ? "" : p.desc + "<br><br>")
-			+ "<table width=500 align=left valign=top>"
-			+ "<tr><td width=80>Supported</td><td><font color=blue>" + p.supportStr + "</font></td></tr>"
+			+ "<table width=500 align=left valign=top >"
+			+ "<tr><td width=80>Supported</td><td><font color=blue>"
+			+ (p.supportStr.length() < 71 ? p.supportStr : WordUtils.wrap(p.supportStr, 70, "<br>", true))
+			+ "</font></td></tr>"
 			+ "<tr><td>Playback</td><td><font color=blue>"
 			+ (p.delay * p.buffersize == 1 ? " default" : ""
 				+ (p.delay == -1 ? "" : " delay: " + p.delay + "s")
