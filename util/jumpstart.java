@@ -61,6 +61,9 @@ public class jumpstart {
 
 		// jumpy.py is always located alongside the jar
 		command.pms = lib + File.separatorChar + "jumpy.py";
+		command.basesubs = new HashMap<String,String>();
+		command.basesubs.put("home", new File(lib).getParent().replace("\\","\\\\"));
+		command.basesubs.put("PMS", "JUMPSTART");
 
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
 			lib, null);

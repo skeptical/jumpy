@@ -32,6 +32,7 @@ public class command {
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
 	public File startdir;
 	public Map<String,String> env = null;
+	public static Map basesubs = null;
 	public Map substitutions = null;
 	private GatewayServer server = null;
 	public int scriptarg = 0, arg0 = 0;
@@ -203,6 +204,10 @@ public class command {
 		env.put("pms", getpms());
 		if (executables.containsKey("imconvert")) {
 			env.put("imconvert", executables.get("imconvert"));
+		}
+		substitutions = new HashMap<String,String>();
+		if (basesubs != null && ! basesubs.isEmpty()) {
+			substitutions.putAll(basesubs);
 		}
 	}
 

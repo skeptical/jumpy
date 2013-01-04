@@ -110,7 +110,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 
 		runner.out = logger;
 		runner.version = version;
-		runner.home = home;
 
 		home += File.separatorChar;
 
@@ -148,6 +147,11 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 		String bin = utils.getBinPaths(configuration, command.executables);
 		command.basepath =
 			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
+		command.basesubs = new HashMap<String,String>() {{
+			put("home", home.replace("\\","\\\\"));
+			put("PMS", host);
+		}};
+
 
 		log("\n");
 		log("home=" + home, true);

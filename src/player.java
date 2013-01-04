@@ -271,14 +271,11 @@ public class player extends Player {
 					dlna instanceof xmbAction ? ((xmbAction)dlna).syspath : null,
 					dlna instanceof xmbAction ? ((xmbAction)dlna).env : null);
 			}
-			HashMap<String,String> vars = new HashMap<String,String>();
-			vars.put("format", isMediaitem ?
+			cmdline.substitutions.put("format", isMediaitem ?
 				((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
-			vars.put("filename", filename.replace("\\","\\\\"));
-			vars.put("home", jumpy.home.replace("\\","\\\\"));
-			vars.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
+			cmdline.substitutions.put("filename", filename.replace("\\","\\\\"));
+			cmdline.substitutions.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
 				((mediaItem)dlna).userdata : "");
-			cmdline.substitutions = vars;
 			return true;
 		}
 		return false;
