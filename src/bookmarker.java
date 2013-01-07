@@ -23,7 +23,7 @@ public class bookmarker {
 
 	public bookmarker(jumpy jumpy) {
 		this.jumpy = jumpy;
-		bookmarks = new scriptFolder(jumpy, "Bookmarks", null, null);
+		bookmarks = new scriptFolder(jumpy, "Bookmarks", null, "#book");
 		bookmarks.refreshAlways = true;
 		jumpy.top.addChild(bookmarks);
 		bookmarksini = jumpy.bookmarksini;

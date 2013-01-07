@@ -152,7 +152,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 			put("PMS", host);
 		}};
 
-
 		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);
@@ -218,7 +217,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
 			});
 
 		if (refresh != 0) {
-			util = new scriptFolder(this, "Util", null, null);
+			util = new scriptFolder(this, "Util", null, "#wrench");
 			top.addChild(util);
 			final jumpy self = this;
 			util.addChild(new xmbAction("Refresh",

@@ -96,7 +96,7 @@ def pms_addVideofeed(name, cmd, thumb=None):
 def pms_addAction(name, cmd, thumb=None, playback=None):
 	pms_addItem(PMS_ACTION, name, cmd, thumb, playback)
 
-def pms_addCmd(name, cmd, ok='Success', fail='Failed', thumb=None):
+def pms_addCmd(name, cmd, thumb=None, ok='Success', fail='Failed'):
 	pms_addItem(PMS_ACTION, name, cmd, thumb, '+CMD : %s : %s' % (ok, fail))
 
 def pms_addConsoleCmd(name, cmd, thumb=None):

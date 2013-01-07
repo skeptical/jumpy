@@ -237,7 +237,7 @@ public final class utils {
 		pathHash paths = new pathHash();
 		String path;
 		if ((path = (String)configuration.getCustomProperty("bin.path")) != null) {
-			for (String p : path.split(",")) {
+			for (String p : path.split(",|" + File.pathSeparator)) {
 				paths.add(p.trim());
 			}
 		}
