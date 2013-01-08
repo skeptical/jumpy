@@ -72,37 +72,40 @@ public class jumpstart {
 		item current = root;
 
 		while (true) {
-			if (! current.discovered) {
+			if (! current.discovered && current.type != 0) {
+				if (current.children.size() != 0) current.children.clear();
 				new runner().run(current, current.uri, current.syspath, current.env);
 				current.discovered = true;
 			}
 			int size = current.children.size();
-			if (size == 0) break;
 
 			c.printf("\n------------- MENU -------------\n");
-			for (int i=0; i<size; i++) {
-				item x = (item)current.get(i);
-				String type = "";
-				switch (x.type) {
-					case  -64: type = " (UNRESOLVED)"; break;
-					case  -32: type = ""; break;
-					case   -2: type = " (ACTION)"; break;
-					case   -1: type = " (MEDIA)"; break;
-					case    1: type = " (AUDIO)"; break;
-					case    2: type = " (IMAGE)"; break;
-					case    4: type = " (VIDEO)"; break;
-					case   16: type = " (PLAYLIST)"; break;
-					case   32: type = " (ISO)"; break;
-					case 4096: type = " (FEED)"; break;
-					case 4097: type = " (AUDIOFEED)"; break;
-					case 4098: type = " (IMAGEFEED)"; break;
-					case 4100: type = " (VIDEOFEED)"; break;
-					case    0:
-					case    8:
-					default  : type = " (UNKNOWN)"; break;
+			if (size != 0) {
+				for (int i=0; i<size; i++) {
+					item x = (item)current.get(i);
+					String type = "";
+					switch (x.type) {
+						case  -64: type = " (UNRESOLVED)"; break;
+						case    0:
+						case  -32: type = ""; break;
+						case   -2: type = " (ACTION)"; break;
+						case   -1: type = " (MEDIA)"; break;
+						case    1: type = " (AUDIO)"; break;
+						case    2: type = " (IMAGE)"; break;
+						case    4: type = " (VIDEO)"; break;
+						case   16: type = " (PLAYLIST)"; break;
+						case   32: type = " (ISO)"; break;
+						case 4096: type = " (FEED)"; break;
+						case 4097: type = " (AUDIOFEED)"; break;
+						case 4098: type = " (IMAGEFEED)"; break;
+						case 4100: type = " (VIDEOFEED)"; break;
+						case    8:
+						default  : type = " (UNKNOWN)"; break;
+					}
+					c.printf("  [%d] %s%s\n", i+1, x.name, type);
 				}
-				c.printf("  [%d] %s%s\n", i+1, x.name, type);
-			}
+			} else c.printf("  [empty]\n");
+
 			String sel = c.readLine("Choose an item, u=up h=home q=quit [" + (level < last ? hist[level] : "q") + "]: ");
 			if (sel.equals("q")) break;
 			if (sel.equals("u")){
@@ -146,6 +149,12 @@ public class jumpstart {
 			l.write(log.trim().getBytes());
 			l.close();
 		} catch (Exception e) {}
+
+		if (runner.active.size() > 0) {
+			for (runner r : runner.active) {
+				runner.stop(r);
+			}
+		}
 	}
 
 	public static void usage() {
@@ -198,18 +207,11 @@ class item extends node implements jumpyAPI {
 	public String getName() {
 		return name;
 	}
-
 	public Object addItem(int type, String filename, String uri, String thumb, String data) {
-		item folder = this;
-		String name = filename;
-		if (type == jumpyAPI.FOLDER && filename.contains("/")) {
-			File f = new File(filename);
-			name = f.getName();
-			String path = f.getParent();
-			if (path != null) {
-				folder = mkdirs(path, this);
-			}
-		}
+		File f = new File(filename);
+		String name = f.getName();
+		String path = f.getParent();
+		item folder = path == null ? this : mkdirs(path, this);
 		item i = new item(type, name, uri, thumb, syspath, env);
 		folder.add(i);
 		return i;
@@ -255,11 +257,12 @@ class item extends node implements jumpyAPI {
 				continue;
 			}
 			if (! (exists && (child = (item)parent.get(dir)) != null)) {
-				child = new item(-1, dir, "", "", "", parent.env);
+				child = new item(0, dir, "", "", "", parent.env);
 				parent.add(child);
 				parent.discovered = true;
 				exists = false;
 			}
+			parent = child;
 		}
 		return parent;
 	}
