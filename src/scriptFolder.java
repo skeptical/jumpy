@@ -243,7 +243,20 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			case PLUGINJAR:
 				try {
 					return this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().normalize().getPath();
-				} catch(Exception e) {break;}
+				} catch(Exception e) {}
+				break;
+			case REFRESH:
+				int level = Integer.parseInt(arg1);
+				DLNAResource folder = this;
+				while (folder != null && level-- > -1) {
+					jumpy.log("refresh: " + folder.getName());
+					if (folder instanceof scriptFolder) {
+						((scriptFolder)folder).refresh();
+					}
+					folder.resolve();
+					folder = folder.getParent();
+				}
+				break;
 			case RESTART:
 				try {
 					ex.shutdown();

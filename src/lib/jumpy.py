@@ -46,6 +46,7 @@ except NameError:
 	__builtin__.PMS_XMBPATH = 12;
 	__builtin__.PMS_ICON = 13;
 	__builtin__.PMS_RESOURCE = 14;
+	__builtin__.PMS_REFRESH = 15;
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -139,6 +140,9 @@ def pms_getLogDir():
 def pms_getPluginJar():
 	return pms_util(PMS_PLUGINJAR)
 
+def pms_refresh(up=0):
+	return pms_util(PMS_REFRESH, str(up))
+
 def pms_restart():
 	return pms_util(PMS_RESTART)
 
@@ -190,6 +194,7 @@ __builtin__.pms.getHome = pms_getHome
 __builtin__.pms.getProfileDir = pms_getProfileDir
 __builtin__.pms.getLogDir = pms_getLogDir
 __builtin__.pms.getPluginJar = pms_getPluginJar
+__builtin__.pms.refresh = pms_refresh
 __builtin__.pms.restart = pms_restart
 __builtin__.pms.reboot = pms_reboot
 __builtin__.pms.getFolderName = pms_getFolderName

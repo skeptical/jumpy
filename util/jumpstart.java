@@ -235,6 +235,15 @@ class item extends node implements jumpyAPI {
 			case SETPMS:
 				command.pms = arg1;
 				break;
+			case REFRESH:
+				int level = Integer.parseInt(arg1);
+				item folder = this;
+				while (folder != null && level-- > -1) {
+					System.out.println("refresh: " + folder.getName());
+					folder.discovered = false;
+					folder = (item)folder.parent;
+				}
+				break;
 			case HOME:
 			case PROFILEDIR:
 			case LOGDIR:
