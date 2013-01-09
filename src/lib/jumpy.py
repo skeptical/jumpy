@@ -106,6 +106,9 @@ def pms_addConsoleCmd(name, cmd, thumb=None):
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
 
+def pms_submit(name, uri, thumb=None):
+	pms_addItem(PMS_MEDIA, name, uri, thumb, None)
+
 def pms_addPath(path=None):
 	pms._addPath(path)
 
@@ -185,6 +188,7 @@ __builtin__.pms.addAction = pms_addAction
 __builtin__.pms.addCmd = pms_addCmd
 __builtin__.pms.addConsoleCmd = pms_addConsoleCmd
 __builtin__.pms.addMedia = pms_addMedia
+__builtin__.pms.submit = pms_submit
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath
 __builtin__.pms.setPath = pms_addPath # deprecated

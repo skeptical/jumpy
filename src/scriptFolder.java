@@ -25,6 +25,8 @@ import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.DVDISOFile;
+import net.pms.formats.Format;
+import net.pms.formats.FormatFactory;
 
 
 public class scriptFolder extends xmbObject implements jumpyAPI {
@@ -138,6 +140,17 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			f = new File(uri.startsWith("file://") ? uri.substring(7) : uri);
 			if (! f.exists()) {
 				f = null;
+			}
+		}
+
+		if (type == MEDIA && data == null) {
+			Format format = FormatFactory.getAssociatedExtension("." + FilenameUtils.getExtension(uri));
+			if (format == null) {
+				return null;
+			}
+			int ftype = format.getType();
+			if (ftype != Format.UNKNOWN) {
+				type = ftype;
 			}
 		}
 
