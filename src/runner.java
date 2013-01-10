@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
 
+import org.jvnet.winp.WinProcess;
+
 public class runner {
 
 	private static boolean quiet = false;
@@ -29,7 +31,7 @@ public class runner {
 		cmdline = cmd;
 	}
 
-	public void log(String str) {
+	public static void log(String str) {
 		if (! quiet) {
 			out.println(str);
 		}
@@ -118,19 +120,27 @@ public class runner {
 	}
 
 	public static void stop (runner r) {
-		r.log("stopping '" + r.name + "'");
-		r.shutdown();
+		if (r.running) {
+			r.log("stopping '" + r.name + "'");
+			r.shutdown();
+		}
 	}
 
 	public int shutdown() {
-		running = false;
 		try {
-			if (p != null) {
-				p.destroy();
-			}
 			if (cmdline != null) {
 				cmdline.stopAPI();
 			}
+			if (p != null) {
+				if (cmdline.windows) {
+//					log("pid="+new WinProcess(p).getPid());
+					new WinProcess(p).killRecursively();
+				} else {
+					p.destroy();
+				}
+				p = null;
+			}
+			running = false;
 		} catch(Exception e) {e.printStackTrace();}
 		return 0;
 	}

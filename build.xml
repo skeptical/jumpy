@@ -37,7 +37,7 @@
 		<jar jarfile="${jumpy}.jar" basedir="${build}">
 			<manifest>
 				<!--<attribute name="Main-Class" value="net.pms.external.infidel.jumpy"/>-->
-				<attribute name="Class-Path" value="jumpy/lib/py4j0.7.jar jumpy/lib/ini4j-0.5.2.jar jumpy/lib/commons-exec-1.1.jar"/>
+				<attribute name="Class-Path" value="jumpy/lib/py4j0.7.jar jumpy/lib/ini4j-0.5.2.jar jumpy/lib/commons-exec-1.1.jar jumpy/lib/winp-1.14.jar"/>
 				<attribute name="Implementation-Version" value="${ver}"/>
 			</manifest>
 		</jar>
@@ -61,6 +61,7 @@
 		<copy file="lib/py4j0.7.jar" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/ini4j-0.5.2.jar" todir="${dist}/jumpy/lib"/>
 		<copy file="lib/commons-exec-1.1.jar" todir="${dist}/jumpy/lib"/>
+		<copy file="lib/winp-1.14.jar" todir="${dist}/jumpy/lib"/>
 		<zip destfile="${jumpy}.zip" basedir="${dist}"/>
 	</target>
 
