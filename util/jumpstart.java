@@ -30,8 +30,8 @@ public class jumpstart {
 			System.exit(1);
 		}
 
-		ex.cmdline.scriptarg = argv.length-1;
-		File script = new File(argv[argv.length-1]);
+		ex.cmdline.scriptarg = 0;
+		File script = new File(argv[ex.cmdline.scriptarg]);
 		if (! script.exists()) {
 			System.err.printf("'%s' not found.\n", script.getPath());
 			usage();

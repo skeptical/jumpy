@@ -174,15 +174,17 @@ public final class utils {
 			URL src = new URL(url);
 			dest = new File(destdir, new File(src.getPath()).getName());
 			temp = new File(destdir, dest.getName() + ".part");
+			if (temp.exists()) temp.delete();
 			FileUtils.copyURLToFile(src, temp, 30000, 30000);
 			if (temp.exists()) {
+				if (dest.exists()) dest.delete();
 				temp.renameTo(dest);
 				return dest;
 			}
 		} catch (Exception e) {
-			if (temp != null && temp.exists()) temp.delete();
 			e.printStackTrace();
 		}
+		if (temp != null && temp.exists()) temp.delete();
 		return null;
 	}
 
