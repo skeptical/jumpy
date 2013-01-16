@@ -96,7 +96,7 @@ public class command {
 
 	public static boolean isOuterQuoted(String str)  {
 		return (StringUtils.isQuoted(str) &&
-			! str.matches("\\\".*\\\"\\s+\\\".*\\\"|'.*'\\s+'.*'"));
+			! str.matches("\\\".*\\\".+\\\".*\\\"|'.*'.+'.*'"));
 	}
 
 	public List<String> split(String cmd) {
