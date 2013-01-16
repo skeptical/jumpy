@@ -28,6 +28,7 @@ Place or symlink the following dependencies in 'lib' before running ant:
 <li><i>py4j0.7.jar</i> (<a href="http://py4j.sourceforge.net" target="_blank">py4j.sourceforge.net</a>)</li>
 <li><i>ini4j-0.5.2.jar</i> (<a href="http://ini4j.sourceforge.net" target="_blank">ini4j.sourceforge.net</a>)</li>
 <li><i>commons-exec-1.1.jar</i> (<a href="http://commons.apache.org/exec/" target="_blank">commons.apache.org/exec</a>)</li>
+<li><i>winp-1.14.jar</i> (<a href="http://winp.kohsuke.org/" target="_blank">winp.kohsuke.org</a>)</li>
 </ul>
 </ul>
 
