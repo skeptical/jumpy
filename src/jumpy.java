@@ -47,9 +47,10 @@ import net.pms.io.ProcessWrapper;
 //import org.slf4j.LoggerFactory;
 
 import net.pms.external.dbgpack;
+import net.pms.external.DebugPacker;
 
 
-public class jumpy implements AdditionalFoldersAtRoot, dbgpack {
+public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 
 	public static final String appName = "jumpy";
 	public static final String version = "0.2.5";
