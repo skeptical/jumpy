@@ -22,6 +22,7 @@ import java.lang.Process;
 import java.lang.ProcessBuilder;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -95,6 +96,15 @@ public final class utils {
 			pb.start();
 		} catch (Exception e) { e.printStackTrace(); return; }
 		System.exit(0);
+	}
+
+	public static Method getFormatSetIconMethod() {
+		try {
+			// Format.setIcon() is only available under UMS > 2.2.5
+			return Class.forName("net.pms.formats.Format")
+				.getMethod("setIcon", String.class);
+		} catch (Exception e) {}
+		return null;
 	}
 
 	public static ArrayList<RendererConfiguration> getFoundRenderers() {

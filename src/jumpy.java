@@ -99,7 +99,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 			log("\n\n\nWARNING: No 'python.path' setting found in PMS.conf.\n\n\n");
 		}
 
-
 		try {
 			cache = new File(PMS.getConfiguration().getTempFolder(), "jumpy");
 			if (! cache.isDirectory()) {

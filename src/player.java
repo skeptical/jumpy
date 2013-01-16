@@ -14,6 +14,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import java.lang.reflect.Method;
+
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.FormatConfiguration;
@@ -48,6 +50,7 @@ public class player extends Player {
 	private ProcessWrapperImpl pw;
 	public static PrintStream out = System.out;
 	public int delay, buffersize;
+	public static Method Format_setIcon = utils.getFormatSetIconMethod();
 
 	public jumpy jumpy;
 
@@ -151,6 +154,11 @@ public class player extends Player {
 		PlayerFactory.getAllPlayers().add(0, this);
 		PlayerFactory.getPlayers().add(0, this);
 		if (icon != null) {
+			if (Format_setIcon != null) {
+				try {
+					Format_setIcon.invoke(this.format, jumpy.getResource(icon));
+				} catch (Exception e) {jumpy.log(e.toString());}
+			}
 			jumpy.setIcon(fmt, icon);
 		}
 		enable(true);
