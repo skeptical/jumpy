@@ -8,7 +8,7 @@
 .orange {
 	color: #ff6600;
 }
-.comment {
+.comment, .comment a {
 	color: dimgrey;
 }
 ul {
@@ -87,15 +87,16 @@ div.main {
 <!--<li><a href="scripts.html#ARRAY">Array Notation</a></li>-->
 <li><a href="scripts.html#PLAYERS">Players</a></li>
 <li><a href="scripts.html#INTERPRETERS">Interpreters</a></li>
+<li><a href="scripts.html#ICONS">Icons</a></li>
 <li><a href="scripts.html#JUMPSTART">Jumpstarting Scripts</a></li>
-<li><a href="#EXAMPLES">Examples</a></li>
+<li><a href="scripts.html#EXAMPLES">Examples</a></li>
 <!--<ul>-->
 <!--<a href="scripts.html#HELLOPY">py</a></li> <a href="scripts.html#HELLOSH">sh</a>-->
 <!--<a href="scripts.html#HELLOPL">pl</a> <a href="scripts.html#HELLOBAT">bat</a</li>-->
 <!--</ul>-->
 <!--<center>LINKS</center><br/>-->
-<br/><br/><br/>
-<li><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">Download</a></li>
+<br/>
+<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/" target="_blank">Download</a></li>
 <li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288" target="_blank">Forum</a></li>
 <li><a href="https://github.com/skeptical/jumpy" target="_blank">Code</a></li>
 </ul>
@@ -123,8 +124,8 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put <i><a href="https://github.com/downloads/skeptical/jumpy/Jumpy-0.2.4.exe" target="_blank">Jumpy-0.2.4.exe</a></i> (Windows)
-or <i><a href="https://github.com/downloads/skeptical/jumpy/Jumpy-0.2.4.run" target="_blank">Jumpy-0.2.4.run</a></i> (Linux/OS-X)
+<li>Put <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.exe/download" target="_blank">Jumpy-0.2.5.exe</a></i> (Windows)
+or <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.run/download" target="_blank">Jumpy-0.2.5.run</a></i> (Linux/OS-X)
 in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -133,10 +134,10 @@ Launch it and follow through as usual with external package installers if prompt
 </li>
 <br/>
 <div style="text-indent:-1.5em;">
-<b><a name="QUICKER">Even Quicker</a></b>
-<br/>
-<b><a name="UMSSETUP">UMS</b> <i>(2.0.1+)</i> <b>users</a></b> : install/update from the <i>Plugin Management</i> tab.
-<br/>
+<!--<b><a name="QUICKER">Even Quicker</a></b>-->
+<!--<br/>-->
+<!--<b><a name="UMSSETUP">UMS</b> <i>(2.0.1+)</i> <b>users</a></b> : install/update from the <i>Plugin Management</i> tab.-->
+<!--<br/>-->
 <b><a name="UPDATE">Future updates</a></b> can be installed directly from the <i>jumpy gui</i> panel.
 </div>
 <br/>
@@ -194,7 +195,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip the <i><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">latest zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.zip/download" target="_blank">jumpy-0.2.5.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -209,6 +210,12 @@ perl.path = c:\\perl\\bin\\perl.exe
 media addons found in your xbmc user directory.
 </li>
 </ol>
+<b><a name="MANUALUPDATE">Updating</a></b>
+<ul>
+When updating by hand you may want to merge any new sections or changes in
+<i>plugins/jumpy/examples/sample-jumpy-scripts.ini</i>
+into your own <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>.
+</ul>
 </div>
 <br/><br/>
 <b><a name="BOOKMARKS">Bookmarks</a></b>
@@ -324,7 +331,7 @@ right to left) and top to bottom in 4 second shots across the page. It requires 
 to be intalled.
 <br/><br/>
 Try one of the web pages
-in the <i>Examples/Web Reader</i> folder on the xmb to see how it works, but basically:
+in the <i>Web Reader</i> folder on the xmb to see how it works, but basically:
 <br/>
 <ul>
 <li>Press <b><i>pause</i></b> to stop panning and read, press again to continue.</li>

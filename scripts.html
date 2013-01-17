@@ -8,7 +8,7 @@
 .orange {
 	color: #ff6600;
 }
-.comment {
+.comment, .comment a {
 	color: dimgrey;
 }
 ul {
@@ -16,6 +16,12 @@ ul {
 }
 .comment a:link a:visited a:hover a:active {
 	text-decoration:none;
+}
+.icon{
+	padding:8;
+}
+.icon:hover{
+	background:#808080;
 }
 pre, code {
 	-moz-tab-size: 4;
@@ -61,7 +67,19 @@ div.main {
 	width: 45em;
 	margin-left: 15em;
 }
+.thumb {
+cursor:pointer;
+}
 </style>
+<script type="text/javascript">
+function preview(img, bg) {
+	var style=document.getElementById("preview").style;
+	style.background="url("+img.getAttribute('src')+")";
+	var cap=document.getElementById("caption");
+	cap.innerHTML='';
+	cap.appendChild(document.createTextNode(img.getAttribute('title')));
+}
+</script>
 </head>
 <body>
 <div class="contents">
@@ -82,11 +100,52 @@ div.main {
 <center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
 <li><a href="#QUICKSTART">Quick Start</a></li>
 <li><a href="#QUICKSTARTPLAYER">Quick Start - Players</a></li>
-<li><a href="#API">API</a></li>
+<li><table><tr><td><a href="#API">API</a><td>
+<select style="display:block;border:none;color:#0000BB;background-color:#FFFFFF;font-family:monospace" onchange="document.location.href='#'+this.options[this.selectedIndex].innerHTML">
+<option>addAction</option>
+<option>addAudio</option>
+<option>addAudiofeed</option>
+<option>addCmd</option>
+<option>addConsoleCmd</option>
+<option>addFolder</option>
+<option>addImage</option>
+<option>addImagefeed</option>
+<option>addISO</option>
+<option>addItem</option>
+<option>addMedia</option>
+<option>addPath</option>
+<option>addPlayer</option>
+<option>addPlaylist</option>
+<option>addVideo</option>
+<option>addVideofeed</option>
+<option>err</option>
+<option>getFolderName</option>
+<option>getHome</option>
+<option>getLogDir</option>
+<option>getPluginJar</option>
+<option>getProfileDir</option>
+<option>getProperty</option>
+<option>getXmbPath</option>
+<option>imgfx</option>
+<option>info</option>
+<option>ok</option>
+<option>refresh</option>
+<option>reboot</option>
+<option>restart</option>
+<option>setEnv</option>
+<option>setIcon</option>
+<option>setPath</option>
+<option>setProperty</option>
+<option>version</option>
+<option>vmsg</option>
+<option>warn</option>
+</select></td></tr></table>
+</li>
 <li><a href="#OTHERSCRIPTS">Other Languages</a></li>
 <!--<li><a href="#ARRAY">Array Notation</a></li>-->
 <li><a href="#PLAYERS">Players</a></li>
 <li><a href="#INTERPRETERS">Interpreters</a></li>
+<li><a href="#ICONS">Icons</a></li>
 <li><a href="#JUMPSTART">Jumpstarting Scripts</a></li>
 <li><a href="#EXAMPLES">Examples</a></li>
 <!--<ul>-->
@@ -94,12 +153,13 @@ div.main {
 <!--<a href="#HELLOPL">pl</a> <a href="#HELLOBAT">bat</a</li>-->
 <!--</ul>-->
 <!--<center>LINKS</center><br/>-->
-<br/><br/><br/>
-<li><a href="https://github.com/skeptical/jumpy/downloads" target="_blank">Download</a></li>
+<br/>
+<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/" target="_blank">Download</a></li>
 <li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288" target="_blank">Forum</a></li>
 <li><a href="https://github.com/skeptical/jumpy" target="_blank">Code</a></li>
 </ul>
 </div>
+
 <div class="main">
 <a name="SCRIPTS"><H3 style="color:darkblue"><center><span class="orange">SCRIPTS</span></center></H3></a>
 Any arbitrary system command qualifies as a 'script' which jumpy will execute and listen for
@@ -118,10 +178,11 @@ with no arguments. You can only add folders during this first call.
 <li>Other scripts can be located anywhere, and are registered with Jumpy by means of <a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a>.
 They can be called at startup, shutdown, or placed on the xmb for future use.
 </li>
-<li>Any folder item added with <a href="#ADDITEM"><kbd>addItem</kbd></a> will execute whatever command
+<li>Any folder item added with <a href="#addItem"><kbd>addItem</kbd></a> will execute whatever command
 you've specified in the <code>cmd</code> parameter when the user clicks on it in the future. Usually you will want
 your future command to call the same script but with different arguments.
 </li>
+<li>Commands with '<code>&</code>' as the last argument will be launched asynchronously.</li>
 <li>Any media item you add will be passed along to PMS for normal processing.
 </li>
 <li>Python scripts communicate with Jumpy via internal <a href="#API">API</a> calls to the jumpy python module.
@@ -140,10 +201,11 @@ if present are in the system PATH and can be launched just by name.</li>
 (located wherever <i>PMS.conf</i> is) modeled on these:
 <ul>
 <pre>
-<i class="comment">; Create the folder "Jumpy > my scripts > testing > helloworld" on the xmb</i>
-<i class="comment">; and run the command 'echo "hello world"' when the user opens it.</i>
-[my scripts/testing/helloworld]
-cmd = echo "hello world"
+<i class="comment">; Create the folder "Jumpy > my scripts > testing > hello" on the xmb</i>
+<i class="comment">; containing an action labeled 'click me' which will run the command</i>
+<i class="comment">; 'echo hello' when the user clicks on it.</i>
+[my scripts/testing/hello]
+cmd = pms addCmd "click me" "echo hello"
 
 <i class="comment">; Run the command 'echo "foo"' at startup</i>
 <i class="comment">; (note the '+' which means 'execute at startup').</i>
@@ -171,7 +233,7 @@ cmd = pms addPlayer flipflop <i><span class="orange">"ffmpeg -y -i '${filename}'
 If you want to try it out add it to <i>jumpy-scripts.ini</i>, restart and look for <i>flipflop</i> items in
 the <i>#--TRANSCODE--#</i> folder, since mpegs are likely streamed as-is by default.
 <br/><br/>
-For details see <a href="#ADDPLAYER"><code>pms.addPlayer</code></a>, and
+For details see <a href="#addPlayer"><code>pms.addPlayer</code></a>, and
 <a href="#PLAYERS">Players</a>.
 </ul>
 <br/>
@@ -182,20 +244,22 @@ The extremely basic python API is initialized on import
 <pre>import jumpy</pre>
 defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
 <br/><br/>
-<li><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addPlaylist</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addISO</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addAudiofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addImagefeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<kbd>pms.addVideofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<li><a name="addFolder"></a><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addPlaylist"></a><kbd>pms.addPlaylist</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addISO"></a><kbd>pms.addISO</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addAudiofeed"></a><kbd>pms.addAudiofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addImagefeed"></a><kbd>pms.addImagefeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addVideofeed"></a><kbd>pms.addVideofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <ul> Convenience functions for <code>pms.addItem</code> with the appropriate
 <code>type</code> built-in.</ul>
-</li><br/>
-<li><a name="ADDITEM"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>)</code></a></li>
-or<br/>
+</li>
+
+<br/>
+<li><a name="addItem"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>)</code></a>
+<br/>or<br/>
 <kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>)</code><br/><br/>
 where
 <ul>
@@ -217,9 +281,9 @@ PMS_VIDEOFEED
 </li>
 <li><code>name</code> is the item's label.
 <ul><li><a name="UNIXPATH"/>Using a unix-style path as the label (e.g. '<code>myscripts/perl/foo</code>')
-will create the specified path on the xmb, branching from the top folder if absolute or current
-folder if relative.
-</li></ul>
+will create the specified path on the xmb, branching from the current folder if relative or the xmb
+root if absolute. The <i>Jumpy</i> folder is '<code>~</code>'.</li>
+</ul>
 </li>
 <br/>
 <li><code>cmd</code> is either a command or a uri depending on the given <code>type</code>:
@@ -259,49 +323,84 @@ processing.
 </li>
 </li>
 <br/>
-<li><code>thumb</code> is a path or url to the item's thumbnail image.
+<li><a name="thumb"></a><code>thumb</code> is the item's thumbnail image, and can be either
+<ul>
+<li>a path or url to to an image file.</li>
+<li>or the name of a pre-defined <a href="#ICONS">icon</a>.</li>
+</ul>
+To control color, shading and other effects an optional <a href="#FX"><i>+fx string</i></a> can be
+appended here (see <a href="#ICONS">icons</a> for syntax examples).
 </li>
 </ul>
+</li>
 <br/>
 
-<li><kbd>pms.addAction</kbd><code>(name, cmd, thumb<i>=None</i>, playback<i>=None</i>)</code></li>
+<li><a name="addAction"><kbd>pms.addAction</kbd><code>(name, cmd, thumb<i>=None</i>, playback<i>=None</i>)</code></a>
 <ul>
-Add an mpeg video item to launch a command that ultimately generates video, where
+Add an mpeg video item to launch a command that ultimately produces video, where
 <ul>
-<li><code>name</code> is the item's label (or unix-style path), see <a href="#ADDITEM"><code>addItem</code></a>.
+<li><code>name</code> is the item's label (or unix-style path), see <a href="#addItem"><code>addItem</code></a>.
 </li>
 <li><code>cmd</code> is the command to be executed when the user clicks the item,
 and can include the <code>${filename}</code>, <code>${outfile}</code>, and <code>${home}</code>
 runtime variables.
-see <code>cmd</code> under <a href="#ADDPLAYER"><code>addPlayer</code></a>.
+see <code>cmd</code> under <a href="#addPlayer"><code>addPlayer</code></a>.
 </li>
-<li><code>thumb</code> is a path or url to the item's thumbnail image.</li>
-<li><code>playback</code> is a string to control delay and buffering, see <a href="#PLAYBACK">addPlayer</a>.</li>
+<li><code>thumb</code> is the item's thumbnail image, see <a href="#thumb"><code>thumb</code></a> under <code>addItem</code>..
+</li>
+<li><code>playback</code> is a string to control delay and buffering, see <a href="#PLAYBACK">addPlayer</a>.
+</li>
 </ul>
-the video could be generated using <a href="#VMSG"><code>pms.ok()</code></a>, <code>pms.info()</code> and so on in your script.
+the video could be generated using <a href="#vmsg"><code>pms.ok()</code></a>, <code>pms.info()</code> and so on in your script.
 </ul>
 </li>
 <br/>
 
-<li><a name="ADDMEDIA"><kbd>pms.addMedia</kbd><code>(name, format, cmd, thumb<i>=None</i>)</code></a></li>
+<li><a name="addCmd"><kbd>pms.addCmd</kbd><code>(name, cmd, ok<i>='Success'</i>, fail<i>='Failed'</i>, thumb<i>=None</i>)</code></a>
+<ul>
+Add an mpeg video item to run a command and automatically show a video message based on the
+outcome, where
+<ul>
+<li><code>ok</code> is the message to display if its exit code is 0.</li>
+<li><code>fail</code> is the message to display if its exit code is non-zero.</li>
+<li><code>name</code>, <code>cmd</code>, <code>thumb</code> - see <a href="#addAction"><code>addAction</code></a>.
+</li>
+</ul>
+</ul>
+</li>
+<br/>
+
+<li><a name="addConsoleCmd"><kbd>pms.addConsoleCmd</kbd><code>(name, cmd, thumb<i>=None</i>)</code></a>
+<ul>
+Add an mpeg video item to run a command and automatically show its console output as a
+video, where
+<ul>
+<li><code>name</code>, <code>cmd</code>, <code>thumb</code> - see <a href="#addAction"><code>addAction</code></a>.
+</li>
+</ul>
+</ul>
+</li>
+<br/>
+
+<li><a name="addMedia"><kbd>pms.addMedia</kbd><code>(name, format, cmd, thumb<i>=None</i>)</code></a>
 <ul>
 Add a generic media item containing properties set by the user which will presumably
 be handled by a corresponding user-defined player, where
 <ul>
-<li><code>name</code> is the item's label (or unix-style path), see <a href="#ADDITEM"><code>addItem</code></a>.
+<li><code>name</code> is the item's label (or unix-style path), see <a href="#addItem"><code>addItem</code></a>.
 </li>
 <li><code>format</code> is a string specifying the item's media format, followed by optional
 user-defined properties in the form:
 <ul><code>media_format<span class="orange">:</span>delay_seconds<span class="orange">:</span>buffer_mb<span class="orange">+</span>userdata</code></ul>
 where
 <ul>
-<li><code></span>delay_seconds<span class="orange">:</span>buffer_mb</code> uses the syntax of
+<li><code>delay_seconds<span class="orange">:</span>buffer_mb</code> uses the syntax of
 <code>playback</code> in <a href="#PLAYBACK"><code>addplayer</code></a>.</li>
-<li><code>userdata</code> is any string defined by you (not containing '<span class="orange">+</span>' which is reserved).</li>
+<li><code>userdata</code> is any string defined by you.</li>
 </ul>
 e.g.
 <ul><code>foo
-foo<span class="orange"<span class="orange">+</span>myFooData
+foo<span class="orange">+</span>myFooData
 foo<span class="orange">:</span>10<span class="orange">+</span>myFooData
 foo<span class="orange">:</span>-1<span class="orange">:</span>20<span class="orange">+</span>myFooData
 </code></ul>
@@ -309,15 +408,16 @@ foo<span class="orange">:</span>-1<span class="orange">:</span>20<span class="or
 <li><code>cmd</code> is the command to be executed when the user clicks the item,
 and can include the <code>${filename}</code>, <code>${outfile}</code>, <code>${format}</code>, <code>${userdata}</code>, and <code>${home}</code>
 runtime variables.
-see <code>cmd</code> under <a href="#ADDPLAYER"><code>addPlayer</code></a>.
+see <code>cmd</code> under <a href="#addPlayer"><code>addPlayer</code></a>.
 </li>
-<li><code>thumb</code> is a path or url to the item's thumbnail image.
+<li><code>thumb</code> is the item's thumbnail image, see <a href="#thumb"><code>thumb</code></a> under <code>addItem</code>..
 </li>
 </ul>
 </ul>
+</li>
 <br/>
 
-<li><kbd>pms.addPath</kbd><code>(path<i>=None</i>)</code></li>
+<li><a name="addPath"><kbd>pms.addPath</kbd><code>(path<i>=None</i>)</code></a>
 <ul>
 <li><code>path</code> is a path segment to be prefixed to the system PATH when the item is executed in the future.
 </li>
@@ -328,59 +428,87 @@ can be cleared to its initial value for the current folder using <code>pms.addPa
 <code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
 </li>
 </ul>
+</li>
 <br/>
-<li><kbd>pms.setEnv</kbd><code>(name<i>=None</i>, val<i>=None</i>)</code></li>
+<li><a name="setEnv"><kbd>pms.setEnv</kbd><code>(name<i>=None</i>, val<i>=None</i>)</code></a>
 <ul>
-Define an environment variable to be set when the current folder or its descendants are executed in the future.
-<code>pms.setEnv()</code> without args will clear the current folder's user-defined variables.
+Define an environment variable to be set when the current folder or its descendants are executed in the future. Also
+<ul>
+<li><code>pms.setEnv('<i>foo</i>')</code> with no <code>val</code> will remove the variable '<i>foo</i>'.
+</li>
+<li><code>pms.setEnv()</code> without args will clear the current user-defined variables.
+</li>
 </ul>
+</ul>
+</li>
 <br/>
-<li><kbd>pms.version</kbd><code>()</code></li>
+<li><a name="version"><kbd>pms.version</kbd><code>()</code></a>
 <ul>Get jumpy's version.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getHome</kbd><code>()</code></li>
+<li><a name="getHome"><kbd>pms.getHome</kbd><code>()</code></a>
 <ul>Get jumpy's home path.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getFolderName</kbd><code>()</code></li>
+<li><a name="getFolderName"><kbd>pms.getFolderName</kbd><code>()</code></a>
 <ul>Get the name of the current xmb folder.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getProfileDir</kbd><code>()</code></li>
+<li><a name="getXmbPath"><kbd>pms.getXmbPath</kbd><code>()</code></a>
+<ul>Get the full path of the current xmb folder.
+</ul>
+</li>
+<br/>
+<li><a name="getProfileDir"><kbd>pms.getProfileDir</kbd><code>()</code></a>
 <ul>Get the PMS profile path (where confs can be read/written).
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getLogDir</kbd><code>()</code></li>
+<li><a name="getLogDir"><kbd>pms.getLogDir</kbd><code>()</code></a>
 <ul>Get the PMS log path (where logs can be written).
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getPluginJar</kbd><code>()</code></li>
+<li><a name="getPluginJar"><kbd>pms.getPluginJar</kbd><code>()</code></a>
 <ul>Get the path to the running <i>jumpy.jar</i>.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.restart</kbd><code>()</code></li>
+<li><a name="refresh"><kbd>pms.refresh</kbd><code>(up<i>=0</i>)</code></a>
+<ul>Mark the current folder and its ancestors <i>n</i> levels <code>up</code> for refresh. Note that how
+and when the refresh actually takes effect is renderer-dependent, usually requiring re-entry into
+the folder on the xmb.
+</ul>
+</li>
+<br/>
+<li><a name="restart"><kbd>pms.restart</kbd><code>()</code></a>
 <ul>Restart PMS' http server.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.reboot</kbd><code>()</code></li>
+<li><a name="reboot"><kbd>pms.reboot</kbd><code>()</code></a>
 <ul>Restart PMS itself.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.getProperty</kbd><code>(key)</code></li>
+<li><a name="getProperty"><kbd>pms.getProperty</kbd><code>(key)</code></a>
 <ul>Get a property from <i>PMS.conf</i>.
 </ul>
+</li>
 <br/>
-<li><kbd>pms.setProperty</kbd><code>(key, val)</code></li>
+<li><a name="setProperty"><kbd>pms.setProperty</kbd><code>(key, val)</code></a>
 <ul>Set a property in <i>PMS.conf</i>.
 </ul>
+</li>
 
 <br/>
-<li><a name="ADDPLAYER"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, playback<i>=None</i>)</code></a></li>
-<br/>
+<li><a name="addPlayer"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, icon<i>=None</i>, playback<i>=None</i>)</code></a>
+<br/><br/>
 where
 <ul>
-<br/>
 <li><code>name</code> is the player's name.
 </li>
 <br/>
@@ -393,7 +521,7 @@ player, and can include these runtime variables:
 <li><code>${format}</code> which expands to the media item's format name.
 </li>
 <li><code>${userdata}</code> which expands to any userdata attached if the item was created
-using <a href="#ADDMEDIA"><code>pms.addMedia()</code></a>.
+using <a href="#addMedia"><code>pms.addMedia()</code></a>.
 </li>
 <li><code>${home}</code> which expands to the jumpy home folder.
 </li>
@@ -403,7 +531,7 @@ for example:
 </li>
 <br/>
 <li><code>supported</code> is a string specifying supported media in the same syntax used for configuring renderers
-(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L335" target="_blank"><i>PMS.conf</i></a>).
+(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L359" target="_blank"><i>PMS.conf</i></a>).
 For instance an "audio as video" player might use:
 <ul><code>"f:flac|wav m:video/mpeg"</code></ul>
 which means 'accept any <i>flac</i> or <i>wav</i> file and broadcast a <i>video/mpeg</i>
@@ -414,7 +542,7 @@ mimetype for it'. Some things to keep in mind:
 </li>
 <li>If <code>f:</code> specifies known formats, your player will override PMS' default
 player for those formats.  In this case, since the media is known and can be parsed, you can
-further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L399" target="_blank">etc</a>).
+further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L423" target="_blank">etc</a>).
 <li>If <code>f:</code> specifies unrecognised formats (real such as <code>f:txt</code> or
 imaginary such as <code>f:foo</code>), then only <code>m:</code> will be valid,
 since PMS obviously can't parse the media and presumably your player knows what to do
@@ -449,27 +577,46 @@ PMS_MISC_PLAYER
 <li><code>desc</code> is a description of the player to be included in the PMS transcode tab.
 <br/><br/>
 </li>
+<li><code>icon</code> is the default icon to use for the player's supported formats, usage is
+identical to <a href="#img"><code>img</code></a> in <code>pms.setIcon()</code>.
+<br/><br/>
+</li>
 <li><a name="PLAYBACK"></a><code>playback</code> is a string to modify the player's default playback behavior where
 <ul>
 <li>the format is <code>delay_seconds:buffer_mb</code>, e.g. <code>15:20</code> for a 15 second delay and 20mb buffer.</li>
 <li>you can omit buffer, e.g. just <code>15</code> for a 15 second delay</li>
 <li><code>-1</code> means 'default' for either variable, e.g. <code>-1:20</code> for default delay and 20mb buffer.</li>
 </ul>
-</li>
 </ul>
+</li>
+
 
 <br/>
-<li><a name="VMSG"></a><kbd>pms.info</kbd><code>(msg)</code><br/>
-<kbd>pms.ok</kbd><code>(msg)</code><br/>
-<kbd>pms.warn</kbd><code>(msg)</code><br/>
-<kbd>pms.err</kbd><code>(msg)</code><br/>
-<ul>output a 10 second dvd-ntsc video showing <code>msg</code> printed under the relevant icon.
-These are convenience functions for <code>pms.vmsg()</code> and will automatically output
-to the current <code>${outfile}</code>.</ul>
+<li><a name="setIcon"></a><kbd>pms.setIcon</kbd><code>(fmt, img)</code><br/>
+<ul>
+Set the default xmb icon for the given format(s), where
+<ul>
+<li><code>fmt</code> is one or more formats separated by '<code>|</code>', e.g. '<code>foo|bar</code>'</li>
+<li><a name="img"></a><code>img</code> is either a filename or <a href="#ICONS">named icon</a>
+and can be appended with an optional <i><a href="#FX">+fx string</a></i>.</li>
+</ul>
+</ul>
 </li>
 
 <br/>
-<li><kbd>pms.vmsg</kbd><code>(
+<li><a name="info"></a><kbd>pms.info</kbd><code>(msg, seconds<i>=7</i>)</code><br/>
+<a name="ok"></a><kbd>pms.ok</kbd><code>(msg, seconds<i>=7</i>)</code><br/>
+<a name="warn"></a><kbd>pms.warn</kbd><code>(msg, seconds<i>=7</i>)</code><br/>
+<a name="err"></a><kbd>pms.err</kbd><code>(msg, seconds<i>=7</i>)</code><br/>
+<ul>Output a dvd-ntsc video showing <code>msg</code> printed under the relevant icon for
+the specified number of <code>seconds</code>.
+These are convenience functions for <code>pms.vmsg()</code> and will automatically output
+to the current <code>${outfile}</code>.
+</ul>
+</li>
+
+<br/>
+<li><a name="vmsg"></a><kbd>pms.vmsg</kbd><code>(
 		seconds <i>= 10</i>,                    <i class="comment"># duration</i>
 		msg <i>= ""</i>,                        <i class="comment"># message string</i>
 		file <i>= None</i>,                     <i class="comment"># (or) text file</i>
@@ -483,12 +630,12 @@ to the current <code>${outfile}</code>.</ul>
 		density <i>= 75</i>,                    <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?density" target="_blank">-density</a></i>
 		gravity <i>= None</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a></i>
 		rate <i>= '1'</i>,                      <i class="comment"># input rate (images/sec)</i>
-		img <i>= None</i>,                      <i class="comment"># background image file</i>
+		img <i>= None</i>,                      <i class="comment"># background image (file or <a href="#ICONS">named icon</a>)</i>
 		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a> for img</i>
 		resize <i>= False</i>                   <i class="comment"># whether to 'best fit' img</i>
 	)</code>
 <br/>
-<ul>output a custom dvd-ntsc video showing <code>msg</code> with an optional countdown and
+<ul>Output a custom dvd-ntsc video showing <code>msg</code> with an optional countdown and
 background image. This is a <i>variadic named argument</i> function which means the
 parameters are all optional and need to be specified by name, e.g.
 <ul><code>pms.vmsg(seconds=12, msg='hello ', countdown=True)</code></ul>
@@ -497,9 +644,51 @@ or from the unix shell, for instance
 Note that <code>out</code> doesn't actually need to be specified, it will be automatically
 resolved to the current <code>${outfile}</code>.
 For details please see the script <i>jumpy/lib/vmsg.py</i>, basically a front-end
-for <a href="http://www.imagemagick.org/script/command-line-options.php?">imagemagick convert</a>.</ul>
+for <a href="http://www.imagemagick.org/script/command-line-options.php?">imagemagick convert</a>.
+</ul>
+</li>
+<!--</ul>-->
+
+<br/>
+<li><a name="imgfx"></a><kbd>pms.imgfx</kbd><code>(imgfile, fx, dir<i>=None</i>)</code><br/>
+<ul>Apply the specified effects to the given image and save it for later use as a thumbnail or icon,
+where
+<ul>
+<li>
+<code>imgfile</code> is the input image file.
+</li>
+<li>
+<a name="FX"></a><code>fx</code> is a semicolon-separated list of any of these operations:
+<ul>
+<li><code>f=<i class="comment">color</i></code> - use this <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill" target="_blank">fill</a>, where <i class="comment">color</i>
+is an imagemagick <a href="http://www.imagemagick.org/script/color.php#color_names" target="_blank">named color</a>, <code>#rrggbb</code> hex color or other supported <a href="http://www.imagemagick.org/script/color.php" target="_blank">color code</a>.
+</li>
+<li><code>r=<i class="comment">wxh</i></code> - resize to this width x height in pixels.</li>
+<li><code>t=<i class="comment">SRT</i></code> - apply these imagemagick <a href="http://www.imagemagick.org/Usage/distorts/#srt" target="_blank"><i class="comment">SRT</i></a> (scale-rotate-transform)
+operations (with underscores substituted for spaces). </li>
+<li><code>c=<i class="comment">crop</i></code> - crop to this imagemagick <a href="http://www.imagemagick.org/Usage/option_link.cgi?crop" target="_blank"><i class="comment">crop</i></a>
+<a href="http://www.imagemagick.org/script/command-line-processing.php#geometry" target="_blank">geometry</a>. </li>
+<li><code>h</code> - flip horizontal, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flop" target="_blank">flop</a>.</li>
+<li><code>v</code> - flip vertical, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flip" target="_blank">flip</a>.</li>
+<li><code>3</code> - apply a 3D effect.</li>
+<li><code>s</code> - apply a shadow effect.</li>
+<li><code>g</code> - apply a gel effect.</li>
+</ul>
+See <a href="#ICONS">icons</a> for examples of <i>fx string</i> syntax.
+</li>
+<li>
+<code>dir</code> is the directory to save the rendered image in, and defaults to the current directory
+if omitted.
 </li>
 </ul>
+<br/>
+This function doesn't normally need to be called directly and is invoked in the background whenever
+any <code>thumb</code>, <code>img</code>, or <code>icon</code> argument to the other api functions is appended with a
+<i>+fx string</i>.
+For details please see the script <i>jumpy/lib/imgfx.py</i>, another front-end
+to <a href="http://www.imagemagick.org/script/command-line-options.php?">imagemagick convert</a>.</ul>
+</ul>
+</li>
 <br/>
 
 <b><a name="OTHERSCRIPTS">Scripts In Other Languages</a></b>
@@ -538,7 +727,7 @@ For API functions that return a string, such as <code>pms.getProperty("ffmpeg.pa
 </code>
 </ul><br/>
 Keep in mind that these are system calls and you need to quote/escape your strings as appropriate.
-To avoid embedded quotes <a href="#ADDITEM"><kbd>addItem</kbd></a> also supports a special
+To avoid embedded quotes <a href="#addItem"><kbd>addItem</kbd></a> also supports a special
 <i><a href="#ARRAY">array notation syntax</a></i> to describe
 your command array as a single string when your args contain spaces, for example:
 <br/><br/>
@@ -572,14 +761,14 @@ The script is identified as a startup <code>[<span class="orange">+</span>]</cod
 cmd = "${home}/webreader/webreader.py" init
 </pre>
 which generates an initial call where the script registers itself as a player by calling
-<a href="readme.html#ADDPLAYER"><code>pms.addPlayer</code></a> to
+<a href="readme.html#addPlayer"><code>pms.addPlayer()</code></a> to
 define what formats it accepts and what command to issue for playback. For instance
 <pre>
 <i class="comment"># create the player</i>
 pms.addPlayer(
 	name <i>= 'webreader'</i>,
 	<span style="background:#eeeeec">cmd <i>= [sys.argv[0], '${filename}', '${outfile}', '${format}:${userdata}'],</i></span>
-	<span style="background:#eeeeec">supported <i>= 'f:html|htm|webpage|rdb|readability m:video/mpeg',</i></span>
+	<span style="background:#eeeeec">supported <i>= 'f:webpage|rdb|readability m:video/mpeg',</i></span>
 	mediatype <i>= PMS_VIDEO</i>,
 	purpose <i>= PMS_MISC_PLAYER</i>,
 	desc <i>= 'Browse snapshots of your webpages.'</i>,
@@ -589,11 +778,17 @@ here the playback command <code>cmd</code> is a callback to the same script with
 variables as arguments, and will produce calls such as
 <pre>webreader.py http://nytimes.com/ /tmp/ps3mediaserver/1346412874907webreader webpage:</pre>
 and <code>supported</code> declares that <code>video/mpeg</code> is the mimetype to be broadcast
-for items matching the formats <code><span class="orange">html</span>|<span class="orange">htm</span>|<span class="orange">webpage</span>|<span class="orange">rdb</span>|<span class="orange">readability</span></code>.
-Note that the last three are psuedo-formats meaningful only to the player itself, and represent
-custom items that can be added to the xmb by calls to <a href="#ADDMEDIA"><code>pms.addMedia</code></a> elsewhere
-in this or other scripts, e.g.
+for items matching the formats <code><span class="orange">webpage</span>|<span class="orange">rdb</span>|<span class="orange">readability</span></code>.
+Although <code>supported</code> can include valid formats understood by PMS too, note that these
+three happen to be psuedo-formats meaningful only to the player itself,
+and represent custom items that are added to the xmb by calls to
+<a href="#addMedia"><code>pms.addMedia()</code></a> elsewhere in this or other scripts, e.g.
 <ul><code>pms.addMedia('NYT Front Page', '<span class="orange">webpage</span>', 'http://nytimes.com/')</code></ul>
+<br/>
+Default icons for the new formats are declared next. Here two predefined
+<a href="#ICONS">icons</a> are being used, but they could be image files too:
+<ul><code>pms.setIcon('<span class="orange">webpage</span>', '#globe')
+pms.setIcon('<span class="orange">readability|rdb</span>', '#page')</code></ul>
 </ul>
 <br/>
 <b>Playback</b>
@@ -610,7 +805,7 @@ set to this filename and the more robust method is to retrieve it there directly
 </ul>
 <br/>
 Note that although the example given here is in python, players, like other scripts, can be
-written in any language using <a href="#OTHERSCRIPTS">command-line syntax</a></i>.
+written in any language using <i><a href="#OTHERSCRIPTS">command-line syntax</a></i>.
 </ul>
 <br/>
 
@@ -665,6 +860,142 @@ i.e. '<i><code><span class="orange">pl</span>.interpreter</code></i>' and then p
 </ul>
 <br/>
 
+<b><a name="ICONS">Icons</a></b>
+<ul>
+The names of the icons below (from
+<a href="http://raphaeljs.com/icons" target="_blank">raphaeljs</a>,
+<a href="http://git.gnome.org/browse/gnome-icon-theme-symbolic/tree/src/gnome-stencils.svg" target="_blank">gnome-stencils</a>,
+plus a few of my own) can be substituted for a filename anywhere a <code>thumb</code>, <code>img</code>, or <code>icon</code>
+is used in the api, e.g.
+<ul><pre>pms.addAction('greetings', 'echo Hello', '<span class="orange">#smile</span>')
+</pre></ul>
+Click on any icon to see it full size (160x160):
+<br/><br/>
+<table><tr><td>
+<table>
+<tbody>
+<tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#pointer" src="lib/resources/icon/pointer.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#checkmark" src="lib/resources/icon/checkmark.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#plus" src="lib/resources/icon/plus.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#minus" src="lib/resources/icon/minus.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#x" src="lib/resources/icon/x.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#less" src="lib/resources/icon/less.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#less-more" src="lib/resources/icon/less-more.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#more" src="lib/resources/icon/more.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#plus-square" src="lib/resources/icon/plus-square.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#minus-square" src="lib/resources/icon/minus-square.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#begining" src="lib/resources/icon/begining.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#prev" src="lib/resources/icon/prev.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#rewind" src="lib/resources/icon/rewind.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#back" src="lib/resources/icon/back.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#up" src="lib/resources/icon/up.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#down" src="lib/resources/icon/down.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#play" src="lib/resources/icon/play.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#ffwd" src="lib/resources/icon/ffwd.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#next" src="lib/resources/icon/next.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#end" src="lib/resources/icon/end.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#pause" src="lib/resources/icon/pause.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#square" src="lib/resources/icon/square.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#round" src="lib/resources/icon/round.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#eject" src="lib/resources/icon/eject.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#left-arrow" src="lib/resources/icon/left-arrow.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#up-arrow" src="lib/resources/icon/up-arrow.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#two-way" src="lib/resources/icon/two-way.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#down-arrow" src="lib/resources/icon/down-arrow.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#right-arrow" src="lib/resources/icon/right-arrow.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#refresh" src="lib/resources/icon/refresh.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#info" src="lib/resources/icon/info.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#question" src="lib/resources/icon/question.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#warning" src="lib/resources/icon/warning.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#forbid" src="lib/resources/icon/forbid.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#power" src="lib/resources/icon/power.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#plug" src="lib/resources/icon/plug.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#unlock" src="lib/resources/icon/unlock.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#lock" src="lib/resources/icon/lock.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#key" src="lib/resources/icon/key.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#paperclip" src="lib/resources/icon/paperclip.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#pencil" src="lib/resources/icon/pencil.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#bucket" src="lib/resources/icon/bucket.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#brush" src="lib/resources/icon/brush.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#magnify" src="lib/resources/icon/magnify.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#wrench" src="lib/resources/icon/wrench.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#gear" src="lib/resources/icon/gear.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#armyknife" src="lib/resources/icon/armyknife.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#clock" src="lib/resources/icon/clock.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#star" src="lib/resources/icon/star.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#trash" src="lib/resources/icon/trash.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#talk" src="lib/resources/icon/talk.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#cloud" src="lib/resources/icon/cloud.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#book" src="lib/resources/icon/book.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#page" src="lib/resources/icon/page.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#textlines" src="lib/resources/icon/textlines.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#afolder" src="lib/resources/icon/afolder.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#envelope" src="lib/resources/icon/envelope.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#calendar" src="lib/resources/icon/calendar.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#notebook" src="lib/resources/icon/notebook.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#link" src="lib/resources/icon/link.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#video" src="lib/resources/icon/video.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#music" src="lib/resources/icon/music.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#mic" src="lib/resources/icon/mic.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#disc" src="lib/resources/icon/disc.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#camera" src="lib/resources/icon/camera.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#videocam" src="lib/resources/icon/videocam.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#monitor" src="lib/resources/icon/monitor.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#console" src="lib/resources/icon/console.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#cube" src="lib/resources/icon/cube.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#box" src="lib/resources/icon/box.png" height="33" width="33"></td>
+</tr><tr>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#globe" src="lib/resources/icon/globe.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#oceans" src="lib/resources/icon/oceans.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#earth" src="lib/resources/icon/earth.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#bug" src="lib/resources/icon/bug.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#smile" src="lib/resources/icon/smile.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#frown" src="lib/resources/icon/frown.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#wink" src="lib/resources/icon/wink.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#shades" src="lib/resources/icon/shades.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#raspberry" src="lib/resources/icon/raspberry.png" height="33" width="33"></td>
+<td class="icon"><img class="thumb" onclick="preview(this)" title="#rss" src="lib/resources/icon/rss.png" height="33" width="33"></td>
+</tr>
+</tbody></table>
+</td><td style="vertical-align:middle">
+<div><table>
+<tr><td class="icon"><div id="preview" style="width:160px;height:160px"></div></td></tr>
+<tr><td><center><code id="caption" style="width:160px;height:160px"></code></center></td></tr>
+</table></div>
+</td></tr></table>
+<br/>
+You can also control the color, orientation, location, size as well as rendering effects by adding a
+<i><a href="#FX">+fx string</a></i> to the name:
+<br/><br/>
+<table>
+<tbody>
+<tr><td style="width:33%"><center><img class="thumb" onclick="preview(this)" title="#frown" src="lib/resources/icon/frown.png" height="80" width="80"></center></td>
+<td style="width:33%"><center><img class="thumb" onclick="preview(this)" title="#smile+f=gold;s" src="examples/smile+f=gold;s.png" height="80" width="80"></center></td>
+<td style="width:33%"><center><img class="thumb" onclick="preview(this)" title="#wink+t=79,79_30;c=160x160+30+30;s;3" src="examples/wink+t=79,79_30;c=160x160+30+30;s;3.png" height="80" width="80"></center></td>
+</tr>
+<tr><td><center><code>#frown</code></center></td>
+<td><center><code>#smile<span class="orange">+f=gold;s</span></code></center></td>
+<td><center><code>#wink<span class="orange">+t=79,79_30;<br/>c=160x160+30+30;s;3</span></code></center></td>
+</tr>
+</tbody></table>
+<br/>
+<i>+fx strings</i> work with regular filenames too, for instance to stream a video message with
+a custom image flipped upside down and shadow added:
+<ul><pre>
+pms.vmsg(msg='<i>Not all those who wander are lost.</i>',
+	img='<i>c:\bag-end\bilbo.png<span class="orange">+v;s</span></i>',
+	background='<i>SpringGreen</i>', imggrav='<i>west</i>')
+</pre></ul>
+</ul>
+<br/>
+
 <b><a name="JUMPSTART">Jumpstarting Scripts</a></b>
 <ul>
 <i>Jumpstart</i> is a console utility to speed up development by testing
@@ -679,58 +1010,70 @@ scripts and navigating folders outside of PMS. To see how it works first edit th
 <b><a name="EXAMPLES">Examples</a></b>
 <br/>
 <ul>
-These examples are all equivalent, somewhat contrived, don't do anything very useful and employ a lot of fake
-videos, but hopefully they get the essential points across.  To try one out in PMS save it somewhere
-and add an entry like this to <i><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></i>:
+These examples are all equivalent, somewhat contrived and don't do anything very useful,
+but hopefully they get the essential points across.  They're all included in the <i>examples</i>
+folder, and to try one out in PMS enable the corresponding section in
+<i>examples\examples.ini</i> by removing the '<span class="orange">#</span>':
 <ul>
 <pre>
-[+bat]
-cmd = c:\somewhere\helloworld.bat
+[<span class="orange">#</span>+hello.bat]
+cmd = ${home}/examples/hello.bat
 </pre>
 </ul>
 You can also try it in a console using <a href="#JUMPSTART">jumpstart</a> like so:
 <ul>
-<pre>jumpstart c:\somewhere\helloworld.bat</pre>
+<pre>jumpstart c:\path\to\hello.bat</pre>
+</ul>
+For more practical examples have a look at:
+<ul>
+<li><i>jumpy/xbmc.py</i></li>
+<li><i>jumpy/webreader/webreader.py</i></li>
+<li><i>jumpy/examples/httpserver.py</i></li>
 </ul>
 </ul>
 <br/>
 <ul>
-<li><b><a name="HELLOPY">helloworld.py</a></b></li>
+<li><b><a name="HELLOPY">hello.py</a></b></li>
 <pre>
 import sys, os, jumpy
-from datetime import datetime
 
 <i class="comment"># initial call:</i>
 if len(sys.argv) == 1:
 	<i class="comment"># add some folders</i>
 	pms.addFolder('Examples/python/Hello', [sys.argv[0], 'hello'])
-	pms.addFolder('Examples/python/Date', [sys.argv[0], 'date'])
 	pms.addFolder('Examples/python/Version', [sys.argv[0], 'jumpy version'])
-	<i class="comment"># set an environment variable and add a folder to test it</i>
-	pms.setEnv('test', 'This is a test')
+	<i class="comment"># set the environment variable $foo</i>
+	pms.setEnv('foo', 'This is a test')
+	<i class="comment"># and add an action to retrieve it later</i>
 	pms.addFolder('Examples/python/Test Env', [sys.argv[0], 'env'])
+	<i class="comment"># add an action to display the output of a command</i>
+	pms.addConsoleCmd('Examples/python/Date', 'date')
+	<i class="comment"># add an action to start a background process</i>
+	<i class="comment"># note also the custom <a href="#ICONS">icon</a> and message</i>
+	if sys.platform.startswith('win32'):
+		cmd = 'cmd /c start "jumpy async example" netstat 10'
+	else:
+		cmd = 'xterm -title "jumpy async example" -e netstat -c &'
+	pms.addCmd('Examples/python/netstat', cmd, \
+		'#two-way', 'netstat console launched on computer')
 
 <i class="comment"># callbacks:</i>
 elif sys.argv[1] == 'hello':
 	<i class="comment"># add a video item</i>
 	pms.addVideo('World', 'world.mpg')
-elif sys.argv[1] == 'date':
-	<i class="comment"># print the time and date as a video label</i>
-	pms.addVideo(str(datetime.now()), 'null.mpg')
 elif sys.argv[1] == 'jumpy version':
-	<i class="comment"># print jumpy's version as a video label</i>
-	pms.addVideo('Jumpy version %s' % pms.version(), 'null.mpg')
+	<i class="comment"># add an action specifying an api command in <a href="#ARRAY">array notation syntax</a></i>
+	<i class="comment"># to stream jumpy's version as a video message</i>
+	pms.addAction('show', ['pms', 'info', 'Jumpy version %s' % pms.version()])
 elif sys.argv[1] == 'env':
-	<i class="comment"># print the environment variable 'test' as a video label</i>
-	pms.addVideo(os.getenv('test'), 'null.mpg')
+	<i class="comment"># stream a video message showing the value of '$foo'</i>
+	pms.info("foo = '%s'" % os.getenv('foo'))
 </pre>
-<br/>
-For a more practical example have a look at <i>xbmc.py</i> in the '<i>plugins/jumpy</i>' folder.
 </ul>
 <br/><br/>
 
 <ul>
-<li><b><a name="HELLOSH">helloworld.sh</a></b></li>
+<li><b><a name="HELLOSH">hello.sh</a></b></li>
 <pre>
 <i class="comment">#!/bin/sh</i>
 
@@ -739,39 +1082,40 @@ case "$1" in
 	("")
 		<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
 		$pms addFolder Examples/sh/Hello "'$0' hello"
-		$pms addFolder Examples/sh/Date "'$0' date"
 		<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i>
 		<i class="comment"># instead of embedded quotes</i>
 		$pms addFolder Examples/sh/Version "[$0 , jumpy version]"
-		<i class="comment"># set an environment variable and add a folder to test it</i>
-		$pms setEnv test "This is a test"
-		$pms addFolder "Examples/sh/Test Env" "'$0' env"
+		<i class="comment"># set the environment variable '$foo'</i>
+		$pms setEnv foo "This is a test"
+		<i class="comment"># and add an action to retrieve it later</i>
+		$pms addAction "Examples/sh/Test Env Var" "'$0' env"
+		<i class="comment"># add an action to display the output of a command</i>
+		$pms addConsoleCmd Examples/sh/Date date
+		<i class="comment"># add an action to start a background process (note the final '&')</i>
+		<i class="comment"># note also the custom <a href="#ICONS">icon</a> and message</i>
+		$pms addCmd "Examples/sh/netstat" \
+			"xterm -title 'jumpy async example' -e netstat -c &" \
+			"#two-way" "netstat console launched on computer"
 		;;
 
 	<i class="comment"># callbacks:</i>
 	(hello)
 		<i class="comment"># add a video item</i>
 		$pms addVideo World world.mpg ;;
-	(date)
-		<i class="comment"># print the time and date as video labels</i>
-		t=$(date +'%I:%M %p')
-		d=$(date +'%a %d %b %Y')
-		$pms addVideo "$t" null.mpg
-		$pms addVideo "$d" null.mpg
-		;;
 	("jumpy version")
-		<i class="comment"># print jumpy's version as a video label</i>
-		$pms addVideo "Jumpy version $($pms version)" null.mpg ;;
+		<i class="comment"># add an action specifying an api command in <a href="#ARRAY">array notation syntax</a></i>
+		<i class="comment"># to stream jumpy's version as a video message</i>
+		$pms addAction show "[pms , info , Jumpy version $($pms version)]" ;;
 	(env)
-		<i class="comment"># print the environment variable $test as a video label</i>
-		$pms addVideo "$test" null.mpg ;;
+		<i class="comment"># stream a video message showing the value of '$foo'</i>
+		$pms info "foo = '$foo'" ;;
 esac
 </pre>
 </ul>
 <br/><br/>
 
 <ul>
-<li><b><a name="HELLOPL">helloworld.pl</a></b></li>
+<li><b><a name="HELLOPL">hello.pl</a></b></li>
 <pre>
 <i class="comment">#!/usr/bin/perl</i>
 
@@ -779,15 +1123,23 @@ our $pms = $ENV{"pms"};
 
 <i class="comment"># initial call:</i>
 if (not @ARGV) {
-	<i class="comment"># add some folders (note the embedded quotes: '$0')</i>
+	<i class="comment"># add a folder (note the embedded quotes: '$0')</i>
 	`$pms addFolder Examples/perl/Hello "'$0' hello"`;
-	`$pms addFolder Examples/perl/Date "'$0' date"`;
-	<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i></i>
+	<i class="comment"># add a folder using <a href="#ARRAY">array notation syntax</a></i>
 	<i class="comment"># instead of embedded quotes</i>
 	`$pms addFolder Examples/perl/Version "[$0 , jumpy version]"`;
-	<i class="comment"># set an environment variable and add a folder to test it</i>
-	`$pms setEnv test "This is a test"`;
-	`$pms addFolder "Examples/perl/Test Env" "'$0' env"`;
+	<i class="comment"># set the environment variable $foo</i>
+	`$pms setEnv foo "This is a test"`;
+	<i class="comment"># and add an action to retrieve it later</i>
+	`$pms addAction "Examples/perl/Test Env Var" "'$0' env"`;
+	<i class="comment"># add an action to display the output of a command</i>
+	`$pms addFolder Examples/perl/Date "'$0' date"`;
+	<i class="comment"># add an action to start a background process</i>
+	<i class="comment"># note also the custom <a href="#ICONS">icon</a> and message</i>
+	my $cmd = ($^O eq 'MSWin32' ?
+		"cmd /c start \"jumpy async example\" netstat 10" :
+		"xterm -title 'jumpy async example' -e netstat -c &");
+	`$pms addCmd "Examples/perl/netstat" "$cmd" "#two-way" "netstat console launched on computer"`
 }
 
 <i class="comment"># callbacks:</i>
@@ -795,40 +1147,44 @@ elsif ($ARGV[0] eq 'hello') {
 	<i class="comment"># add a video item</i>
 	`$pms addVideo World world.mpg`;
 }
-elsif ($ARGV[0] eq 'date') {
-	<i class="comment"># print the time and date as a video label</i>
-	my $time = localtime;
-	`$pms addVideo "$time" null.mpg`;
-}
 elsif ($ARGV[0] eq 'jumpy version') {
-	<i class="comment"># print jumpy's version as a video label</i>
+	<i class="comment"># get jumpy's version</i>
 	my $ver = `$pms version`;
-	`$pms addVideo "Jumpy version $ver" null.mpg`;
+	<i class="comment"># and add an action specifying an api command in</i>
+	<i class="comment"># <a href="#ARRAY">array notation syntax</a> to stream it as a video message</i>
+	`$pms addAction show "[pms , info , Jumpy version $ver]"`;
 }
 elsif ($ARGV[0] eq 'env') {
-	<i class="comment"># print the environment variable 'test' as a video label</i>
-	`$pms addVideo "$ENV{'test'}" null.mpg`;
+	<i class="comment"># stream a video message showing the value of '$foo'</i>
+	`$pms info "foo = '$ENV{'foo'}'"`;
 }
 </pre>
 </ul>
 <br/><br/>
 
 <ul>
-<li><b><a name="HELLOBAT">helloworld.bat</a></b></li>
+<li><b><a name="HELLOBAT">hello.bat</a></b></li>
 <pre>
 @echo off
 setlocal ENABLEDELAYEDEXPANSION
 
 <i class="comment">:: initial call:</i>
 if "%~1" == "" (
-	<i class="comment">:: add some folders (note the embedded quotes: ""%~0"")</i>
+	<i class="comment">:: add a folder (note the embedded quotes: ""%~0"")</i>
 	%pms% addFolder Examples/bat/Hello """%~0"" hello"
-	%pms% addFolder Examples/bat/Date """%~0"" date"
 	<i class="comment">:: add a folder using <a href="#ARRAY">array notation syntax</a> instead of embedded quotes</i>
 	%pms% addFolder Examples/bat/Version "[%~0 , jumpy version]"
-	<i class="comment">:: set an environment variable and add a folder to test it</i>
-	%pms% setEnv test "This is a test"
-	%pms% addFolder "Examples/bat/Test Env" """%~0"" env"
+	<i class="comment">:: set the environment variable 'foo'</i>
+	%pms% setEnv foo "This is a test"
+	<i class="comment">:: and add an action to retrieve it later</i>
+	%pms% addAction "Examples/bat/Test Env Var" """%~0"" env"
+	<i class="comment">:: add an action to display the output of a command</i>
+	%pms% addConsoleCmd "Examples/bat/Date" "date"
+	<i class="comment">:: add an action to start a background process</i>
+	<i class="comment">:: note also the custom <a href="#ICONS">icon</a> and message</i>
+	%pms% addCmd "Examples/bat/netstat" ^
+		"cmd /c start ""jumpy async example"" netstat 10" ^
+		"#two-way" "netstat console launched on computer"
 	exit
 )
 
@@ -837,21 +1193,16 @@ if "%~1" == "hello" (
 	<i class="comment">:: add a video item</i>
 	%pms% addVideo World world.mpg
 
-) else if "%~1" == "date" (
-	<i class="comment">:: print the time and date as video labels</i>
-	for /f "delims=" %%i in ('time /t') do set t=%%i
-	for /f "delims=" %%i in ('date /t') do set d=%%i
-	%pms% addVideo "!t!" null.mpg
-	%pms% addVideo "!d!" null.mpg
-
 ) else if "%~1" == "jumpy version" (
-	<i class="comment">:: print jumpy's version as a video label.</i>
+	<i class="comment">:: get jumpy's version</i>
 	for /f "delims=" %%i in ('%pms% version') do set ver=%%i
-	%pms% addVideo "Jumpy version !ver!" null.mpg
+	<i class="comment">:: and add an action specifying an api command in</i>
+	<i class="comment">:: <a href="#ARRAY">array notation syntax</a> to stream it as a video message</i>
+	%pms% addAction show "[pms , info , Jumpy version !ver!]"
 
 ) else if "%~1" == "env" (
-	<i class="comment">:: print the environment variable 'test' as a video label</i>
-	%pms% addVideo "%test%" null.mpg
+	<i class="comment">:: stream a video message showing the value of 'foo'</i>
+	%pms% info "foo = '%foo%'"
 )
 </pre>
 </ul>

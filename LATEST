@@ -1,4 +1,4 @@
-version=0.2.4
-win32=http://cloud.github.com/downloads/skeptical/jumpy/jumpy-0.2.4.exe
-linux=http://cloud.github.com/downloads/skeptical/jumpy/jumpy-0.2.4.run
-osx=http://cloud.github.com/downloads/skeptical/jumpy/jumpy-0.2.4.run
+version=0.2.5
+win32=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.5.exe
+linux=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.5.run
+osx=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.5.run

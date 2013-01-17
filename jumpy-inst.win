@@ -1,2 +1,2 @@
-http://cloud.github.com/downloads/skeptical/jumpy/jumpy-0.2.4.exe,plugins
-exec,plugins/jumpy-0.2.4.exe
+http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.5.exe,plugins
+exec,plugins/jumpy-0.2.5.exe
