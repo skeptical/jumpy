@@ -23,8 +23,13 @@ public class runner {
 	public String output = null;
 	public static ArrayList<runner> active = new ArrayList<runner>();
 	public String name;
+	public int mode = 1;
 
 	public runner() {
+	}
+
+	public runner(int mode) {
+		this.mode = mode;
 	}
 
 	public runner(command cmd) {
@@ -67,18 +72,19 @@ public class runner {
 
 	private int run(jumpyAPI obj) {
 
-		if (name == null) {
-			name = obj.getName();
-		}
-
 		if (! cmdline.startAPI(obj)) {
 			return -1;
 		}
 
 		String[] argv = cmdline.toStrings();
+		String cmdstr = Arrays.toString(argv);
+		if (name == null) {
+			name = mode == 1 ? obj.getName() : cmdstr;
+		}
+		log("running " + (cmdline.async ? "(async) " : "") + cmdstr + cmdline.envInfo());
+
 		int exitValue = 0;
 		running = true;
-		log("running " + (cmdline.async ? "(async) " : "") + Arrays.toString(argv) + cmdline.envInfo());
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder(argv);

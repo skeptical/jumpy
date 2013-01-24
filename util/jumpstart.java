@@ -244,6 +244,8 @@ class item extends node implements jumpyAPI {
 					folder = (item)folder.parent;
 				}
 				break;
+			case RUN:
+				return Integer.toString(new runner(0).run(this, arg1, syspath, env));
 			case HOME:
 			case PROFILEDIR:
 			case LOGDIR:

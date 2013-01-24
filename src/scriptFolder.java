@@ -127,11 +127,14 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	@Override
 	public Object addItem(int type, String filename, String uri, String thumbnail, String data) {
 
+		if (filename == null || uri == null) {
+			return null;
+		}
+
 		String path = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
 		String label = FilenameUtils.getName(path);
 		path = FilenameUtils.getFullPath(path);
 		DLNAResource folder = path == null ? this : utils.mkdirs(path, this);
-
 		String thumb = jumpy.getResource(thumbnail);
 
 		// see if target is a local file
@@ -282,6 +285,8 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				} catch(Exception e) {e.printStackTrace();}
 				utils.restart();
 				break;
+			case RUN:
+				return Integer.toString(new runner(0).run(this, arg1, syspath, env));
 			case FOLDERNAME:
 				return this.getName();
 			case XMBPATH:
