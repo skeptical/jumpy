@@ -152,6 +152,9 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 			put("PMS", host);
 		}};
 
+		utils.checkFFmpeg();
+		log(utils.properties.toString());
+
 		log("\n");
 		log("home=" + home, true);
 		log("log=" + jumpylog, true);

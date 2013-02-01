@@ -48,6 +48,8 @@ except NameError:
 	__builtin__.PMS_RESOURCE = 14;
 	__builtin__.PMS_REFRESH = 15;
 	__builtin__.PMS_RUN = 16;
+	__builtin__.PMS_SUBTITLE = 17;
+	__builtin__.PMS_GETVAR = 18;
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -165,6 +167,9 @@ def pms_getFolderName():
 def pms_getXmbPath():
 	return pms_util(PMS_XMBPATH)
 
+def pms_getVar(key):
+	return pms_util(PMS_GETVAR, key)
+
 def pms_getProperty(key):
 	return pms_util(PMS_GETPROPERTY, key)
 
@@ -176,6 +181,9 @@ def pms_getResource(src):
 
 def pms_setIcon(fmt, img):
 	pms_util(PMS_ICON, fmt, img)
+
+def pms_setSubtitles(path):
+	pms_util(PMS_SUBTITLE, path)
 
 def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, icon=None, playback=None):
 	if type(cmd).__name__ == 'list':
@@ -211,10 +219,12 @@ __builtin__.pms.reboot = pms_reboot
 __builtin__.pms.run = pms_run
 __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getXmbPath = pms_getXmbPath
+__builtin__.pms.getVar = pms_getVar
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
 __builtin__.pms.getResource = pms_getResource
 __builtin__.pms.setIcon = pms_setIcon
+__builtin__.pms.setSubtitles = pms_setSubtitles
 __builtin__.pms.addPlayer = pms_addPlayer
 
 lib = os.path.dirname(os.path.realpath(__file__))

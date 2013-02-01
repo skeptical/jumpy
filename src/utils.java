@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import java.util.List;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
@@ -36,6 +39,11 @@ import net.pms.util.PropertiesUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RootFolder;
 import net.pms.dlna.virtual.VirtualFolder;
+import net.pms.dlna.DLNAMediaSubtitle;
+import net.pms.formats.Format;
+import net.pms.formats.FormatFactory;
+import net.pms.formats.v2.SubtitleType;
+import net.pms.formats.WEB;
 
 public final class utils {
 
@@ -45,6 +53,7 @@ public final class utils {
 	public static DLNAResource home = null;
 	static ArrayList<RendererConfiguration> foundRenderers = null;
 	public static boolean startup = true;
+	public static HashMap<String,String> properties = new HashMap<String,String>();
 
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
 	//http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
@@ -98,6 +107,34 @@ public final class utils {
 		System.exit(0);
 	}
 
+	private static Field getField(Class c, String name) throws NoSuchFieldException {
+		Class clazz = c;
+		while (true) {
+			try {
+				Field field = clazz.getDeclaredField(name);
+				field.setAccessible(true);
+				return field;
+			} catch (NoSuchFieldException e) {
+				clazz = clazz.getSuperclass();
+				if (clazz == null) {
+					throw e;
+				}
+			}
+		}
+	}
+
+	public static void setMediaSubtitle(DLNAResource d, String path, String lang) {
+		DLNAMediaSubtitle sub = new DLNAMediaSubtitle();
+		try {
+			sub.setId(100); // fake id, not used
+			sub.setLang(lang);
+			sub.setType(SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(path)));
+			sub.setExternalFile(new File(path));
+			getField(d.getClass(), "media_subtitle").set(d, sub);
+			getField(d.getClass(), "srtFile").set(d, true);
+		} catch (Exception e) {e.printStackTrace();}
+	}
+
 	public static Method getFormatSetIconMethod() {
 		try {
 			// Format.setIcon() is only available under UMS > 2.2.5
@@ -118,6 +155,57 @@ public final class utils {
 			// shouldn't happen
 			PMS.debug(e.toString());
 			return null;
+		}
+	}
+
+	public static String run(String... cmd) {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(cmd);
+			pb.redirectErrorStream(true);
+			Process p = pb.start();
+			InputStream is = p.getInputStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line;
+			StringBuilder output = new StringBuilder();
+			while ((line = br.readLine()) != null) {
+				output.append(line).append("\n");
+			}
+			return output.toString();
+		} catch (Exception e) {e.printStackTrace();}
+		return "";
+	}
+
+	public static String getCustomProperty(String key) {
+		Object obj;
+		if ((obj = PMS.get().getConfiguration().getCustomProperty(key)) != null) {
+			// return last occurrence
+			return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
+		}
+		return "";
+	}
+
+	public static void checkFFmpeg() {
+		String ffmpeg_hdr = run(PMS.getConfiguration().getFfmpegPath());
+		if (ffmpeg_hdr.contains("--enable-librtmp")) {
+			properties.put("librtmp", "true");
+			if (FormatFactory.getAssociatedExtension("rtmp://") == null) {
+				FormatFactory.getExtensions().add(0, new WEB() {
+					@Override
+					public String[] getId() {
+						return (new String[] {"rtmp", "rtmpt", "rtmps", "rtmpe", "rtmfp", "rtmpte", "rtmpts"});
+					}
+					@Override
+					public String toString() {
+						return "RTMP";
+					}
+				});
+			}
+			if (! getCustomProperty("rtmpdump.force").equals("true")) {
+				properties.put("using_librtmp", "true");
+			}
+		}
+		if (ffmpeg_hdr.contains("--enable-libass")) {
+			properties.put("libass", "true");
 		}
 	}
 

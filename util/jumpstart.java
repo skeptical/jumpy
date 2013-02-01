@@ -252,9 +252,11 @@ class item extends node implements jumpyAPI {
 			case RESTART:
 			case REBOOT:
 			case XMBPATH: //TODO
+			case GETVAR:
 			case GETPROPERTY:
 			case SETPROPERTY:
 			case ICON:
+			case SUBTITLE:
 			default:
 				break;
 		}

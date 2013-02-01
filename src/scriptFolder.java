@@ -34,6 +34,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	public Map<String,String> env;
 	private jumpy jumpy;
 	private runner ex;
+	private DLNAResource newItem;
 
 	public boolean canBookmark = true;
 	public boolean isBookmark = false;
@@ -66,6 +67,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			this.env.putAll(env);
 		}
 		this.ex = null;
+		this.newItem = null;
 		this.refreshAlways = (jumpy.refresh == 0);
 	}
 
@@ -158,69 +160,73 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		}
 
 		String media = "unknown";
+		newItem = null;
 
 		switch (type) {
 			case FOLDER:
 				media = "folder";
-				folder.addChild(new scriptFolder(jumpy, label, uri, thumb, syspath, env));
+				newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
 				break;
 			case UNRESOLVED:
 				media = "unresolved item";
-				folder.addChild(new scriptFolder(jumpy, label, uri, thumb, syspath, env));
+				newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
 				break;
 			case ACTION:
 				data = (data == null ? "" : data);
 				media = data + " action";
-				folder.addChild(new xmbAction(label, "jump:" + data, uri, thumb, syspath, env));
+				newItem = new xmbAction(label, "jump:" + data, uri, thumb, syspath, env);
 				break;
 			case MEDIA:
 				mediaItem item = new mediaItem(label, data, uri, thumb);
 				media = item.fmt + " item";
-				folder.addChild(item);
+				newItem = item;
 				break;
 			case Format.VIDEO:
 				media = (f == null ? "web " : "") + "video";
-				folder.addChild(f == null ? new WebVideoStream(label, uri, thumb) : new RealFile(f, label));
+				newItem = (f == null ? new WebVideoStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.AUDIO:
 				media = (f == null ? "web " : "") + "audio";
-				folder.addChild(f == null ? new WebAudioStream(label, uri, thumb) : new RealFile(f, label));
+				newItem = (f == null ? new WebAudioStream(label, uri, thumb) : new RealFile(f, label));
 				break;
 			case Format.IMAGE:
 				media = (f == null ? "web " : "") + "image";
-				folder.addChild(f == null ? new FeedItem(label, uri, thumb, null, Format.IMAGE) : new RealFile(f, label));
+				newItem = (f == null ? new FeedItem(label, uri, thumb, null, Format.IMAGE) : new RealFile(f, label));
 				break;
 			case Format.PLAYLIST:
 				media = "playlist";
 				if (f != null ) {
-					folder.addChild(new PlaylistFolder(f));
+					newItem = new PlaylistFolder(f);
 				}
 				break;
 			case Format.ISO:
 				media = "iso";
 				if (f != null ) {
-					folder.addChild(new DVDISOFile(f));
+					newItem = new DVDISOFile(f);
 				}
 				break;
 			case IMAGEFEED:
 				media = "imagefeed";
-				folder.addChild(new ImagesFeed(uri));
+				newItem = new ImagesFeed(uri);
 				break;
 			case VIDEOFEED:
 				media = "videofeed";
-				folder.addChild(new VideosFeed(uri));
+				newItem = new VideosFeed(uri);
 				break;
 			case AUDIOFEED:
 				media = "audiofeed";
-				folder.addChild(new AudiosFeed(uri));
+				newItem = new AudiosFeed(uri);
 				break;
 			case Format.UNKNOWN:
 			default:
 				if (f != null ) {
-					folder.addChild(new RealFile(f, label));
+					newItem = new RealFile(f, label);
 				}
 		}
-		jumpy.log("Adding " + media +  ": " + filename + ".");
+		if (newItem != null) {
+			folder.addChild(newItem);
+			jumpy.log("Adding " + media +  ": " + filename + ".");
+		}
 		return (ex != null && ex.running) ? null : folder.getChildren().get(folder.getChildren().size()-1);
 	}
 
@@ -246,7 +252,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	@Override
 	public String util(int action, String arg1, String arg2) {
 
-		jumpy.log("util: " + apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
+		jumpy.log(apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
 		switch (action) {
 			case VERSION:
 				return jumpy.version;
@@ -291,10 +297,13 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				return this.getName();
 			case XMBPATH:
 				return ("/" + utils.getXMBPath(this, jumpy.top.getParent()) + "/" + this.name).replace("//", "/");
+			case GETVAR:
+				if (utils.properties.containsKey(arg1)) {
+					return utils.properties.get(arg1);
+				}
+				break;
 			case GETPROPERTY:
-				Object obj = PMS.get().getConfiguration().getCustomProperty(arg1);
-				// return last occurrence
-				return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
+				return utils.getCustomProperty(arg1);
 			case SETPROPERTY:
 				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
 				break;
@@ -305,6 +314,14 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				return jumpy.getResource(arg1);
 			case SETPMS:
 				command.pms = arg1;
+				break;
+			case SUBTITLE:
+				if (newItem != null) {
+					DLNAResource parent = newItem.getParent();
+					parent.getChildren().remove(newItem);
+					utils.setMediaSubtitle(newItem, arg1, null);
+					parent.addChild(newItem);
+				}
 				break;
 		}
 		return "";
