@@ -124,8 +124,8 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.exe/download" target="_blank">jumpy-0.2.5.exe</a></i> (Windows)
-or <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.run/download" target="_blank">jumpy-0.2.5.run</a></i> (Linux/OS-X)
+<li>Put <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6.exe/download" target="_blank">jumpy-0.2.6.exe</a></i> (Windows)
+or <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6.run/download" target="_blank">jumpy-0.2.6.run</a></i> (Linux/OS-X)
 in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -195,7 +195,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.5.zip/download" target="_blank">jumpy-0.2.5.zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6.zip/download" target="_blank">jumpy-0.2.6.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -342,7 +342,7 @@ your renderer may behave differently).</li>
 To add web pages edit the <code>[+webreader]</code> section of
 <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>, adding one page per line in this form:
 
-<ul><pre>data = <i>name, url, [style]</i></pre></ul>
+<ul><pre>data = <i>name, url, [style, thumb]</i></pre></ul>
 
 where
 <ul>
@@ -388,6 +388,8 @@ see <i>jumpy/webreader/readability.css</i> (and edit it too if you like).
 <li><code class="comment"><i>delay_seconds<span class="orange">:</span>buffer_mb</i></code> are <a href="scripts.html#PLAYBACK">playback</a> settings.
 </li>
 </ul>
+<li><code>thumb</code> is an image file or a pre-defined <a href="scripts.html#ICONS">icon</a>.
+</li>
 </ul>
 
 <br/>
@@ -403,10 +405,10 @@ Some examples:
 	data = My Pages/p4, http://www.foo.org/article.html, rdb<span class="orange">:</span>10<span class="orange">+</span>novel<span class="orange">:</span>large
 </pre>
 you can also include a <i>csv</i> file
-<ul><pre>data = <i>name, filename.csv, [style]</i></pre></ul>
+<ul><pre>data = <i>name, filename.csv, [style, thumb]</i></pre></ul>
 where the <i>csv</i> file looks like this:
 <pre>
-<i class="comment"># csv columns are: label, url, [style]
+<i class="comment"># csv columns are: label, url, [style, thumb]
 # default style is webpage
 # comments and blank lines are allowed</i>
 
@@ -428,12 +430,12 @@ except that the default style is <code>readability</code>.
 To add feeds edit the <code>[+feedreader]</code> section of
 <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>, adding one feed per line in this form:
 
-<ul><pre>data = <i>name, feedurl, [style]</i></pre></ul>
+<ul><pre>data = <i>name, feedurl, [style, thumb]</i></pre></ul>
 or a <i>csv</i> file containing feed urls
-<ul><pre>data = <i>name, filename.csv, [style]</i></pre></ul>
+<ul><pre>data = <i>name, filename.csv, [style, thumb]</i></pre></ul>
 where the <i>csv</i> file looks like this:
 <pre>
-<i class="comment"># csv columns are: label, url, [style]
+<i class="comment"># csv columns are: label, url, [style, thumb]
 # default style is readability
 # comments and blank lines are allowed</i>
 
