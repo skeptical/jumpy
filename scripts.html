@@ -125,6 +125,7 @@ function preview(img, bg) {
 <option>getPluginJar</option>
 <option>getProfileDir</option>
 <option>getProperty</option>
+<option>getVar</option>
 <option>getXmbPath</option>
 <option>imgfx</option>
 <option>info</option>
@@ -132,10 +133,12 @@ function preview(img, bg) {
 <option>refresh</option>
 <option>reboot</option>
 <option>restart</option>
+<option>run</option>
 <option>setEnv</option>
 <option>setIcon</option>
 <option>setPath</option>
 <option>setProperty</option>
+<option>setSubtitles</option>
 <option>version</option>
 <option>vmsg</option>
 <option>warn</option>
@@ -494,6 +497,30 @@ the folder on the xmb.
 </ul>
 </li>
 <br/>
+<li><a name="run"><kbd>pms.run</kbd><code>(cmd)</code></a>
+<ul>Run the given command and return its exit code as a string.
+<ul>
+<li>Commands with '<code>&</code>' as the last argument
+(whether in Windows or unix) are launched
+asynchronously and automatically killed if still alive at program shutdown.
+</li>
+</ul>
+</ul>
+</li>
+<br/>
+<li><a name="getVar"><kbd>pms.getVar</kbd><code>(key)</code></a>
+<ul>Get an internal property from <i>jumpy</i>, where the keys, so far, are:
+<br/>
+<ul>
+<table>
+<tr><td><code>librtmp</code></td><td>:</td><td><code>'true'</code> if ffmpeg is compiled with <i class=comment>--enable-librtmp</i>.</td></tr>
+<tr><td><code>using_librtmp</code></td><td>:</td><td><code>'true'</code> if <code>librtmp</code> is <code>'true'</code> and the <i>PMS.conf</i> setting <code>rtmpdump.force</code> is not <code>'true'</code>.</td></tr>
+<tr><td><code>libass</code></td><td>:</td><td><code>'true'</code> if ffmpeg is compiled with <i class=comment>--enable-libass</i>.</td></tr>
+</table>
+</ul>
+</ul>
+</li>
+<br/>
 <li><a name="getProperty"><kbd>pms.getProperty</kbd><code>(key)</code></a>
 <ul>Get a property from <i>PMS.conf</i>.
 </ul>
@@ -501,6 +528,12 @@ the folder on the xmb.
 <br/>
 <li><a name="setProperty"><kbd>pms.setProperty</kbd><code>(key, val)</code></a>
 <ul>Set a property in <i>PMS.conf</i>.
+</ul>
+</li>
+<br/>
+<li><a name="setSubtitles"><kbd>pms.setSubtitles</kbd><code>(path)</code></a>
+<ul>Set an external subtitles file for the last item added. This function must be called
+before adding any other items (<i>requires UMS > <i class=comment>2.3.0</i> and ffmpeg compiled with <i class=comment>--enable-libass</i></i>).
 </ul>
 </li>
 
