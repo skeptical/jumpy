@@ -1,4 +1,4 @@
 version=0.2.6
 win32=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.6.exe
-linux=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.6.run
-osx=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.6.run
+linux=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.6b.run
+osx=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.2.6b.run
