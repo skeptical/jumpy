@@ -91,7 +91,8 @@ public class command {
 //	}
 
 	public static File absolute(String file) {
-		return new File(file).getAbsoluteFile();
+		File f = new File(file);
+		return f.exists() ? f.getAbsoluteFile() : f;
 	}
 
 	public static boolean isOuterQuoted(String str)  {
