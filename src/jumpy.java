@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JComponent;
 
@@ -42,6 +43,7 @@ import net.pms.external.ExternalListener;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.io.OutputParams;
 import net.pms.io.ProcessWrapper;
+import net.pms.external.URLResolver;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -50,7 +52,7 @@ import net.pms.external.dbgpack;
 import net.pms.external.DebugPacker;
 
 
-public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
+public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URLResolver {
 
 	public static final String appName = "jumpy";
 	public static final String version = "0.2.6";
@@ -60,14 +62,14 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 	private Properties conf = null;
 	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini, host;
 	public String lasturi;
-	public boolean debug, check_update, showBookmarks, verboseBookmarks;
+	public boolean debug, check_update, showBookmarks, verboseBookmarks, resolverEnabled;
 	public int refresh;
 	private Timer timer;
 	private FileOutputStream logfile;
 	private static quickLog logger;
 	private static HashSet<String> logspam = new HashSet<String>();
 	private File[] scripts;
-	public static scriptFolder top, util;
+	public static scriptFolder top, util, resolver;
 	private bookmarker bookmarks;
 	private userscripts userscripts;
 	public List<player> players;
@@ -320,6 +322,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
 		verboseBookmarks = Boolean.valueOf(conf.getProperty("verbose_bookmarks", "true"));
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
+		resolverEnabled = Boolean.valueOf(conf.getProperty("url_resolver", "true"));
 	}
 
 	public boolean writeconf() {
@@ -328,6 +331,9 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
 		conf.setProperty("refresh", String.valueOf(refresh));
+		if (jumpy.host.equals("UMS")) {
+			conf.setProperty("url_resolver", String.valueOf(resolverEnabled));
+		}
 		try {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);
 			conf.store(conf_file, null);
@@ -423,6 +429,50 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker {
 		return new String[] {jumpylog, jumpyconf, scriptsini};
 	}
 
+	public interface urlResolver {
+		public String resolve(String url);
+	}
+
+	public static urlResolver urlresolver = null;
+
+	public void startresolver() {
+		if (resolver == null) {
+			final CountDownLatch ready = new CountDownLatch(1);
+			resolver = new scriptFolder(this, "Resolver", null, null) {
+				@Override
+				public void register(Object obj) {
+					if (obj == null) {
+						try {
+							ready.await();
+						} catch (Exception e) {e.printStackTrace();}
+					} else {
+						jumpy.log("registering " + obj.getClass().getName(), true);
+						jumpy.urlresolver = (urlResolver)obj;
+						ready.countDown();
+					}
+				}
+			};
+			command cmd = new command();
+			cmd.init("[" + home + "lib" + File.separatorChar + "xbmc-resolver.py , &]",
+				resolver.syspath, resolver.env);
+			cmd.has_callback = true;
+			runner r = new runner();
+			r.run(resolver, cmd);
+		}
+	}
+
+	@Override
+	public URLResult urlResolve(String url) {
+		if (! resolverEnabled) {
+			return null;
+		}
+		if (resolver == null) {
+			startresolver();
+		}
+		URLResult res = new URLResult();
+		res.url = urlresolver.resolve(url);
+		return res.url == null ? null : res;
+	}
 }
 
 class quickLog extends PrintStream {

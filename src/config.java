@@ -63,6 +63,8 @@ public class config {
 				checkLatest();
 			} else if (opt.equals("debug")) {
 				jumpy.debug = (state == ItemEvent.DESELECTED ? false : true);
+			} else if (opt.equals("url_resolver")) {
+				jumpy.resolverEnabled = (state == ItemEvent.DESELECTED ? false : true);
 			}
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -185,6 +187,10 @@ public class config {
 		panel.add(checkbox("Check for updates", jumpy.check_update, "check_update"), c);
 		c.gridx = 0; c.gridy++;
 		panel.add(checkbox("Print log messages to console", jumpy.debug, "debug"), c);
+		if (jumpy.host.equals("UMS")) {
+			c.gridx = 0; c.gridy++;
+			panel.add(checkbox("Resolve urls for UMS", jumpy.resolverEnabled, "url_resolver"), c);
+		}
 
 		JPanel p = new JPanel();
 		p.add(actionButton("Revert", "Reload settings from disk."));

@@ -14,7 +14,9 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.util.StringUtils;
 
 import java.net.InetAddress;
+
 import py4j.GatewayServer;
+import py4j.CallbackClient;
 import py4j.Py4JNetworkException;
 
 //import net.pms.PMS;
@@ -35,9 +37,11 @@ public class command {
 	public static Map basesubs = null;
 	public Map substitutions = null;
 	private GatewayServer server = null;
+	private CallbackClient client = null;
 	public int scriptarg = 0, arg0 = 0;
 	private boolean delims = false;
 	public boolean async = false;
+	public boolean has_callback = false;
 
 	public static HashMap<String,String> interpreters = new HashMap<String,String>() {{
 		put("py", "python");
@@ -213,19 +217,29 @@ public class command {
 	}
 
 	public boolean startAPI(jumpyAPI obj) {
-		for (int i=0; i<32; i++) {
+		boolean needs_client = has_callback;
+		for (int port=GatewayServer.DEFAULT_PORT; port<GatewayServer.DEFAULT_PORT+32; port++) {
 			try {
-				server = new GatewayServer(obj, GatewayServer.DEFAULT_PORT + i);
-				server.start();
-				try {
-					env.put("JGATEWAY", InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort());
-				} catch(Exception e) {
-					stopAPI();
-					e.printStackTrace();
-					System.err.println("Error: failed to start API.");
-					return false;
+				if (needs_client) {
+					client = new CallbackClient(port);
+					env.put("JCLIENT", Integer.toString(client.getPort()));
+					needs_client = false;
+				} else {
+					server = has_callback ?
+						new GatewayServer(obj, port, GatewayServer.DEFAULT_CONNECT_TIMEOUT,
+							GatewayServer.DEFAULT_READ_TIMEOUT, null, client) :
+						new GatewayServer(obj, port);
+					server.start();
+					try {
+						env.put("JGATEWAY", InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort());
+					} catch(Exception e) {
+						stopAPI();
+						e.printStackTrace();
+						System.err.println("Error: failed to start API.");
+						return false;
+					}
+					return true;
 				}
-				return true;
 			}
 			catch(Py4JNetworkException e) {
 				// socket is in use
@@ -237,6 +251,10 @@ public class command {
 	}
 
 	public void stopAPI() {
+		if (client != null) {
+			client.shutdown();
+			client = null;
+		}
 		if (server != null) {
 			server.shutdown();
 			server = null;

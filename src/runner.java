@@ -101,28 +101,39 @@ public class runner {
 
 			p = pb.start();
 
+			outputlogger logger = new outputlogger();
+
 			if (cmdline.async) {
 				active.add(this);
+				new Thread(logger, "outputlogger").start();
+				if (cmdline.has_callback) {
+					obj.register(null);
+				}
 				return 0;
 			}
 
-			String line;
-			BufferedReader br;
-			output = "";
-			br = new BufferedReader (new InputStreamReader(p.getInputStream()));
-			while ((line = br.readLine()) != null) {
-				if (cache) output += line + "\n";
-				out.println(line);
-			}
+			logger.run();
 			p.waitFor();
 			exitValue = p.exitValue();
-
-			br.close();
 			shutdown();
 		} catch(Exception e) {running = false; e.printStackTrace();}
 
 		name = null;
 		return exitValue;
+	}
+
+	class outputlogger implements Runnable {
+		public void run() {
+			String line;
+			BufferedReader br = new BufferedReader (new InputStreamReader(p.getInputStream()));
+			try {
+				while ((line = br.readLine()) != null) {
+					if (cache) output += line + "\n";
+					out.println(line);
+				}
+				br.close();
+			} catch(Exception e) {e.printStackTrace();}
+		}
 	}
 
 	public static void stop (runner r) {

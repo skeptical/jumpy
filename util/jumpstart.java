@@ -282,6 +282,8 @@ class item extends node implements jumpyAPI {
 	public int addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc, String icon, String playback) {
 		return 0;
 	}
+	@Override
+	public synchronized void register(Object obj) {}
 }
 
 

@@ -6,10 +6,10 @@ import vmsg, imgfx
 try: pms
 except NameError:
 	host, port = os.environ['JGATEWAY'].split(':')
+	hascb, cbport = (True, int(os.getenv('JCLIENT'))) if 'JCLIENT' in os.environ else (False, None)
 	client = GatewayClient(address=host, port=int(port))
-	gateway = JavaGateway(client)
+	gateway = JavaGateway(client, start_callback_server=hascb, python_proxy_port=cbport)
 	__builtin__.pms = gateway.entry_point
-#	__builtin__.pms = JavaGateway(client).entry_point
 	__builtin__.pms._addItem = pms.addItem
 	__builtin__.pms._addPath = pms.addPath
 	__builtin__.pms._setEnv = pms.setEnv
@@ -50,6 +50,7 @@ except NameError:
 	__builtin__.PMS_RUN = 16
 	__builtin__.PMS_SUBTITLE = 17
 	__builtin__.PMS_GETVAR = 18
+	__builtin__.PMS_LOG = 19
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -185,6 +186,9 @@ def pms_setIcon(fmt, img):
 def pms_setSubtitles(path):
 	pms_util(PMS_SUBTITLE, path)
 
+def pms_log(msg):
+	pms_util(PMS_LOG, msg)
+
 def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, icon=None, playback=None):
 	if type(cmd).__name__ == 'list':
 		cmd = flatten(cmd)
@@ -225,6 +229,7 @@ __builtin__.pms.setProperty = pms_setProperty
 __builtin__.pms.getResource = pms_getResource
 __builtin__.pms.setIcon = pms_setIcon
 __builtin__.pms.setSubtitles = pms_setSubtitles
+__builtin__.pms.log = pms_log
 __builtin__.pms.addPlayer = pms_addPlayer
 
 lib = os.path.dirname(os.path.realpath(__file__))
@@ -272,6 +277,7 @@ class flushed(object):
 		except UnicodeEncodeError: self.s.write(x.encode('ascii', 'ignore'))
 		self.s.flush()
 sys.stdout = flushed(sys.stdout)
+#sys.stderr = flushed(sys.stderr)
 
 __builtin__.sys = sys
 
@@ -330,5 +336,4 @@ elif __name__ == "__main__":
 		traceback.print_exc(file=sys.stderr)
 		sys.stderr.write("Error: invalid syntax.\n")
 		sys.exit(-1)
-
 

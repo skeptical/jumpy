@@ -252,7 +252,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	@Override
 	public String util(int action, String arg1, String arg2) {
 
-		jumpy.log(apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
+		if (action != LOG) {
+			jumpy.log(apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
+		}
 		switch (action) {
 			case VERSION:
 				return jumpy.version;
@@ -323,6 +325,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 					parent.addChild(newItem);
 				}
 				break;
+			case LOG:
+				jumpy.log(arg1, true);
+				break;
 		}
 		return "";
 	}
@@ -331,5 +336,8 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback) {
 		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback);
 	}
+
+	@Override
+	public synchronized void register(Object obj) {}
 }
 
