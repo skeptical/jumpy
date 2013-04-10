@@ -13,7 +13,10 @@ import org.jvnet.winp.WinProcess;
 
 public class runner {
 
-	private static boolean quiet = false;
+	public static final int QUIET = 1;
+	public static final int DEV = 2;
+	public int mode = 0;
+
 	public static PrintStream out = System.out;
 	public static String version = "";
 	public command cmdline;
@@ -23,7 +26,6 @@ public class runner {
 	public String output = null;
 	public static ArrayList<runner> active = new ArrayList<runner>();
 	public String name;
-	public int mode = 1;
 
 	public runner() {
 	}
@@ -36,16 +38,17 @@ public class runner {
 		cmdline = cmd;
 	}
 
-	public static void log(String str) {
-		if (! quiet) {
+	public void log(String str) {
+		if ((mode & QUIET) == 0) {
 			out.println(str);
 		}
 	}
 
 	public int quiet(jumpyAPI obj, String cmd, String syspath, Map<String,String> myenv) {
-		quiet = true;
+		int old = mode;
+		mode |= QUIET;
 		int r = run(obj, cmd, syspath, myenv);
-		quiet = false;
+		mode = old;
 		return r;
 	}
 
@@ -79,7 +82,7 @@ public class runner {
 		String[] argv = cmdline.toStrings();
 		String cmdstr = Arrays.toString(argv);
 		if (name == null) {
-			name = mode == 1 ? obj.getName() : cmdstr;
+			name = (mode & DEV) == 0 ? obj.getName() : cmdstr;
 		}
 		log("running " + (cmdline.async ? "(async) " : "") + cmdstr + cmdline.envInfo());
 
@@ -101,18 +104,20 @@ public class runner {
 
 			p = pb.start();
 
-			outputlogger logger = new outputlogger();
-
 			if (cmdline.async) {
 				active.add(this);
-				new Thread(logger, "outputlogger").start();
+				if ((mode & QUIET) == 0) {
+					new Thread(new outputlogger(), "outputlogger").start();
+				}
 				if (cmdline.has_callback) {
 					obj.register(null);
 				}
 				return 0;
 			}
 
-			logger.run();
+			if ((mode & QUIET) == 0) {
+				new outputlogger().run();
+			}
 			p.waitFor();
 			exitValue = p.exitValue();
 			shutdown();
@@ -131,8 +136,12 @@ public class runner {
 					if (cache) output += line + "\n";
 					out.println(line);
 				}
-				br.close();
-			} catch(Exception e) {e.printStackTrace();}
+			} catch (Exception e) {
+			} finally {
+				try {
+					br.close();
+				} catch (Exception e) {}
+			}
 		}
 	}
 
