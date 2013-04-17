@@ -5,6 +5,7 @@
 	<property name="src2" location="../src"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="../dist"/>
+	<property name="py4j.jar" value="py4j0.7-789ad9.jar"/>
 	<property environment="env"/>
 
 	<path id="lib.path.ref">
@@ -30,7 +31,7 @@
 		<jar jarfile="${jumpstart.jar}" basedir="${build}">
 		<manifest>
 			<attribute name="Main-Class" value="jumpstart" />
-			<attribute name="Class-Path" value="py4j0.7.jar ini4j-0.5.2.jar commons-exec-1.1.jar winp-1.14.jar"/>
+			<attribute name="Class-Path" value="${py4j.jar} ini4j-0.5.2.jar commons-exec-1.1.jar winp-1.14.jar"/>
 		</manifest>
 		</jar>
 		<mkdir dir="${dist}/jumpy/lib"/>

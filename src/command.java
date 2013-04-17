@@ -42,6 +42,7 @@ public class command {
 	private boolean delims = false;
 	public boolean async = false;
 	public boolean has_callback = false;
+	private static String localhost = getLocalhost();
 
 	public static HashMap<String,String> interpreters = new HashMap<String,String>() {{
 		put("py", "python");
@@ -216,6 +217,21 @@ public class command {
 		}
 	}
 
+	public static String getLocalhost() {
+		String addr = GatewayServer.DEFAULT_ADDRESS;
+		if (windows) {
+			try {
+				// py4j python side connects to localhost in later versions
+				// but only to host ip in v0.7 (release)
+				if (new File(py4j.GatewayServer.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName()
+						.equals("py4j0.7.jar")) {
+					addr = InetAddress.getLocalHost().getHostAddress();
+				}
+			} catch (Exception e) {}
+		}
+		return addr;
+	}
+
 	public boolean startAPI(jumpyAPI obj) {
 		boolean needs_client = has_callback;
 		for (int port=GatewayServer.DEFAULT_PORT; port<GatewayServer.DEFAULT_PORT+32; port++) {
@@ -230,14 +246,7 @@ public class command {
 							GatewayServer.DEFAULT_READ_TIMEOUT, null, client) :
 						new GatewayServer(obj, port);
 					server.start();
-					try {
-						env.put("JGATEWAY", InetAddress.getLocalHost().getHostAddress() + ":" + server.getListeningPort());
-					} catch(Exception e) {
-						stopAPI();
-						e.printStackTrace();
-						System.err.println("Error: failed to start API.");
-						return false;
-					}
+					env.put("JGATEWAY", localhost + ":" + server.getListeningPort());
 					return true;
 				}
 			}

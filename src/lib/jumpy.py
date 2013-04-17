@@ -1,5 +1,12 @@
-import os, os.path, sys, imp, traceback
-import __builtin__
+import sys, os, inspect
+
+# ensure that packages installed here (jumpy/lib) have precedence
+here = os.path.dirname(inspect.getfile(inspect.currentframe()))
+if here in sys.path:
+	sys.path.remove(here)
+sys.path.insert(1, here)
+
+import imp, traceback, __builtin__
 from py4j.java_gateway import GatewayClient, JavaGateway
 import vmsg, imgfx
 
