@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JComponent;
 
@@ -62,14 +61,14 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	private Properties conf = null;
 	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini, host;
 	public String lasturi;
-	public boolean debug, check_update, showBookmarks, verboseBookmarks, resolverEnabled;
+	public boolean debug, check_update, showBookmarks, verboseBookmarks;
 	public int refresh;
 	private Timer timer;
 	private FileOutputStream logfile;
 	private static quickLog logger;
 	private static HashSet<String> logspam = new HashSet<String>();
 	private File[] scripts;
-	public static scriptFolder top, util, resolver;
+	public static scriptFolder top, util;
 	private bookmarker bookmarks;
 	private userscripts userscripts;
 	public List<player> players;
@@ -88,6 +87,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		config.init(this);
 		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
 		scriptsini = configuration.getProfileDirectory() + File.separator + appName + "-scripts.ini";
+		resolver.jumpy = this;
 
 		try {
 			jumpylog = new File(LoggingConfigFileLoader.getLogFilePaths().get("debug.log"))
@@ -183,6 +183,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		}
 		top.env.clear();
 		log("\n");
+
+		resolver.verify();
 
 		scripts = new File(home).listFiles(
 			new FilenameFilter() {
@@ -322,7 +324,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		showBookmarks = Boolean.valueOf(conf.getProperty("bookmarks", "true"));
 		verboseBookmarks = Boolean.valueOf(conf.getProperty("verbose_bookmarks", "true"));
 		refresh = Integer.valueOf(conf.getProperty("refresh", "60"));
-		resolverEnabled = Boolean.valueOf(conf.getProperty("url_resolver", "true"));
+		resolver.enabled = Boolean.valueOf(conf.getProperty("url_resolver", "true"));
+		resolver.playback = Boolean.valueOf(conf.getProperty("resolve_at_playback", "true"));
 	}
 
 	public boolean writeconf() {
@@ -331,8 +334,11 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		conf.setProperty("bookmarks", String.valueOf(showBookmarks));
 		conf.setProperty("verbose_bookmarks", String.valueOf(verboseBookmarks));
 		conf.setProperty("refresh", String.valueOf(refresh));
-		if (jumpy.host.equals("UMS")) {
-			conf.setProperty("url_resolver", String.valueOf(resolverEnabled));
+//		if (jumpy.host.equals("UMS")) {
+			conf.setProperty("url_resolver", String.valueOf(resolver.enabled));
+//		}
+		if (! resolver.playback) {
+			conf.setProperty("resolve_at_playback", String.valueOf(resolver.playback));
 		}
 		try {
 			FileOutputStream conf_file = new FileOutputStream(jumpyconf);
@@ -429,49 +435,15 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		return new String[] {jumpylog, jumpyconf, scriptsini};
 	}
 
-	public interface urlResolver {
-		public String resolve(String url);
-	}
-
-	public static urlResolver urlresolver = null;
-
-	public void startresolver() {
-		if (resolver == null) {
-			final CountDownLatch ready = new CountDownLatch(1);
-			resolver = new scriptFolder(this, "Resolver", null, null) {
-				@Override
-				public void register(Object obj) {
-					if (obj == null) {
-						try {
-							ready.await();
-						} catch (Exception e) {e.printStackTrace();}
-					} else {
-						jumpy.log("registering " + obj.getClass().getName(), true);
-						jumpy.urlresolver = (urlResolver)obj;
-						ready.countDown();
-					}
-				}
-			};
-			command cmd = new command();
-			cmd.init("[" + home + "lib" + File.separatorChar + "xbmc-resolver.py , &]",
-				resolver.syspath, resolver.env);
-			cmd.has_callback = true;
-			runner r = new runner();
-			r.run(resolver, cmd);
-		}
-	}
-
 	@Override
 	public URLResult urlResolve(String url) {
-		if (! resolverEnabled) {
-			return null;
+		if (resolver.enabled) {
+			URLResult res = new URLResult();
+			if((res.url = resolver.resolve(url)) != null) {
+				return res;
+			}
 		}
-		if (resolver == null) {
-			startresolver();
-		}
-		URLResult res = new URLResult();
-		res.url = urlresolver.resolve(url);
-		return res.url == null ? null : res;
+		return null;
 	}
 }
 

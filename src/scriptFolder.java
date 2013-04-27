@@ -18,7 +18,6 @@ import net.pms.dlna.DLNAResource;
 import net.pms.dlna.VideosFeed;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.ImagesFeed;
-import net.pms.formats.Format;
 import net.pms.dlna.RealFile;
 import net.pms.dlna.FeedItem;
 import net.pms.dlna.WebVideoStream;
@@ -141,7 +140,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 
 		// see if target is a local file
 		File f = null;
-		if (type > FOLDER) {
+		if (type < FOLDER) {
 			f = new File(uri.startsWith("file://") ? uri.substring(7) : uri);
 			if (! f.exists()) {
 				f = null;
@@ -159,6 +158,12 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			}
 		}
 
+		int utype = 0;
+		if ((type & UNRESOLVED) == UNRESOLVED) {
+			utype = type ^ UNRESOLVED;
+			type = UNRESOLVED;
+		}
+
 		String media = "unknown";
 		newItem = null;
 
@@ -168,8 +173,12 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
 				break;
 			case UNRESOLVED:
-				media = "unresolved item";
-				newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
+				media = "unresolved." + utype + " item";
+				if (resolver.playback) {
+					newItem = new resolver(jumpy, utype, label, uri, thumb, syspath, env);
+				} else {
+					newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
+				}
 				break;
 			case ACTION:
 				data = (data == null ? "" : data);

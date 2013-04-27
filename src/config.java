@@ -64,7 +64,7 @@ public class config {
 			} else if (opt.equals("debug")) {
 				jumpy.debug = (state == ItemEvent.DESELECTED ? false : true);
 			} else if (opt.equals("url_resolver")) {
-				jumpy.resolverEnabled = (state == ItemEvent.DESELECTED ? false : true);
+				resolver.enabled = (state == ItemEvent.DESELECTED ? false : true);
 			}
 		}
 		public void actionPerformed(ActionEvent e) {
@@ -187,10 +187,15 @@ public class config {
 		panel.add(checkbox("Check for updates", jumpy.check_update, "check_update"), c);
 		c.gridx = 0; c.gridy++;
 		panel.add(checkbox("Print log messages to console", jumpy.debug, "debug"), c);
-		if (jumpy.host.equals("UMS")) {
+//		if (jumpy.host.equals("UMS")) {
 			c.gridx = 0; c.gridy++;
-			panel.add(checkbox("Resolve urls for UMS", jumpy.resolverEnabled, "url_resolver"), c);
-		}
+			boolean have_scrapers = resolver.scrapers != 0;
+			JCheckBox resolverBox = checkbox("Act as a url resolver", have_scrapers && resolver.enabled,
+				have_scrapers ? "url_resolver" :
+				"<html>Requires installing the xbmc urlresolver addon<br>or youtube-dl- see docs</html>");
+			panel.add(resolverBox, c);
+			resolverBox.setEnabled(have_scrapers);
+//		}
 
 		JPanel p = new JPanel();
 		p.add(actionButton("Revert", "Reload settings from disk."));

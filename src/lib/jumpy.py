@@ -21,11 +21,6 @@ except NameError:
 	__builtin__.pms._addPath = pms.addPath
 	__builtin__.pms._setEnv = pms.setEnv
 	__builtin__.pms._addPlayer = pms.addPlayer
-	# new constants:
-	__builtin__.PMS_UNRESOLVED = -64
-	__builtin__.PMS_FOLDER = -32
-	__builtin__.PMS_ACTION = -2
-	__builtin__.PMS_MEDIA = -1
 	# constants from net.pms.formats.Format:
 	__builtin__.PMS_AUDIO = 1
 	__builtin__.PMS_IMAGE = 2
@@ -34,7 +29,12 @@ except NameError:
 	__builtin__.PMS_PLAYLIST = 16
 	__builtin__.PMS_ISO = 32
 	__builtin__.PMS_CUSTOM = 64
-	# new constants (net.pms.formats.Format|FEED) where FEED=4096
+	# new constants:
+	__builtin__.PMS_MEDIA = 1025
+	__builtin__.PMS_FOLDER = 1026
+	__builtin__.PMS_ACTION = 1028
+	__builtin__.PMS_UNRESOLVED = 2048
+	__builtin__.PMS_FEED = 4096
 	__builtin__.PMS_AUDIOFEED = 4097
 	__builtin__.PMS_IMAGEFEED = 4098
 	__builtin__.PMS_VIDEOFEED = 4100
@@ -116,6 +116,9 @@ def pms_addConsoleCmd(name, cmd, thumb=None):
 
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, format)
+
+def pms_addUnresolved(name, cmd, thumb=None, type=PMS_VIDEO):
+	pms_addItem(type|PMS_UNRESOLVED, name, cmd, thumb, None)
 
 def pms_submit(name, uri, thumb=None):
 	pms_addItem(PMS_MEDIA, name, uri, thumb, None)
@@ -214,6 +217,7 @@ __builtin__.pms.addAction = pms_addAction
 __builtin__.pms.addCmd = pms_addCmd
 __builtin__.pms.addConsoleCmd = pms_addConsoleCmd
 __builtin__.pms.addMedia = pms_addMedia
+__builtin__.pms.addUnresolved = pms_addUnresolved
 __builtin__.pms.submit = pms_submit
 __builtin__.pms.addItem = pms_addItem
 __builtin__.pms.addPath = pms_addPath

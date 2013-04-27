@@ -85,16 +85,16 @@ public class jumpstart {
 					item x = (item)current.get(i);
 					String type = "";
 					switch (x.type) {
-						case  -64: type = " (UNRESOLVED)"; break;
-						case    0:
-						case  -32: type = ""; break;
-						case   -2: type = " (ACTION)"; break;
-						case   -1: type = " (MEDIA)"; break;
 						case    1: type = " (AUDIO)"; break;
 						case    2: type = " (IMAGE)"; break;
 						case    4: type = " (VIDEO)"; break;
 						case   16: type = " (PLAYLIST)"; break;
 						case   32: type = " (ISO)"; break;
+						case 1025: type = " (MEDIA)"; break;
+						case    0:
+						case 1026: type = ""; break; // FOLDER
+						case 1028: type = " (ACTION)"; break;
+						case 2048: type = " (UNRESOLVED)"; break;
 						case 4096: type = " (FEED)"; break;
 						case 4097: type = " (AUDIOFEED)"; break;
 						case 4098: type = " (IMAGEFEED)"; break;
@@ -134,7 +134,7 @@ public class jumpstart {
 				current = (item)current.get(s);
 				c.printf("--------------------------------\ntype : %d\nname : %s\nuri  : %s\nthumb: %s\n--------------------------------\n",
 					current.type, current.name, current.uri, current.thumb);
-				if (current.type > 0) break;
+				if (current.type < 1024 || current.type > 4095) break;
 			} catch (Exception e) {
 				System.err.printf("Invalid selection: %s\n", sel);
 				break;
