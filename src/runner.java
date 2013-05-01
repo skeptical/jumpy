@@ -23,7 +23,7 @@ public class runner {
 	private Process p = null;
 	public boolean running = false;
 	public boolean cache = false;
-	public String output = null;
+	public String output;
 	public static ArrayList<runner> active = new ArrayList<runner>();
 	public String name;
 
@@ -131,6 +131,7 @@ public class runner {
 		public void run() {
 			String line;
 			BufferedReader br = new BufferedReader (new InputStreamReader(p.getInputStream()));
+			output = "";
 			try {
 				while ((line = br.readLine()) != null) {
 					if (cache) output += line + "\n";
