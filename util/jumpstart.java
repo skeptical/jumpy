@@ -21,7 +21,7 @@ public class jumpstart {
 
 		runner ex = new runner(new command());
 
-		runner.version = "0.2.1";
+		runner.version = "0.2.2";
 		System.out.println("jumpstart " + runner.version);
 
 		Console c = System.console();
