@@ -96,6 +96,7 @@ function preview(img, bg) {
 <li><a href="readme.html#SCRIPTSINI">jumpy-scripts.ini</a></li>
 <li><a href="readme.html#WEBREADER">Webreader</a></li>
 <li><a href="readme.html#FEEDREADER">Feedreader</a></li>
+<li><a href="readme.html#RESOLVER">Resolver</a></li>
 <br/>
 <center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
 <li><a href="#QUICKSTART">Quick Start</a></li>
@@ -116,6 +117,7 @@ function preview(img, bg) {
 <option>addPath</option>
 <option>addPlayer</option>
 <option>addPlaylist</option>
+<option>addUnresolved</option>
 <option>addVideo</option>
 <option>addVideofeed</option>
 <option>err</option>
@@ -129,6 +131,7 @@ function preview(img, bg) {
 <option>getXmbPath</option>
 <option>imgfx</option>
 <option>info</option>
+<option>log</option>
 <option>ok</option>
 <option>refresh</option>
 <option>reboot</option>
@@ -157,9 +160,9 @@ function preview(img, bg) {
 <!--</ul>-->
 <!--<center>LINKS</center><br/>-->
 <br/>
-<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/" target="_blank">Download</a></li>
-<li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288" target="_blank">Forum</a></li>
-<li><a href="https://github.com/skeptical/jumpy" target="_blank">Code</a></li>
+<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/">Download</a></li>
+<li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288">Forum</a></li>
+<li><a href="https://github.com/skeptical/jumpy">Code</a></li>
 </ul>
 </div>
 
@@ -268,15 +271,13 @@ where
 <ul>
 <li><code>type</code> is one of these constants:
 <pre>
-<i class="comment"># media items           # folder items</i>
+<i class="comment"># media items           # dynamic items</i>
 PMS_AUDIO               PMS_FOLDER
-PMS_IMAGE               PMS_UNRESOLVED
+PMS_IMAGE               PMS_ACTION
 PMS_VIDEO
-PMS_ACTION
-PMS_MEDIA
-PMS_UNKNOWN
-PMS_PLAYLIST
-PMS_ISO
+PMS_UNKNOWN             <i class="comment"># hybrid items</i>
+PMS_PLAYLIST            PMS_MEDIA
+PMS_ISO                 PMS_UNRESOLVED
 PMS_AUDIOFEED
 PMS_IMAGEFEED
 PMS_VIDEOFEED
@@ -292,7 +293,7 @@ root if absolute. The <i>Jumpy</i> folder is '<code>~</code>'.</li>
 <li><code>cmd</code> is either a command or a uri depending on the given <code>type</code>:
 <ul>
 <br/>
-<li>For <b>folder items</b> <code>cmd</code> is the command
+<li>For <b>dynamic items</b> <code>cmd</code> is the command
 to be executed in the future when the user opens the folder on the xmb. It can be either:
 <ol type=A>
 <li>a typical command string to be parsed according to the usual system rules.
@@ -322,6 +323,9 @@ system calls to the API.
 processing.
 </li>
 <br/>
+<li>For <b>hybrid items</b> <code>cmd</code> can be either a path/url or a command, depending on how you use it.
+</li>
+<br/>
 <li>as a command it can include the runtime variable <code>${home}</code> which expands to the jumpy home folder.</ul>
 </li>
 </li>
@@ -334,6 +338,29 @@ processing.
 To control color, shading and other effects an optional <a href="#FX"><i>+fx string</i></a> can be
 appended here (see <a href="#ICONS">icons</a> for syntax examples).
 </li>
+</ul>
+</li>
+<br/>
+
+<li><a name="addUnresolved"><kbd>pms.addUnresolved</kbd><code>(name, cmd, thumb<i>=None</i>, type<i>=PMS_VIDEO</i>)</code></a>
+<ul>
+Add an incomplete media item whose final uri/url will be resolved at playback, where
+<ul>
+<li><code>cmd</code> is either:
+<ul>
+<li>a command array (a python list, or a string in <a href="#ARRAY">array notation syntax</a>) that when executed will deliver the final url either via
+the API (<code>addVideo</code>, <code>addAudio</code> etc)
+or by printing it to stdout.
+</li>
+<li>a url resolvable by the built-in resolver support (e.g. via <i>xbmc</i> or <i>youtube-dl</i> if installed).
+</li>
+</ul>
+</li>
+<li><code>type</code> is the item's expected media type - see <a href="#addItem"><code>addItem</code></a>.
+</li>
+<li><code>name</code>, <code>thumb</code> - see <a href="#addItem"><code>addItem</code></a>.
+</li>
+</ul>
 </ul>
 </li>
 <br/>
@@ -427,7 +454,7 @@ see <code>cmd</code> under <a href="#addPlayer"><code>addPlayer</code></a>.
 <li>You typically set this once at the beginning, after which any descendants will inherit it. Its value builds incrementally, and
 can be cleared to its initial value for the current folder using <code>pms.addPath()</code> with path omitted.
 </li>
-<li>For python scripts <code>path</code> will also be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables" target="_blank"><code>PYTHONPATH</code></a>.
+<li>For python scripts <code>path</code> will also be appended to <a href="http://docs.python.org/using/cmdline.html#environment-variables"><code>PYTHONPATH</code></a>.
 <code>PYTHONPATH</code> tells python where to import any uninstalled modules you may be using.
 </li>
 </ul>
@@ -564,7 +591,7 @@ for example:
 </li>
 <br/>
 <li><code>supported</code> is a string specifying supported media in the same syntax used for configuring renderers
-(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L359" target="_blank"><i>PMS.conf</i></a>).
+(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L358"><i>PMS.conf</i></a>).
 For instance an "audio as video" player might use:
 <ul><code>"f:flac|wav m:video/mpeg"</code></ul>
 which means 'accept any <i>flac</i> or <i>wav</i> file and broadcast a <i>video/mpeg</i>
@@ -575,7 +602,7 @@ mimetype for it'. Some things to keep in mind:
 </li>
 <li>If <code>f:</code> specifies known formats, your player will override PMS' default
 player for those formats.  In this case, since the media is known and can be parsed, you can
-further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L423" target="_blank">etc</a>).
+further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L423">etc</a>).
 <li>If <code>f:</code> specifies unrecognised formats (real such as <code>f:txt</code> or
 imaginary such as <code>f:foo</code>), then only <code>m:</code> will be valid,
 since PMS obviously can't parse the media and presumably your player knows what to do
@@ -649,22 +676,28 @@ to the current <code>${outfile}</code>.
 </li>
 
 <br/>
+<li><a name="log"></a><kbd>pms.log</kbd><code>(msg)</code><br/>
+<ul>Write <code>msg</code> to <i>jumpy.log</i>, <i>debug.log</i> and the gui log tab.
+</ul>
+</li>
+
+<br/>
 <li><a name="vmsg"></a><kbd>pms.vmsg</kbd><code>(
 		seconds <i>= 10</i>,                    <i class="comment"># duration</i>
 		msg <i>= ""</i>,                        <i class="comment"># message string</i>
 		file <i>= None</i>,                     <i class="comment"># (or) text file</i>
 		out <i>= </i><i class="comment">(automatic)</i>,               <i class="comment"># output file</i>
 		countdown <i>= False</i>,               <i class="comment"># whether to show a mm:ss countdown</i>
-		<i class="comment">                                 # ** see <a href="http://www.imagemagick.org/Usage/text/" target="_blank">imagemagick text docs</a></i>
-		fill <i>= 'white'</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill" target="_blank">-fill</a></i>
-		background <i>= 'black'</i>,            <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?background" target="_blank">-background</a></i>
-		pointsize <i>= 20</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?pointsize" target="_blank">-pointsize</a></i>
-		font <i>= "DejaVu-Sans-Mono-Book"</i>,  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?font" target="_blank">-font</a></i>
-		density <i>= 75</i>,                    <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?density" target="_blank">-density</a></i>
-		gravity <i>= None</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a></i>
+		<i class="comment">                                 # ** see <a href="http://www.imagemagick.org/Usage/text/">imagemagick text docs</a></i>
+		fill <i>= 'white'</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill">-fill</a></i>
+		background <i>= 'black'</i>,            <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?background">-background</a></i>
+		pointsize <i>= 20</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?pointsize">-pointsize</a></i>
+		font <i>= "DejaVu-Sans-Mono-Book"</i>,  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?font">-font</a></i>
+		density <i>= 75</i>,                    <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?density">-density</a></i>
+		gravity <i>= None</i>,                  <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity">-gravity</a></i>
 		rate <i>= '1'</i>,                      <i class="comment"># input rate (images/sec)</i>
 		img <i>= None</i>,                      <i class="comment"># background image (file or <a href="#ICONS">named icon</a>)</i>
-		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity" target="_blank">-gravity</a> for img</i>
+		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity">-gravity</a> for img</i>
 		resize <i>= False</i>                   <i class="comment"># whether to 'best fit' img</i>
 	)</code>
 <br/>
@@ -693,16 +726,16 @@ where
 <li>
 <a name="FX"></a><code>fx</code> is a semicolon-separated list of any of these operations:
 <ul>
-<li><code>f=<i class="comment">color</i></code> - use this <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill" target="_blank">fill</a>, where <i class="comment">color</i>
-is an imagemagick <a href="http://www.imagemagick.org/script/color.php#color_names" target="_blank">named color</a>, <code>#rrggbb</code> hex color or other supported <a href="http://www.imagemagick.org/script/color.php" target="_blank">color code</a>.
+<li><code>f=<i class="comment">color</i></code> - use this <a href="http://www.imagemagick.org/Usage/option_link.cgi?fill">fill</a>, where <i class="comment">color</i>
+is an imagemagick <a href="http://www.imagemagick.org/script/color.php#color_names">named color</a>, <code>#rrggbb</code> hex color or other supported <a href="http://www.imagemagick.org/script/color.php">color code</a>.
 </li>
 <li><code>r=<i class="comment">wxh</i></code> - resize to this width x height in pixels.</li>
-<li><code>t=<i class="comment">SRT</i></code> - apply these imagemagick <a href="http://www.imagemagick.org/Usage/distorts/#srt" target="_blank"><i class="comment">SRT</i></a> (scale-rotate-transform)
+<li><code>t=<i class="comment">SRT</i></code> - apply these imagemagick <a href="http://www.imagemagick.org/Usage/distorts/#srt"><i class="comment">SRT</i></a> (scale-rotate-transform)
 operations (with underscores substituted for spaces). </li>
-<li><code>c=<i class="comment">crop</i></code> - crop to this imagemagick <a href="http://www.imagemagick.org/Usage/option_link.cgi?crop" target="_blank"><i class="comment">crop</i></a>
-<a href="http://www.imagemagick.org/script/command-line-processing.php#geometry" target="_blank">geometry</a>. </li>
-<li><code>h</code> - flip horizontal, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flop" target="_blank">flop</a>.</li>
-<li><code>v</code> - flip vertical, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flip" target="_blank">flip</a>.</li>
+<li><code>c=<i class="comment">crop</i></code> - crop to this imagemagick <a href="http://www.imagemagick.org/Usage/option_link.cgi?crop"><i class="comment">crop</i></a>
+<a href="http://www.imagemagick.org/script/command-line-processing.php#geometry">geometry</a>. </li>
+<li><code>h</code> - flip horizontal, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flop">flop</a>.</li>
+<li><code>v</code> - flip vertical, i.e. <a href="http://www.imagemagick.org/script/command-line-options.php#flip">flip</a>.</li>
 <li><code>3</code> - apply a 3D effect.</li>
 <li><code>s</code> - apply a shadow effect.</li>
 <li><code>g</code> - apply a gel effect.</li>
@@ -896,8 +929,8 @@ i.e. '<i><code><span class="orange">pl</span>.interpreter</code></i>' and then p
 <b><a name="ICONS">Icons</a></b>
 <ul>
 The names of the icons below (from
-<a href="http://raphaeljs.com/icons" target="_blank">raphaeljs</a>,
-<a href="http://git.gnome.org/browse/gnome-icon-theme-symbolic/tree/src/gnome-stencils.svg" target="_blank">gnome-stencils</a>,
+<a href="http://raphaeljs.com/icons">raphaeljs</a>,
+<a href="http://git.gnome.org/browse/gnome-icon-theme-symbolic/tree/src/gnome-stencils.svg">gnome-stencils</a>,
 plus a few of my own) can be substituted for a filename anywhere a <code>thumb</code>, <code>img</code>, or <code>icon</code>
 is used in the api, e.g.
 <ul><pre>pms.addAction('greetings', 'echo Hello', '<span class="orange">#smile</span>')
