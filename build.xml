@@ -14,7 +14,7 @@
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
-	<property name="py4j.jar" value="py4j0.7-789ad9.jar"/>
+	<property name="py4j.jar" value="py4j0.7-97b47c.jar"/>
 	<property environment="env"/>
 
 	<path id="lib.path.ref">

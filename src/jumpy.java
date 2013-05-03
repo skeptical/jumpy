@@ -123,6 +123,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		config.create(new File(scriptsini), false);
 		log("\n");
 
+		log("using " + command.py4j_jar);
 
 		String scriptexts = (String)configuration.getCustomProperty("script.filetypes");
 		if (scriptexts != null) {

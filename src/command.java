@@ -18,9 +18,17 @@ import java.net.InetAddress;
 import py4j.GatewayServer;
 import py4j.CallbackClient;
 import py4j.Py4JNetworkException;
+import py4j.DefaultGatewayServerListener;
 
 //import net.pms.PMS;
 //import net.pms.io.WinUtils;
+
+import java.util.logging.Logger;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 public class command {
 
@@ -38,10 +46,13 @@ public class command {
 	public Map substitutions = null;
 	private GatewayServer server = null;
 	private CallbackClient client = null;
+	private Logger logger = null;
+	private DefaultGatewayServerListener listener = null;
 	public int scriptarg = 0, arg0 = 0;
 	private boolean delims = false;
 	public boolean async = false;
-	public boolean has_callback = false;
+	public boolean has_callback = false, needs_listener = false, serverError = false;
+	public static String py4j_jar = new File(py4j.GatewayServer.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 	private static String localhost = getLocalhost();
 
 	public static HashMap<String,String> interpreters = new HashMap<String,String>() {{
@@ -223,13 +234,34 @@ public class command {
 			try {
 				// py4j python side connects to localhost in later versions
 				// but only to host ip in v0.7 (release)
-				if (new File(py4j.GatewayServer.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName()
-						.equals("py4j0.7.jar")) {
+				if (py4j_jar.equals("py4j0.7.jar")) {
 					addr = InetAddress.getLocalHost().getHostAddress();
 				}
 			} catch (Exception e) {}
 		}
 		return addr;
+	}
+
+	public void py4jlog(boolean on, final jumpyAPI obj) {
+		if (on) {
+			if (logger == null) {
+				logger = Logger.getLogger("py4j");
+				logger.setLevel(Level.ALL);
+				Handler handler = new Handler() {
+					public void publish(LogRecord record) {
+						String msg = getFormatter().format(record).trim();
+						obj.util(jumpyAPI.LOG, msg, null);
+					}
+					public void flush() {}
+					public void close() throws SecurityException {}
+				};
+				handler.setFormatter(new SimpleFormatter());
+				logger.addHandler(handler);
+			}
+			GatewayServer.turnLoggingOn();
+		} else {
+			GatewayServer.turnLoggingOff();
+		}
 	}
 
 	public boolean startAPI(jumpyAPI obj) {
@@ -255,6 +287,17 @@ public class command {
 				continue;
 			}
 			catch(Exception e) {e.printStackTrace(); continue;}
+		}
+		if (needs_listener) {
+			final command self = this;
+			final jumpyAPI api = obj;
+			listener = new DefaultGatewayServerListener() {
+				@Override
+				public void serverError(Exception e) {
+					api.util(jumpyAPI.LOG, "serverError: " + e.getMessage(), null);
+					self.serverError = true;
+				}
+			};
 		}
 		return false;
 	}

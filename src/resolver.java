@@ -26,6 +26,7 @@ public class resolver extends xmbObject {
 
 	public static int scrapers = 0;
 	public static jumpy jumpy;
+	public static command server;
 	public static boolean enabled = false, playback = true;
 
 	public resolver(jumpy jumpy, int type, String name, String uri, String thumb, String syspath, Map<String,String> env) {
@@ -159,12 +160,14 @@ public class resolver extends xmbObject {
 					}
 				}
 			};
-			command cmd = new command();
-			cmd.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , &]",
+			server = new command();
+			server.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , &]",
 				registrar.syspath, registrar.env);
-			cmd.has_callback = true;
+			server.has_callback = true;
+//			server.needs_listener = true;
+//			server.py4jlog(true, registrar);
 			jumpy.log("\n");
-			new runner().run(registrar, cmd);
+			new runner().run(registrar, server);
 		}
 	}
 
