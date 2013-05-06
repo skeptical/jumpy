@@ -37,6 +37,9 @@ public class userscripts {
 		for (Section section : ini.values()) {
 			aggregate(section);
 			String name = section.getName();
+			if (name.startsWith("#")) {
+				continue;
+			}
 			jumpy.log("Adding user script: " + name);
 
 			if (section.containsKey("ini")) {

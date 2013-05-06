@@ -241,6 +241,14 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		userscripts = new userscripts(this);
 		userscripts.autorun(true);
 
+		scripts = new File(home).listFiles(
+			new FilenameFilter() {
+				public boolean accept(File dir, String name) {
+					return name.endsWith(".py") && new File(dir.getPath() + File.separatorChar + name).isFile();
+				}
+			}
+		);
+
 		log("\n");
 		log("Found " + scripts.length + " python scripts.", true);
 
