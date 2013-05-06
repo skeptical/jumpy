@@ -72,10 +72,17 @@ def flatten(list):
 		a.append(item.replace(' , ',' ,, '))
 	return '[%s]' % ' , '.join(a)
 
+def decode(s):
+	if isinstance(s, str):
+		for encoding in ['utf-8', 'ISO-8859-1', 'windows-1252']: # etc...
+			try: return s.decode(encoding)
+			except: pass
+	return s
+
 def pms_addItem(itemtype, name, argv, thumb = None, data = None):
 	if type(argv).__name__ == 'list':
 		argv = flatten(argv)
-	pms._addItem(itemtype, name, argv, thumb, data)
+	pms._addItem(itemtype, decode(name), decode(argv), decode(thumb), decode(data))
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
