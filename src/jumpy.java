@@ -178,7 +178,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		utils.fakeroot.addChild(top);
 		utils.home = top;
 
-		new runner().quiet(top, "[" + command.pms + "]", null, null);
+		new runner(runner.QUIET).run(top, "[" + command.pms + "]", null, null);
 		if (top.env.containsKey("imconvert")) {
 			command.putexec("imconvert", top.env.get("imconvert"));
 		}
@@ -186,6 +186,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		log("\n");
 
 		resolver.verify();
+		log("\n");
 
 		scripts = new File(home).listFiles(
 			new FilenameFilter() {

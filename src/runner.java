@@ -13,8 +13,8 @@ import org.jvnet.winp.WinProcess;
 
 public class runner {
 
-	public static final int QUIET = 1;
-	public static final int DEV = 2;
+	public static final int DEV = 1;
+	public static final int QUIET = 2;
 	public int mode = 0;
 
 	public static PrintStream out = System.out;
@@ -44,11 +44,11 @@ public class runner {
 		}
 	}
 
-	public int quiet(jumpyAPI obj, String cmd, String syspath, Map<String,String> myenv) {
-		int old = mode;
-		mode |= QUIET;
+	public int run(int mode, jumpyAPI obj, String cmd, String syspath, Map<String,String> myenv) {
+		int old = this.mode;
+		this.mode |= mode;
 		int r = run(obj, cmd, syspath, myenv);
-		mode = old;
+		this.mode = old;
 		return r;
 	}
 
@@ -91,7 +91,7 @@ public class runner {
 
 		try {
 			ProcessBuilder pb = new ProcessBuilder(argv);
-			pb.redirectErrorStream(true);
+			pb.redirectErrorStream((mode & QUIET) == 0 ? true : false);
 			pb.directory(cmdline.startdir);
 			Map<String,String> env = pb.environment();
 			if (cmdline.syspath != null ) {
@@ -106,18 +106,14 @@ public class runner {
 
 			if (cmdline.async) {
 				active.add(this);
-				if ((mode & QUIET) == 0) {
-					new Thread(new outputlogger(), "outputlogger").start();
-				}
+				new Thread(new outputlogger(), "outputlogger").start();
 				if (cmdline.has_callback) {
 					obj.register(null);
 				}
 				return 0;
 			}
 
-			if ((mode & QUIET) == 0) {
-				new outputlogger().run();
-			}
+			new outputlogger().run();
 			p.waitFor();
 			exitValue = p.exitValue();
 			shutdown();
@@ -130,7 +126,8 @@ public class runner {
 	class outputlogger implements Runnable {
 		public void run() {
 			String line;
-			BufferedReader br = new BufferedReader (new InputStreamReader(p.getInputStream()));
+			BufferedReader br = new BufferedReader (new InputStreamReader(
+				(mode & QUIET) == 0 ? p.getInputStream() : p.getErrorStream()));
 			output = "";
 			try {
 				while ((line = br.readLine()) != null) {

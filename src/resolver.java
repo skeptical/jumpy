@@ -172,7 +172,7 @@ public class resolver extends xmbObject {
 	}
 
 	public static boolean verify() {
-		new runner().run(jumpy.top, "[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , 'validate']", null, null);
+		new runner(runner.QUIET).run(jumpy.top, "[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , 'validate']", null, null);
 		if (jumpy.top.env.containsKey("resolvers")) {
 			String found = jumpy.top.env.get("resolvers");
 			scrapers = (found.contains("xbmc") ? XBMC : 0) |

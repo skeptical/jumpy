@@ -67,7 +67,7 @@ public class jumpstart {
 
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
 			lib, null);
-		ex.quiet(root, "[" + command.pms + "]", lib, null);
+		ex.run(runner.QUIET, root, "[" + command.pms + "]", lib, null);
 
 		item current = root;
 
