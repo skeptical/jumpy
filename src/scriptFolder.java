@@ -313,6 +313,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 					return utils.properties.get(arg1);
 				}
 				break;
+			case SETVAR:
+				utils.properties.put(arg1, arg2);
+				break;
 			case GETPROPERTY:
 				return utils.getCustomProperty(arg1);
 			case SETPROPERTY:

@@ -14,6 +14,7 @@ import net.pms.external.infidel.jumpy.jumpyAPI;
 public class jumpstart {
 
 	public static item root = null;
+	public static HashMap<String,String> vars = new HashMap<String,String>();
 
 	public static void main(String[] argv) {
 
@@ -246,15 +247,22 @@ class item extends node implements jumpyAPI {
 				break;
 			case RUN:
 				return Integer.toString(new runner(0).run(this, arg1, syspath, env));
+			case GETVAR:
+			case GETPROPERTY:
+				if (jumpstart.vars.containsKey(arg1)) {
+					return jumpstart.vars.get(arg1);
+				}
+				break;
+			case SETVAR:
+			case SETPROPERTY:
+				jumpstart.vars.put(arg1, arg2);
+				break;
 			case HOME:
 			case PROFILEDIR:
 			case LOGDIR:
 			case RESTART:
 			case REBOOT:
 			case XMBPATH: //TODO
-			case GETVAR:
-			case GETPROPERTY:
-			case SETPROPERTY:
 			case ICON:
 			case SUBTITLE:
 			default:
