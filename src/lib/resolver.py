@@ -79,7 +79,7 @@ if enable_xbmc:
 		have_urlresolver = True
 		sys.stderr.write('%s version %s\n' % (_info[id]['name'], _info[id]['version']))
 		if start:
-			sys.path.extend(_info[id]['_pythonpath'].split(os.path.pathsep))
+			sys.path.extend(_info[id]['_pythonpath'])
 			sys.argv = [sys.argv[0], '?']
 			import urlresolver
 	except:
