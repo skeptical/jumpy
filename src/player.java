@@ -273,7 +273,7 @@ public class player extends Player {
 
 	public boolean finalize(String filename, DLNAResource dlna) {
 		isMediaitem = dlna instanceof mediaItem;
-		if (filename != null) {
+		if (! (filename == null || filename.isEmpty())) {
 			if (dynamic || cmdline == null) {
 				cmdline = new command(filename,
 					dlna instanceof xmbAction ? ((xmbAction)dlna).syspath : null,

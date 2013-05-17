@@ -47,7 +47,7 @@ public class mediaItem extends xmbObject {
 
 	@Override
 	public String getSystemName() {
-		return uri;
+		return uri == null ? "" : uri;
 	}
 }
 
