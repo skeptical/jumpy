@@ -78,6 +78,7 @@ div.main {
 <li><a href="#SCRIPTSINI">jumpy-scripts.ini</a></li>
 <li><a href="#WEBREADER">Webreader</a></li>
 <li><a href="#FEEDREADER">Feedreader</a></li>
+<li><a href="#RESOLVER">Resolver</a></li>
 <br/>
 <center><a href="scripts.html">SCRIPTS</a></center><br/>
 <li><a href="scripts.html#QUICKSTART">Quick Start</a></li>
@@ -96,22 +97,22 @@ div.main {
 <!--</ul>-->
 <!--<center>LINKS</center><br/>-->
 <br/>
-<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/" target="_blank">Download</a></li>
-<li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288" target="_blank">Forum</a></li>
-<li><a href="https://github.com/skeptical/jumpy" target="_blank">Code</a></li>
+<li><a href="http://sourceforge.net/projects/jumpy-plugin/files/">Download</a></li>
+<li><a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288">Forum</a></li>
+<li><a href="https://github.com/skeptical/jumpy">Code</a></li>
 </ul>
 </div>
 <div class="main">
 <a name="TOP"><H3 style="color:darkblue"><span class="orange">Jumpy</span> - Jump into Python (and onto XBMC)</H3></a>
 
-Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/" target="_blank">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/" target="_blank">UMS</a>) and mainly
+Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/">UMS</a>) and mainly
 <ul>
 <li>add folders and media items to the xmb.</li>
 <li>act as user-defined external players.</li>
 </ul>
-The API is accessible from python via jumpy's python module, or from other languages via system calls. Interaction is through a localhost socket managed by <a href="http://py4j.sourceforge.net" target="_blank">py4j</a>.
+The API is accessible from python via jumpy's python module, or from other languages via system calls. Interaction is through a localhost socket managed by <a href="http://py4j.sourceforge.net">py4j</a>.
 <br/><br/>
-Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org" target="_blank">xbmc</a> addons for use in PMS, and deciding to see if I could mock the xbmc plugin API itself so as to run these addons under PMS as-is. The result is Jumpy plus <a href="https://github.com/skeptical/jumpy-xbmc">jumpy-xbmc</a>, an included set of python modules to 'jump' the xbmc addons.
+Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org">xbmc</a> addons for use in PMS, and deciding to see if I could mock the xbmc plugin API itself so as to run these addons under PMS as-is. The result is Jumpy plus <a href="https://github.com/skeptical/jumpy-xbmc">jumpy-xbmc</a>, an included set of python modules to 'jump' the xbmc addons.
 <br/><br/>
 Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube</i>, and many more. Addons are 'mostly' functional in the sense that all content is shown but interactive features that require user input are inactive.
 <br/><br/>
@@ -124,8 +125,9 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6.exe/download" target="_blank">jumpy-0.2.6.exe</a></i> (Windows)
-or <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6b.run/download" target="_blank">jumpy-0.2.6b.run</a></i> (Linux/OS-X)
+<li>Put <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.7.exe/download">jumpy-0.2.7.exe</a></i> (Windows)
+, <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.7.run/download">jumpy-0.2.7.run</a></i> (Linux)
+or <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.7.app.zip/download">jumpy-0.2.7.app</a></i> (OS-X)
 in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -144,10 +146,10 @@ Launch it and follow through as usual with external package installers if prompt
 <div style="margin-left:-1.5em;">
 You should end up with
 <i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>XBMC</code>, <code>rtmpdump</code>,
-<code>phantomjs</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
-the grey section below ('mostly', i.e. don't forget to install
-<a href="https://github.com/chocolateboy/pmsencoder" target="_blank"><i>PMSEncoder</i></a>
-and maybe some <a href="#ADDONS"><i>xbmc addons</i></a>).
+<code>phantomjs</code>, <code>youtube-dl</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
+the grey section below ('mostly', i.e. maybe install
+some <a href="#ADDONS"><i>xbmc addons</i></a> or
+<a href="https://github.com/chocolateboy/pmsencoder"><i>PMSEncoder</i></a>).
 </div>
 </ol>
 <!--</div>-->
@@ -155,24 +157,24 @@ and maybe some <a href="#ADDONS"><i>xbmc addons</i></a>).
 <div style="background-color:#f7f7f1;margin:-8;padding:8;padding-bottom:2">
 <b><a name="REQUIREMENTS">Requirements</a></b>
 <ol>
-<li><a href="http://www.python.org/download/releases/2.7.3/#download" target="_blank">Python 2.7</a>.
-To make life simpler <a href="http://superuser.com/questions/143119/how-to-add-python-to-the-windows-path/143121#143121" target="_blank">add python to your system path</a>
-and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-instructions" target="_blank">easy_install</a>.
+<li><a href="http://www.python.org/download/releases/2.7.3/#download">Python 2.7</a>.
+To make life simpler <a href="http://superuser.com/questions/143119/how-to-add-python-to-the-windows-path/143121#143121">add python to your system path</a>
+and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-instructions">easy_install</a>.
 </li>
-<li><a href="http://py4j.sourceforge.net/download.html" target="_blank">py4j</a>.
+<li><a href="http://py4j.sourceforge.net/download.html">py4j</a>.
 </li>
-<li><a href="https://github.com/chocolateboy/pmsencoder" target="_blank">PMSEncoder</a> and
-<a href="http://rtmpdump.mplayerhq.hu/" target="_blank">rtmpdump</a>, not required but indispensible as always.
+<li><a href="http://rtmpdump.mplayerhq.hu/">rtmpdump</a> and <a href="https://github.com/chocolateboy/pmsencoder">PMSEncoder</a>,
+not required strictly speaking but useful with PMS.
 </li>
 </ol>
 <br/>
 <b><a name="XBMC">XBMC Installation</a></b> ("optional")
 <ol>
-<li>Install <a href="http://xbmc.org/download/" target="_blank">xbmc</a> using the default configuration
+<li>Install <a href="http://xbmc.org/download/">xbmc</a> using the default configuration
 for your platform.
 </li>
-<li><a name="ADDONS"></a><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories" target="_blank">Install and configure</a>
-some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons" target="_blank">addons</a>
+<li><a name="ADDONS"></a><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories">Install and configure</a>
+some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons">addons</a>
 inside xbmc (and of course test them too, some are broken). You may need to configure username/password depending
 on the addon, and so on.
 </li>
@@ -181,7 +183,7 @@ on the addon, and so on.
 
 <b><a name="PHANTOMJS">PhantomJS Installation</a></b> (optional)
 <ul>
-To use the included <a href="#WEBREADER">webreader</a> browser install <a href="http://phantomjs.org/download.html" target="_blank">phantomjs</a>
+To use the included <a href="#WEBREADER">webreader</a> browser install <a href="http://phantomjs.org/download.html">phantomjs</a>
 in one of these places:
 <br/>
 <ul>
@@ -195,7 +197,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.6.zip/download" target="_blank">jumpy-0.2.6.zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.7.zip/download">jumpy-0.2.7.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -229,7 +231,7 @@ Locations are according to your PMS installation (for quick access use the butto
 <ul>
 <li><b><i>jumpy.log</i></b>: located wherever <i>debug.log</i> is.
 </li><br/>
-<li><b><i>jumpy.conf</i></b>: located wherever <i>PMS.conf</i> is.
+<li><a name="JUMPYCONF"><b><i>jumpy.conf</i></b>: located wherever <i>PMS.conf</i> is.
 The available settings are:
 <pre><i class="comment"># whether to activate bookmarks (true|false)</i>
 <b>bookmarks</b>=true
@@ -247,26 +249,30 @@ The available settings are:
 
 <i class="comment"># whether to copy log output to the console (true|false)</i>
 <b>debug</b>=false
+
+<i class="comment"># whether to act as a url resolver (true|false)</i>
+<b>url_resolver</b>=true
 </pre>
 </li>
-<li><b><i>PMS.conf</i></b>:
-If you need to override the locations where jumpy looks for xbmc set:
+<li><a name="PMSCONF"></a><b><i>PMS.conf</i></b>:
+<a name="CONF_XBMC"></a>If you need to override the locations where jumpy looks for xbmc set:
 <pre>
 <i class="comment"># xbmc user folder</i>
 <b>xbmc.path</b> = c:\\path\\to\\my\\XBMC
 <i class="comment"># xbmc program folder</i>
 <b>xbmc.main.path</b> = c:\\path\\to\\program\\XBMC
 </pre>
-You can set paths where external binaries needed by your scripts can be found,
+<a name="CONF_BINPATH"></a>You can set paths where external binaries needed by your scripts can be found,
 separating them with '<code><span class="orange">;</span></code>' in Windows or '<code><span class="orange">:</span></code>' in linux/mac:
 <pre>
 <b>bin.path</b> = c:\somewhere\bin<span class="orange">;</span>c:\somewhere else
 </pre>
-You can also specify your preferred text editor for opening files from the gui:
+You<a name="CONF_EDITOR"> can also specify your preferred text editor for opening files from the gui:
 <pre>
 <b>text.editor</b> = c:\\path\\to\\my\\textEditor
 </pre>
-See also <a href="scripts.html#INTERPRETERS">Interpreters</a> for more <i>PMS.conf</i> settings.
+See also <a href="#RESOLVER">Resolver</a> and
+<a href="scripts.html#INTERPRETERS">Interpreters</a> for more <i>PMS.conf</i> settings.
 </li><br/>
 </ul>
 </ul>
@@ -278,6 +284,7 @@ When reporting bugs please <a href="http://www.ps3mediaserver.org/forum/viewtopi
 </ul>
 </ul>
 <br/>
+
 <b><a name="SCRIPTSINI">jumpy-scripts.ini</a></b>
 <ul>
 Scripts are registered with jumpy via entries inside the user file <i>jumpy-scripts.ini</i>, which is located wherever
@@ -368,7 +375,7 @@ viewing images as opposed to reading text.</li>
 </li>
 </li>
 <li><code>readability</code> (or <code>rdb</code>) which uses the arc90labs
-<a href="http://code.google.com/p/arc90labs-readability/" target="_blank">readability</a>
+<a href="http://code.google.com/p/arc90labs-readability/">readability</a>
 script to clean up web pages into stripped-down article-like versions for easy
 reading.
 <ul>
@@ -447,6 +454,55 @@ World news/Europe, http://www.guardian.co.uk/world/europe/roundup/rss
 </ul>
 <br/>
 
+
+<b><a name="RESOLVER">Resolver</a></b>
+<ul>
+Jumpy acts as a url resolver for unresolved <i>WEB.conf</i> items (youtube, vimeo, many more)
+in UMS if it can find either the
+<i>xbmc urlresolver addon</i>
+or the <i>youtube-dl python library</i>.
+<br/><br/>
+Both are automatically added by the jumpy installer:
+<ul>
+<br/>
+<li><b>xbmc</b>: two new addons are auto-installed:
+<ul>
+<li>script.module.jumpy <i class="comment">(Programs>jumpy)</i></li>
+<li>repository.jumpy.addons <i class="comment">(System>Add-ons>Get Add-ons>jumpy repo)</i></li>
+</ul>
+Restart xbmc and you should see
+a brief update notice for the '<i>jumpy</i>' addon, which just means that <i>urlresolver</i> and
+<i>youtube</i> are being added if not already present. You can then uninstall the new jumpy
+addons if you like.
+</li>
+<br/>
+<li><b>youtube-dl</b>: There's no general reason to change anything in Linux/OS-X,
+but <u><i>If you're on Windows and have the Channels Plugin</i></u> (which
+already resolves using youtube-dl in Windows) you may want to disable it in jumpy by
+editing <i>plugins/jumpy/lib/resolver.py</i>:
+<pre>
+<i class="comment">################# configuration: use True/False #################</i>
+enable_xbmc = True
+enable_youtube_dl = <i><span class="orange">False</span></i>
+<i class="comment">#################################################################</i>
+</pre>
+</li>
+</ul>
+Alternatively, you can of course install these resolvers by hand:
+<br/><br/>
+<ul>
+<li>Install from zip in xbmc: <a href="http://mirrors.xbmc.org/addons/frodo/script.module.urlresolver/">script.module.urlresolver</a>
+</li>
+<li>Download <a href="http://rg3.github.io/youtube-dl/download.html">youtube-dl</a>'s
+latest <i>Full source tarball</i>, untar and point
+to its <i><span class="orange">youtube_dl</span></i> subfolder in <i>UMS.conf</i>:
+<pre>
+<b>youtube-dl.lib.path</b> = c:\\path\\to\\youtube-dl\\<span class="orange">youtube_dl</span>
+</pre>
+</li>
+</ul>
+</ul>
+<br/>
 
 </div>
 </body>
