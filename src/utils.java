@@ -298,6 +298,12 @@ public final class utils {
 	public static boolean update(String url) {
 		File installer = download(url, "plugins");
 		if (installer != null) {
+			try {
+				installer.setExecutable(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
 			ArrayList<String> cmd = new ArrayList<String>();
 			cmd.add(installer.getAbsolutePath());
 			if (url.endsWith(".run")) {
