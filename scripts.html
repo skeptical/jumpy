@@ -142,6 +142,7 @@ function preview(img, bg) {
 <option>setPath</option>
 <option>setProperty</option>
 <option>setSubtitles</option>
+<option>setVar</option>
 <option>version</option>
 <option>vmsg</option>
 <option>warn</option>
@@ -536,7 +537,7 @@ asynchronously and automatically killed if still alive at program shutdown.
 </li>
 <br/>
 <li><a name="getVar"><kbd>pms.getVar</kbd><code>(key)</code></a>
-<ul>Get an internal property from <i>jumpy</i>, where the keys, so far, are:
+<ul>Get a previously set variable from <i>jumpy</i>, including the predefined ones below:
 <br/>
 <ul>
 <table>
@@ -545,6 +546,11 @@ asynchronously and automatically killed if still alive at program shutdown.
 <tr><td><code>libass</code></td><td>:</td><td><code>'true'</code> if ffmpeg is compiled with <i class=comment>--enable-libass</i>.</td></tr>
 </table>
 </ul>
+</ul>
+</li>
+<br/>
+<li><a name="setVar"><kbd>pms.setVar</kbd><code>(key, val)</code></a>
+<ul>Set a variable (for later retrieval via <code>getVar</code>)</i>.
 </ul>
 </li>
 <br/>
