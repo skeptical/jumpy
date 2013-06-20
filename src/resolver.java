@@ -161,7 +161,7 @@ public class resolver extends xmbObject {
 				}
 			};
 			server = new command();
-			server.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , &]",
+			server.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , start , &]",
 				registrar.syspath, registrar.env);
 			server.has_callback = true;
 //			server.needs_listener = true;
