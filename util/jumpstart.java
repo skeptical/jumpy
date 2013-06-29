@@ -94,7 +94,8 @@ public class jumpstart {
 						case 1025: type = " (MEDIA)"; break;
 						case    0:
 						case 1026: type = ""; break; // FOLDER
-						case 1028: type = " (ACTION)"; break;
+						case 1028: type = " (BOOKMARK)"; break;
+						case 1032: type = " (ACTION)"; break;
 						case 2048: type = " (UNRESOLVED)"; break;
 						case 4096: type = " (FEED)"; break;
 						case 4097: type = " (AUDIOFEED)"; break;

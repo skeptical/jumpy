@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
+
+import org.apache.commons.io.FilenameUtils;
 
 import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
@@ -15,38 +18,52 @@ import net.pms.dlna.DLNAResource;
 
 public class bookmarker {
 	private jumpy jumpy;
-	public scriptFolder bookmarks;
+	public scriptFolder Bookmarks;
+	public List<scriptFolder> bookmarks;
 	public boolean verbose = true;
 	private String bookmarksini;
 
-	static List<String> temporal = Arrays.asList(new String[]{"pms", "PYTHONPATH", "JGATEWAY"});
+	static List<String> temporal = Arrays.asList(new String[]{"pms", "PYTHONPATH", "JGATEWAY", "JCLIENT"});
 
 	public bookmarker(jumpy jumpy) {
 		this.jumpy = jumpy;
-		bookmarks = new scriptFolder(jumpy, "Bookmarks", null, "#book");
-		bookmarks.refreshAlways = true;
-		jumpy.top.addChild(bookmarks);
+		Bookmarks = new scriptFolder(jumpy, "Bookmarks", null, "#book");
+		Bookmarks.refreshAlways = true;
+		jumpy.top.addChild(Bookmarks);
+		bookmarks = new ArrayList<scriptFolder>();
 		bookmarksini = jumpy.bookmarksini;
 		verbose = jumpy.verboseBookmarks;
 		load();
 	}
 
 	public void add(scriptFolder folder) {
-		String name = folder.getName();
-		scriptFolder bookmark = new scriptFolder(folder);
+		add(folder, true, true);
+	}
+
+	public void add(scriptFolder folder, boolean copy, boolean save) {
+		String path = folder.getName();
+		String label = FilenameUtils.getName(path);
+		path = FilenameUtils.getFullPath(path);
+		DLNAResource parent = path == null ? Bookmarks : utils.mkdirs(path, Bookmarks);
+
+		scriptFolder bookmark = copy ? new scriptFolder(folder) : folder;
 		bookmark.isBookmark = true;
-		if (verbose) {
-			name += (" :" + topName(folder));
-			bookmark.setName(name);
+		if (parent == Bookmarks && copy && verbose) {
+			label += (" :" + topName(folder));
 		}
-		bookmarks.addChild(bookmark);
-		jumpy.log("Adding bookmark: " + name);
-		store();
+		bookmark.setName(label);
+		parent.addChild(bookmark);
+		bookmarks.add(bookmark);
+		jumpy.log("Adding bookmark: " + label);
+		if (save) {
+			store();
+		}
 	}
 
 	public void remove(scriptFolder folder) {
 		String name = folder.getName();
-		bookmarks.getChildren().remove(folder);
+		folder.getParent().getChildren().remove(folder);
+		bookmarks.remove(folder);
 		jumpy.log("Removing bookmark: " + name);
 		store();
 	}
@@ -61,10 +78,7 @@ public class bookmarker {
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}
 		for (Section section : ini.values()) {
 			jumpy.log("Reading bookmark: " + section.getName());
-
-			scriptFolder bookmark = new scriptFolder(jumpy, section.getName(), section);
-			bookmark.isBookmark = true;
-			bookmarks.addChild(bookmark);
+			add(new scriptFolder(jumpy, section.getName(), section), false, false);
 		}
 	}
 
@@ -73,9 +87,10 @@ public class bookmarker {
 			Wini ini = new Wini();
 			ini.getConfig().setMultiSection(true);
 			ini.setFile(new File(bookmarksini));
-			for (DLNAResource item : bookmarks.getChildren()) {
-				scriptFolder bookmark = (scriptFolder)item;
-				String name = bookmark.getName();
+			for (scriptFolder bookmark : bookmarks) {
+				String name =
+					(bookmark.getParent() == Bookmarks ? "" : (utils.getXMBPath(bookmark, null) + "/")) +
+					bookmark.getName();
 				Section section = ini.add(name);
 				section.put("uri", bookmark.uri);
 				if (! (bookmark.thumbnail == null || bookmark.thumbnail.isEmpty()))
@@ -98,7 +113,7 @@ public class bookmarker {
 
 	public String topName(scriptFolder folder) {
 		String[] dirs = utils.getXMBPath(folder, jumpy.top.getParent()).split("/");
-		return dirs[dirs.length > 1 ? 1 : 0].replace("[xbmc]","").trim();
+		return dirs[dirs.length > 2 ? 2 : 1].replace("[xbmc]","").trim();
 	}
 }
 

@@ -32,7 +32,8 @@ except NameError:
 	# new constants:
 	__builtin__.PMS_MEDIA = 1025
 	__builtin__.PMS_FOLDER = 1026
-	__builtin__.PMS_ACTION = 1028
+	__builtin__.PMS_BOOKMARK = 1028
+	__builtin__.PMS_ACTION = 1032
 	__builtin__.PMS_UNRESOLVED = 2048
 	__builtin__.PMS_FEED = 4096
 	__builtin__.PMS_AUDIOFEED = 4097
@@ -88,6 +89,9 @@ def pms_addItem(itemtype, name, argv, thumb = None, data = None):
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
 	pms_addItem(PMS_FOLDER, name, cmd, thumb)
+
+def pms_addBookmark(name, cmd, thumb=None):
+	pms_addItem(PMS_BOOKMARK, name, cmd, thumb)
 
 def pms_addAudio(name, cmd, thumb=None):
 	pms_addItem(PMS_AUDIO, name, cmd, thumb)
@@ -216,6 +220,7 @@ def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PL
 	pms._addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback)
 
 __builtin__.pms.addFolder = pms_addFolder
+__builtin__.pms.addBookmark = pms_addBookmark
 __builtin__.pms.addAudio = pms_addAudio
 __builtin__.pms.addImage = pms_addImage
 __builtin__.pms.addVideo = pms_addVideo

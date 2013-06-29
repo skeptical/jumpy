@@ -132,9 +132,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			return null;
 		}
 
-		String path = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
-		String label = FilenameUtils.getName(path);
-		path = FilenameUtils.getFullPath(path);
+		filename = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
+		String label = FilenameUtils.getName(filename);
+		String path = FilenameUtils.getFullPath(filename);
 		DLNAResource folder = path == null ? this : utils.mkdirs(path, this);
 		String thumb = jumpy.getResource(thumbnail);
 
@@ -171,6 +171,10 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			case FOLDER:
 				media = "folder";
 				newItem = new scriptFolder(jumpy, label, uri, thumb, syspath, env);
+				break;
+			case BOOKMARK:
+				media = "bookmark";
+				jumpy.bookmarks.add(new scriptFolder(jumpy, filename, uri, thumb, syspath, env), false, true);
 				break;
 			case UNRESOLVED:
 				media = "unresolved." + utype + " item";

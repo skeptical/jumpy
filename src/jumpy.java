@@ -69,7 +69,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	private static HashSet<String> logspam = new HashSet<String>();
 	private File[] scripts;
 	public static scriptFolder top, util;
-	private bookmarker bookmarks;
+	public bookmarker bookmarks;
 	private userscripts userscripts;
 	public List<player> players;
 	public static Map<String,String> icons = new HashMap<String,String>();
@@ -369,7 +369,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public void refresh(boolean timed) {
 		refreshChildren(top);
 		if (showBookmarks) {
-			refreshChildren(bookmarks.bookmarks);
+			refreshChildren(bookmarks.Bookmarks);
 		}
 		if (timed) {
 			log("Timed " + refresh + " minute refresh.");

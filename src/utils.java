@@ -245,14 +245,16 @@ public final class utils {
 	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
 		DLNAResource p = folder;
 		String xmbpath = "/";
+		boolean root;
 		while (true) {
 			p = p.getParent();
-			if (p == null || p == ancestor) {
+			root = (p == null || p == fakeroot || p instanceof net.pms.dlna.RootFolder);
+			if (root || p == ancestor) {
 				break;
 			}
 			xmbpath = p.getName().trim() + "/" + xmbpath;
 		}
-		return (p == null ? "/" : "") + xmbpath.replace("//","").trim();
+		return (root ? "/" : "") + xmbpath.replace("//","").trim();
 	}
 
 	public static File download(String url, String destdir) {

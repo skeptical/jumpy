@@ -16,7 +16,8 @@ public interface jumpyAPI {
 	// new constants:
 	public static final int MEDIA = 1025;
 	public static final int FOLDER = 1026;
-	public static final int ACTION = 1028;
+	public static final int BOOKMARK = 1028;
+	public static final int ACTION = 1032;
 	public static final int UNRESOLVED = 2048;
 	public static final int FEED = 4096;
 	public static final int VIDEOFEED = 4100; // Format.VIDEO|FEED
