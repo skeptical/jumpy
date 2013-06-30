@@ -176,12 +176,16 @@ public final class utils {
 	}
 
 	public static String getCustomProperty(String key) {
+		return getCustomProperty(key, "");
+	}
+
+	public static String getCustomProperty(String key, String fallback) {
 		Object obj;
 		if ((obj = PMS.get().getConfiguration().getCustomProperty(key)) != null) {
 			// return last occurrence
 			return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
 		}
-		return "";
+		return fallback;
 	}
 
 	public static void checkFFmpeg() {

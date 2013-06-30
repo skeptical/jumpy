@@ -264,6 +264,7 @@ class item extends node implements jumpyAPI {
 			case RESTART:
 			case REBOOT:
 			case XMBPATH: //TODO
+			case MKDIRS:
 			case ICON:
 			case SUBTITLE:
 			default:

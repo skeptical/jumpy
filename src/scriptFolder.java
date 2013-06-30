@@ -312,6 +312,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				return this.getName();
 			case XMBPATH:
 				return ("/" + utils.getXMBPath(this, jumpy.top.getParent()) + "/" + this.name).replace("//", "/");
+			case MKDIRS:
+				utils.mkdirs(arg1, this);
+				break;
 			case GETVAR:
 				if (utils.properties.containsKey(arg1)) {
 					return utils.properties.get(arg1);
@@ -321,7 +324,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				utils.properties.put(arg1, arg2);
 				break;
 			case GETPROPERTY:
-				return utils.getCustomProperty(arg1);
+				return utils.getCustomProperty(arg1, arg2);
 			case SETPROPERTY:
 				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
 				break;

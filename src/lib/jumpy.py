@@ -60,6 +60,7 @@ except NameError:
 	__builtin__.PMS_GETVAR = 18
 	__builtin__.PMS_SETVAR = 19
 	__builtin__.PMS_LOG = 20
+	__builtin__.PMS_MKDIRS = 21
 	# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -190,14 +191,17 @@ def pms_getFolderName():
 def pms_getXmbPath():
 	return pms_util(PMS_XMBPATH)
 
+def pms_mkDirs(path):
+	return pms_util(PMS_MKDIRS, path)
+
 def pms_getVar(key):
 	return pms_util(PMS_GETVAR, key)
 
 def pms_setVar(key, val):
 	pms_util(PMS_SETVAR, key, val)
 
-def pms_getProperty(key):
-	return pms_util(PMS_GETPROPERTY, key)
+def pms_getProperty(key, fallback=''):
+	return pms_util(PMS_GETPROPERTY, key, fallback)
 
 def pms_setProperty(key, val):
 	pms_util(PMS_SETPROPERTY, key, val)
@@ -250,6 +254,7 @@ __builtin__.pms.reboot = pms_reboot
 __builtin__.pms.run = pms_run
 __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getXmbPath = pms_getXmbPath
+__builtin__.pms.mkDirs = pms_mkDirs
 __builtin__.pms.getVar = pms_getVar
 __builtin__.pms.setVar = pms_setVar
 __builtin__.pms.getProperty = pms_getProperty
