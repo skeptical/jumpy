@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
+import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 
 import org.apache.commons.exec.util.StringUtils;
@@ -15,6 +17,8 @@ public class jumpstart {
 
 	public static item root = null;
 	public static HashMap<String,String> vars = new HashMap<String,String>();
+	public static String home = null;
+	public static Properties pmsconf = null;
 
 	public static void main(String[] argv) {
 
@@ -22,7 +26,7 @@ public class jumpstart {
 
 		runner ex = new runner(new command());
 
-		runner.version = "0.2.2";
+		runner.version = "0.2.3";
 		System.out.println("jumpstart " + runner.version);
 
 		Console c = System.console();
@@ -54,16 +58,27 @@ public class jumpstart {
 				hist[i] = l[i];
 		}
 
-		// get the current jar's location from a static context (isn't java lovely?)
-		String lib = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+		String lib = null;
+		// get the current jar location without resolving symlinks
+		for (String cp : ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator)) {
+			if (cp.contains("jumpstart") && cp.contains(File.separator)) {
+				lib = cp.substring(0, cp.lastIndexOf(File.separator));
+			}
+		}
+		if (lib == null) {
+			// last resort: accept resolved symlinks
+			lib = new File(new jumpstart().getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+		}
 		try{
 			lib = URLDecoder.decode(lib, "UTF-8");
 		} catch (Exception e) {}
 
+		home = lib.substring(0, lib.lastIndexOf(File.separator));
+
 		// jumpy.py is always located alongside the jar
 		command.pms = lib + File.separatorChar + "jumpy.py";
 		command.basesubs = new HashMap<String,String>();
-		command.basesubs.put("home", new File(lib).getParent().replace("\\","\\\\"));
+		command.basesubs.put("home", home.replace("\\", "\\\\"));
 		command.basesubs.put("PMS", "JUMPSTART");
 
 		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
@@ -159,6 +174,49 @@ public class jumpstart {
 		}
 	}
 
+	public static String getProfileDir() {
+		File debug_log = new File(new File(home).getParentFile().getParentFile(), "debug.log");
+		try {
+			FileInputStream is = new FileInputStream(debug_log);
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (line.contains("Profile directory: ")) {
+					return line.split("Profile directory: ")[1];
+				}
+			}
+		} catch (Exception e) {}
+		return null;
+	}
+
+	public static void readconf() {
+		// TODO: this only finds properties explicitly declared in PMS.conf
+		File conf;
+		String profiledir = getProfileDir();
+		pmsconf = new Properties();
+		try {
+			FileInputStream conf_file =
+				new FileInputStream(new File(profiledir,
+					profiledir.endsWith("PMS") ? "PMS.conf" : "UMS.conf"));
+			pmsconf.load(conf_file);
+			conf_file.close();
+		} catch (IOException e) {}
+	}
+
+	public static String getProperty(String key, String fallback) {
+		if (pmsconf == null) {
+			readconf();
+		}
+		return pmsconf.getProperty(key, fallback);
+	}
+
+	public static String setProperty(String key, String val) {
+		if (pmsconf == null) {
+			readconf();
+		}
+		return (String) pmsconf.setProperty(key, val);
+	}
+
 	public static void usage() {
 		System.err.printf("Usage: jumpstart <scriptfile>\n");
 		System.exit(1);
@@ -248,23 +306,29 @@ class item extends node implements jumpyAPI {
 				break;
 			case RUN:
 				return Integer.toString(new runner(0).run(this, arg1, syspath, env));
-			case GETVAR:
 			case GETPROPERTY:
+				return jumpstart.getProperty(arg1, arg2);
+			case SETPROPERTY:
+				return jumpstart.setProperty(arg1, arg2);
+			case GETVAR:
 				if (jumpstart.vars.containsKey(arg1)) {
 					return jumpstart.vars.get(arg1);
 				}
 				break;
 			case SETVAR:
-			case SETPROPERTY:
 				jumpstart.vars.put(arg1, arg2);
 				break;
+			case MKDIRS:
+				mkdirs(arg1, this);
+				break;
 			case HOME:
+				return jumpstart.home;
 			case PROFILEDIR:
+				return jumpstart.getProfileDir();
 			case LOGDIR:
 			case RESTART:
 			case REBOOT:
 			case XMBPATH: //TODO
-			case MKDIRS:
 			case ICON:
 			case SUBTITLE:
 			default:

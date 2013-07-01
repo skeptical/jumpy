@@ -7,9 +7,13 @@ set PYTHON=c:\Python27
 set OTHERS=
 set JAVA_HOME="c:\Program Files (x86)\Java\jdk1.6.0_12"
 
-set lib=%~dp0\lib
 if not "%path_set%"=="yes" set path=%PYTHON%;%OTHERS%;%PATH%
 set path_set=yes
+
+pushd .
+cd "%~dp0"
+set lib=%CD%\lib
+popd
 
 %JAVA_HOME%\bin\java.exe -cp "%lib%/jumpstart.jar;%lib%/py4j0.7.jar;%lib%/commons-exec-1.1.jar" jumpstart %*
 
