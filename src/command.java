@@ -14,6 +14,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.util.StringUtils;
 
 import java.net.InetAddress;
+import java.net.Socket;
 
 import py4j.GatewayServer;
 import py4j.CallbackClient;
@@ -242,6 +243,17 @@ public class command {
 		return addr;
 	}
 
+	public static boolean avail(int port) {
+		try {
+			new Socket("localhost", port).close();
+			// connection accepted = in use
+			return false;
+		} catch (IOException e) {
+			// connection refused = not in use
+			return true;
+		}
+	}
+
 	public void py4jlog(boolean on, final jumpyAPI obj) {
 		if (on) {
 			if (logger == null) {
@@ -269,9 +281,11 @@ public class command {
 		for (int port=GatewayServer.DEFAULT_PORT; port<GatewayServer.DEFAULT_PORT+32; port++) {
 			try {
 				if (needs_client) {
-					client = new CallbackClient(port);
-					env.put("JCLIENT", Integer.toString(client.getPort()));
-					needs_client = false;
+					if (avail(port)) {
+						client = new CallbackClient(port);
+						env.put("JCLIENT", Integer.toString(client.getPort()));
+						needs_client = false;
+					}
 				} else {
 					server = has_callback ?
 						new GatewayServer(obj, port, GatewayServer.DEFAULT_CONNECT_TIMEOUT,
