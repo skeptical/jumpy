@@ -61,7 +61,8 @@ except NameError:
 	__builtin__.PMS_SETVAR = 19
 	__builtin__.PMS_LOG = 20
 	__builtin__.PMS_MKDIRS = 21
-	# constants from net.pms.encoders.Player
+	__builtin__.PMS_HOST_IP = 22
+# constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
 	__builtin__.PMS_VIDEO_WEBSTREAM_PLAYER = 2
@@ -161,6 +162,9 @@ def pms_version():
 def pms_getHome():
 	return pms_util(PMS_HOME)
 
+def pms_getHostIP():
+	return pms_util(PMS_HOST_IP)
+
 def pms_getProfileDir():
 	return pms_util(PMS_PROFILEDIR)
 
@@ -245,6 +249,7 @@ __builtin__.pms.setPath = pms_addPath # deprecated
 __builtin__.pms.setEnv = pms_setEnv
 __builtin__.pms.version = pms_version
 __builtin__.pms.getHome = pms_getHome
+__builtin__.pms.getHostIP = pms_getHostIP
 __builtin__.pms.getProfileDir = pms_getProfileDir
 __builtin__.pms.getLogDir = pms_getLogDir
 __builtin__.pms.getPluginJar = pms_getPluginJar

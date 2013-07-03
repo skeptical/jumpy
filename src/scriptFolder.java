@@ -273,6 +273,8 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				return jumpy.version;
 			case HOME:
 				return jumpy.home;
+			case HOST_IP:
+				return PMS.get().getServer().getHost();
 			case PROFILEDIR:
 				return new File(jumpy.jumpyconf).getParent();
 			case LOGDIR:

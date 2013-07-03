@@ -325,6 +325,7 @@ class item extends node implements jumpyAPI {
 				return jumpstart.home;
 			case PROFILEDIR:
 				return jumpstart.getProfileDir();
+			case HOST_IP:
 			case LOGDIR:
 			case RESTART:
 			case REBOOT:

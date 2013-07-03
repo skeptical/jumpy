@@ -31,7 +31,7 @@ public interface jumpyAPI {
 	public static final String[] apiName = {"",
 		"VERSION", "HOME", "PROFILEDIR", "LOGDIR", "PLUGINJAR", "RESTART", "FOLDERNAME",
 		"GETPROPERTY", "SETPROPERTY", "SETPMS", "REBOOT", "XMBPATH", "ICON", "RESOURCE",
-		"REFRESH", "RUN", "SUBTITLE", "GETVAR", "SETVAR", "LOG", "MKDIRS"};
+		"REFRESH", "RUN", "SUBTITLE", "GETVAR", "SETVAR", "LOG", "MKDIRS", "HOST_IP"};
 	public static final int VERSION = 1;
 	public static final int HOME = 2;
 	public static final int PROFILEDIR = 3;
@@ -53,6 +53,7 @@ public interface jumpyAPI {
 	public static final int SETVAR = 19;
 	public static final int LOG = 20;
 	public static final int MKDIRS = 21;
+	public static final int HOST_IP = 22;
 
 	public String util(int action, String arg1, String arg2);
 
