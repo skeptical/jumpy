@@ -183,11 +183,11 @@ def pms_restart():
 def pms_reboot():
 	return pms_util(PMS_REBOOT)
 
-def pms_run(cmd):
+def pms_run(cmd, name=None):
 	if type(cmd).__name__ == 'list':
 		cmd = flatten(cmd)
 	print 'cmd=%s'%cmd
-	return int(pms_util(PMS_RUN, cmd))
+	return int(pms_util(PMS_RUN, cmd, name))
 
 def pms_getFolderName():
 	return pms_util(PMS_FOLDERNAME)

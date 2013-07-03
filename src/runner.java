@@ -30,7 +30,16 @@ public class runner {
 	public runner() {
 	}
 
+	public runner(String name) {
+		this.name = name;
+	}
+
 	public runner(int mode) {
+		this.mode = mode;
+	}
+
+	public runner(String name, int mode) {
+		this.name = name;
 		this.mode = mode;
 	}
 

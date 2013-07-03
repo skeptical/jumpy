@@ -309,7 +309,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				utils.restart();
 				break;
 			case RUN:
-				return Integer.toString(new runner(0).run(this, arg1, syspath, env));
+				return Integer.toString(new runner(arg2, 0).run(this, arg1, syspath, env));
 			case FOLDERNAME:
 				return this.getName();
 			case XMBPATH:

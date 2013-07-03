@@ -63,7 +63,7 @@ public class userscripts {
 					jumpy.log("\n");
 					jumpy.log(context + name + ".", true);
 					jumpy.log("\n");
-					new runner().run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
+					new runner(name).run(jumpy.top, section.remove("cmd").split("\n")[0], null, section);
 					jumpy.top.env.clear();
 				}
 			}
