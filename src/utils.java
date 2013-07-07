@@ -190,10 +190,10 @@ public final class utils {
 		String ffmpeg_hdr = run(PMS.getConfiguration().getFfmpegPath());
 		if (ffmpeg_hdr.contains("--enable-librtmp")) {
 			properties.put("librtmp", "true");
-			if (FormatFactory.getAssociatedExtension("rtmp://") == null) {
-				FormatFactory.getExtensions().add(0, new WEB() {
+			if (FormatFactory.getAssociatedExtension("rtmp://?") == null) {
+				FormatFactory.getSupportedFormats().add(0, new WEB() {
 					@Override
-					public String[] getId() {
+					public String[] getSupportedExtensions() {
 						return (new String[] {"rtmp", "rtmpt", "rtmps", "rtmpe", "rtmfp", "rtmpte", "rtmpts"});
 					}
 					@Override
@@ -367,9 +367,11 @@ public final class utils {
 		paths.addExec("mencoder", configuration.getMencoderPath());
 		paths.addExec("tsmuxer", configuration.getTsmuxerPath());
 		paths.addExec("flac", configuration.getFlacPath());
-		paths.addExec("eac3to", configuration.getEac3toPath());
 		paths.addExec("dcraw", configuration.getDCRawPath());
-		paths.addExec("convert", configuration.getIMConvertPath());
+		try {
+			paths.addExec("eac3to", configuration.getEac3toPath());
+			paths.addExec("convert", configuration.getIMConvertPath());
+		} catch (NoSuchMethodError e) {}
 		paths.add(PropertiesUtil.getProjectProperties().get("project.binaries.dir"));
 		paths.add(windows ? "win32" : mac ? "osx" : "linux");
 //		paths.remove("");

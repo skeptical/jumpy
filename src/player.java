@@ -103,22 +103,7 @@ public class player extends Player {
 			final player self = this;
 			this.format = new Format() {
 				@Override
-				public ArrayList<Class<? extends Player>> getProfiles() {
-					ArrayList<Class<? extends Player>> profiles = new ArrayList<Class<? extends Player>>();
-					if (type == self.type) {
-//						for (String engine:PMS.getConfiguration().getEnginesAsList(PMS.get().getRegistry())) {
-//							if (engine.equals(self.id)) {
-						for (Player p : PlayerFactory.getPlayers()) {
-							if (p.id().equals(self.id)) {
-								profiles.add(0, self.getClass());
-								break;
-							}
-						}
-					}
-					return profiles;
-				}
-				@Override
-				public String[] getId() {
+				public String[] getSupportedExtensions() {
 					return fmts;
 				}
 				@Override
@@ -138,7 +123,7 @@ public class player extends Player {
 					return self.id;
 				}
 			};
-			FormatFactory.getExtensions().add(0, this.format/*.duplicate()*/);
+			FormatFactory.getSupportedFormats().add(0, this.format/*.duplicate()*/);
 		}
 		if (this.mimetype == null) {
 			this.mimetype = this.format.mimeType();
@@ -180,12 +165,16 @@ public class player extends Player {
 	}
 
 	public boolean isCompatible(Format format) {
-		return (format != null && supported.match(format.getMatchedId(), null, null) != null);
+		return (format != null && supported.match(format.getMatchedExtension(), null, null) != null);
 	}
 
-	@Override
-	public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
+	public ProcessWrapper launchTranscode(DLNAResource dlna,
 			DLNAMediaInfo media, OutputParams params) throws IOException {
+		return launchTranscode(dlna, media, params, dlna.getSystemName());
+	}
+
+	public ProcessWrapper launchTranscode(DLNAResource dlna,
+			DLNAMediaInfo media, OutputParams params, String filename) throws IOException {
 
 		if (! finalize(filename, dlna)) {
 			return null;
@@ -281,7 +270,7 @@ public class player extends Player {
 					dlna instanceof xmbAction ? ((xmbAction)dlna).env : null);
 			}
 			cmdline.substitutions.put("format", isMediaitem ?
-				((mediaItem)dlna).fmt : dlna.getFormat().getId()[0]);
+				((mediaItem)dlna).fmt : dlna.getFormat().getSupportedExtensions()[0]);
 			cmdline.substitutions.put("filename", filename.replace("\\","\\\\"));
 			cmdline.substitutions.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
 				((mediaItem)dlna).userdata : "");

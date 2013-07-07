@@ -15,6 +15,7 @@ import net.pms.encoders.PlayerFactory;
 import net.pms.dlna.Range;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.configuration.RendererConfiguration;
+import net.pms.util.PlayerUtil;
 
 public class resolver extends xmbObject {
 	public String uri0, uri = null, syspath = null;
@@ -49,11 +50,18 @@ public class resolver extends xmbObject {
 	public void reset(String u) {
 		Format f = FormatFactory.getAssociatedExtension(u);
 		if (f == null) {
-			f = u.matches("\\S+://.*") ? new WEB() :
-				FormatFactory.getAssociatedExtension(
+			if (u.matches("\\S+://.*")) {
+				f = new WEB();
+				// avoid URI.getScheme() parsing (in pms) by setting protocol explicitly,
+				// otherwise psuedo-urls (eg librtmp-style urls with spaces) will fail
+				f.setMatchedExtension(u.split("://")[0].toLowerCase());
+			} else {
+				f = FormatFactory.getAssociatedExtension(
 					type == Format.IMAGE ? ".jpg" : type == Format.AUDIO ? ".mp3" : ".mpg");
+			}
 		}
-		checktype();
+		setFormat(f);
+		resolveFormat();
 	}
 
 	@Override // (h/t SharkHunter)

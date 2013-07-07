@@ -193,8 +193,9 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		players.add(new player(this,
 			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
 			"Jumpy Video Action Player", "#checkmark", 0, 1) {
-				public ProcessWrapper launchTranscode(String filename, DLNAResource dlna,
+				public ProcessWrapper launchTranscode(DLNAResource dlna,
 						DLNAMediaInfo media, OutputParams params) throws IOException {
+					String filename = dlna.getSystemName();
 					xmbAction action = (xmbAction)dlna;
 					if (action.userdata != null && action.userdata.startsWith("CMD")) {
 						finalize(filename, dlna);
@@ -208,7 +209,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 						}
 						cmdline = null;
 					}
-					return super.launchTranscode(filename, dlna, media, params);
+					return launchTranscode(dlna, media, params, filename);
 				}
 			});
 
