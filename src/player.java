@@ -29,6 +29,7 @@ import net.pms.io.ProcessWrapperImpl;
 import net.pms.io.ProcessWrapperLiteImpl;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
+import net.pms.encoders.PlayerPurpose;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 
@@ -327,6 +328,14 @@ public class player extends Player {
 	@Override
 	public int purpose() {
 		return purpose;
+	}
+
+	public PlayerPurpose getPurpose() {
+		return purpose == VIDEO_SIMPLEFILE_PLAYER ? PlayerPurpose.VIDEO_FILE_PLAYER :
+			purpose == AUDIO_SIMPLEFILE_PLAYER ? PlayerPurpose.AUDIO_FILE_PLAYER :
+			purpose == VIDEO_WEBSTREAM_PLAYER ? PlayerPurpose.VIDEO_WEB_STREAM_PLAYER :
+			purpose == AUDIO_WEBSTREAM_PLAYER ? PlayerPurpose.AUDIO_WEB_STREAM_PLAYER :
+			purpose == MISC_PLAYER ? PlayerPurpose.MISC_PLAYER : null;
 	}
 
 	@Override
