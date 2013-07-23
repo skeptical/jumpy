@@ -10,7 +10,6 @@ import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
 
 import net.pms.dlna.DLNAResource;
-import net.pms.dlna.virtual.VirtualFolder;
 
 
 public class userscripts {

@@ -7,14 +7,19 @@ import java.io.IOException;
 import net.pms.network.HTTPResource;
 import net.pms.dlna.DLNAResource;
 
-public abstract class xmbObject extends DLNAResource {
+public class xmbObject extends DLNAResource {
 	public String name, thumbnail, thumbtype;
-	public boolean valid;
+	public boolean valid, isFolder;
 
 	public xmbObject(String name, String thumb) {
+		this(name, thumb, false);
+	}
+
+	public xmbObject(String name, String thumb, boolean isFolder) {
 		this.name = name;
 		setThumbnail(thumb);
 		this.valid = true;
+		this.isFolder = isFolder;
 	}
 
 	public void setName(String name) {
@@ -48,7 +53,17 @@ public abstract class xmbObject extends DLNAResource {
 	}
 
 	@Override
-	public InputStream getThumbnailInputStream() {
+	public boolean isFolder() {
+		return isFolder;
+	}
+
+	@Override
+	public long length() {
+		return 0;
+	}
+
+	@Override
+	public InputStream getThumbnailInputStream() throws IOException {
 		if (thumbnail != null) {
 			try {
 				return new FileInputStream(thumbnail);

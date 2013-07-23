@@ -38,7 +38,6 @@ import net.pms.configuration.RendererConfiguration;
 import net.pms.util.PropertiesUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.RootFolder;
-import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
@@ -49,7 +48,7 @@ public final class utils {
 
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
-	public static DLNAResource fakeroot = new VirtualFolder("fakeroot", null);
+	public static DLNAResource fakeroot = new xmbObject("fakeroot", null, true);
 	public static DLNAResource home = null;
 	static ArrayList<RendererConfiguration> foundRenderers = null;
 	public static boolean startup = true;
@@ -225,16 +224,22 @@ public final class utils {
 	}
 
 	public static DLNAResource mkdirs(String path, DLNAResource pwd) {
+		return mkdirs(path, pwd, null);
+	}
+
+	public static DLNAResource mkdirs(String path, DLNAResource pwd, String thumb) {
 		boolean exists = true, atroot=path.startsWith("/"), rootchanged=false;
 		DLNAResource child, parent = atroot ? fakeroot : path.startsWith("~/") ? home : pwd;
-		for (String dir : path.split("/")) {
-			if (dir.equals("") || dir.equals("~")) continue;
-			if (! (exists && (child = parent.searchByName(dir)) != null)) {
+		String[] dir = path.split("/");
+		int i;
+		for (i=0; i<dir.length; i++) {
+			if (dir[i].equals("") || dir[i].equals("~")) continue;
+			if (! (exists && (child = parent.searchByName(dir[i])) != null)) {
 				if (atroot) {
 					rootchanged = true;
 					atroot = false;
 				}
-				child = new VirtualFolder(dir, null);
+				child = new xmbObject(dir[i], i == dir.length-1 ? thumb : null, true);
 				parent.addChild(child);
 				exists = false;
 			}

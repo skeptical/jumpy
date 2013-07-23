@@ -30,7 +30,6 @@ import org.apache.commons.io.FilenameUtils;
 import net.pms.PMS;
 import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
-import net.pms.dlna.virtual.VirtualFolder;
 import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
@@ -68,7 +67,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	private static quickLog logger;
 	private static HashSet<String> logspam = new HashSet<String>();
 	private File[] scripts;
-	public static scriptFolder top, util;
+	public static scriptFolder top;
+	public static xmbObject util;
 	public bookmarker bookmarks;
 	private userscripts userscripts;
 	public List<player> players;
@@ -226,7 +226,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			});
 
 		if (refresh != 0) {
-			util = new scriptFolder(this, "Util", null, "#wrench");
+			util = new xmbObject("Util", "#wrench", true);
 			top.addChild(util);
 			final jumpy self = this;
 			util.addChild(new xmbAction("Refresh",

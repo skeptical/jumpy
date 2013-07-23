@@ -195,8 +195,8 @@ def pms_getFolderName():
 def pms_getXmbPath():
 	return pms_util(PMS_XMBPATH)
 
-def pms_mkDirs(path):
-	return pms_util(PMS_MKDIRS, path)
+def pms_mkDirs(path, thumb=None):
+	return pms_util(PMS_MKDIRS, path, thumb)
 
 def pms_getVar(key):
 	return pms_util(PMS_GETVAR, key)
