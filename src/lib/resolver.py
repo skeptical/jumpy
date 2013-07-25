@@ -49,6 +49,8 @@ class _xbmc:
 	def __init__(self, enable):
 		lib = os.path.join(home, 'xbmc')
 		if os.path.exists(lib):
+			if lib in sys.path:
+				sys.path.remove(lib)
 			sys.path.insert(1, lib)
 		try:
 			import xbmcinit
@@ -58,7 +60,7 @@ class _xbmc:
 			scrapers.append(self)
 			sys.stderr.write('%s version %s\n' % (_info[id]['name'], _info[id]['version']))
 			if enable:
-				sys.path.extend(_info[id]['_pythonpath'])
+				sys.path.extend([p for p in _info[id]['_pythonpath'] if p not in sys.path])
 				argv = sys.argv
 				sys.argv = [sys.argv[0], '?']
 				import urlresolver
@@ -105,7 +107,7 @@ class _youtube_dl:
 			lib = os.path.join( \
 				os.path.dirname(os.path.dirname(os.path.dirname(home))), \
 				os.path.dirname(lib))
-			if os.path.exists(os.path.join(lib, 'youtube_dl')):
+			if os.path.exists(os.path.join(lib, 'youtube_dl')) and not lib in sys.path:
 				sys.path.append(lib)
 		try:
 			import youtube_dl
