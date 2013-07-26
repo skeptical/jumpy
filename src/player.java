@@ -176,11 +176,11 @@ public class player extends Player {
 	}
 
 	public boolean isCompatible(DLNAMediaInfo mediaInfo) {
-		return supported.match(mediaInfo) != null;
+		return (mediaInfo != null && supported.match(mediaInfo) != null);
 	}
 
 	public boolean isCompatible(Format format) {
-		return supported.match(format.getMatchedId(), null, null) != null;
+		return (format != null && supported.match(format.getMatchedId(), null, null) != null);
 	}
 
 	@Override

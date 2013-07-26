@@ -151,7 +151,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		command.basepath =
 			home + "lib" + (bin == null ? "" : (File.pathSeparator + bin));
 		command.basesubs = new HashMap<String,String>() {{
-			put("home", home.replace("\\","\\\\"));
+			put("home", home.substring(0, home.length() - 1).replace("\\","\\\\"));
 			put("PMS", host);
 		}};
 
@@ -188,19 +188,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		resolver.verify();
 		log("\n");
 
-		scripts = new File(home).listFiles(
-			new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".py") && new File(dir.getPath() + File.separatorChar + name).isFile();
-				}
-			}
-		);
-
-		if (showBookmarks) {
-			bookmarks = new bookmarker(this);
-		}
-
-
 		player.out = logger;
 		players = new ArrayList<player>();
 		players.add(new player(this,
@@ -225,6 +212,13 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 				}
 			});
 
+		userscripts = new userscripts(this);
+		userscripts.autorun(true);
+
+		if (showBookmarks) {
+			bookmarks = new bookmarker(this);
+		}
+
 		if (refresh != 0) {
 			util = new xmbObject("Util", "#wrench", true);
 			top.addChild(util);
@@ -238,9 +232,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			});
 			refresh(false);
 		}
-
-		userscripts = new userscripts(this);
-		userscripts.autorun(true);
 
 		scripts = new File(home).listFiles(
 			new FilenameFilter() {

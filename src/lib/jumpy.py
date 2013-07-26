@@ -86,7 +86,7 @@ def decode(s):
 def pms_addItem(itemtype, name, argv, thumb = None, data = None):
 	if type(argv).__name__ == 'list':
 		argv = flatten(argv)
-	pms._addItem(itemtype, decode(name), decode(argv), decode(thumb), decode(data))
+	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), decode(data))
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):

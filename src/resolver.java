@@ -10,8 +10,10 @@ import java.util.concurrent.CountDownLatch;
 
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
+import net.pms.formats.WEB;
 import net.pms.encoders.PlayerFactory;
 import net.pms.dlna.Range;
+import net.pms.dlna.DLNAMediaInfo;
 import net.pms.configuration.RendererConfiguration;
 
 public class resolver extends xmbObject {
@@ -40,14 +42,16 @@ public class resolver extends xmbObject {
 		}
 		this.type = (type == 0 ? Format.VIDEO : type);
 		setSpecificType(type);
+		setMedia(new DLNAMediaInfo());
 		reset(uri0);
 	}
 
 	public void reset(String u) {
-		setFormat(FormatFactory.getAssociatedExtension(u));
-		if (getFormat() == null) {
-			setFormat(FormatFactory.getAssociatedExtension(
-				type == Format.IMAGE ? ".jpg" : type == Format.AUDIO ? ".mp3" : ".mpg"));
+		Format f = FormatFactory.getAssociatedExtension(u);
+		if (f == null) {
+			f = u.matches("\\S+://.*") ? new WEB() :
+				FormatFactory.getAssociatedExtension(
+					type == Format.IMAGE ? ".jpg" : type == Format.AUDIO ? ".mp3" : ".mpg");
 		}
 		checktype();
 	}
@@ -56,11 +60,6 @@ public class resolver extends xmbObject {
 	public InputStream getInputStream(Range range, RendererConfiguration mediarenderer) throws IOException {
 		if (! resolved) {
 			uri = resolve(uri0, syspath, env);
-			if (uri == null) {
-				// maybe there was a network issue, try again
-				jumpy.log("resolver returned null: retrying...");
-				uri = resolve(uri0, syspath, env);
-			}
 			if (uri != null) {
 				resolved = true;
 				reset(uri);
@@ -146,7 +145,7 @@ public class resolver extends xmbObject {
 	public static void startPyServer() {
 		if (pyResolver == null) {
 			final CountDownLatch ready = new CountDownLatch(1);
-			scriptFolder registrar = new scriptFolder(jumpy, "registrar", null, null) {
+			scriptFolder registrar = new scriptFolder(jumpy, "resolver", null, null) {
 				@Override
 				public void register(Object obj) {
 					if (obj == null) {

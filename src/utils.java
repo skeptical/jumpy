@@ -106,7 +106,7 @@ public final class utils {
 		System.exit(0);
 	}
 
-	private static Field getField(Class c, String name) throws NoSuchFieldException {
+	private static Field _getField(Class c, String name) throws NoSuchFieldException {
 		Class clazz = c;
 		while (true) {
 			try {
@@ -122,15 +122,16 @@ public final class utils {
 		}
 	}
 
-	public static void setMediaSubtitle(DLNAResource d, String path, String lang) {
-		DLNAMediaSubtitle sub = new DLNAMediaSubtitle();
+	public static Object getField(Object obj, String name) {
 		try {
-			sub.setId(100); // fake id, not used
-			sub.setLang(lang);
-			sub.setType(SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(path)));
-			sub.setExternalFile(new File(path));
-			getField(d.getClass(), "media_subtitle").set(d, sub);
-			getField(d.getClass(), "srtFile").set(d, true);
+			return _getField(obj.getClass(), name).get(obj);
+		} catch (Exception e) {e.printStackTrace();}
+		return null;
+	}
+
+	public static void setField(Object obj, String name, Object val) {
+		try {
+			_getField(obj.getClass(), name).set(obj, val);
 		} catch (Exception e) {e.printStackTrace();}
 	}
 
@@ -143,18 +144,16 @@ public final class utils {
 		return null;
 	}
 
-	public static ArrayList<RendererConfiguration> getFoundRenderers() {
-		// reflect upon (private final) PMS.foundRenderers
+	public static void setMediaSubtitle(DLNAResource d, String path, String lang) {
+		DLNAMediaSubtitle sub = new DLNAMediaSubtitle();
 		try {
-			PMS instance = PMS.get();
-			Field field = instance.getClass().getDeclaredField("foundRenderers");
-			field.setAccessible(true);
-			return (ArrayList<RendererConfiguration>)field.get(instance);
-		} catch (Exception e) {
-			// shouldn't happen
-			PMS.debug(e.toString());
-			return null;
-		}
+			sub.setId(100); // fake id, not used
+			sub.setLang(lang);
+			sub.setType(SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(path)));
+			sub.setExternalFile(new File(path));
+			setField(d, "media_subtitle", sub);
+			setField(d, "srtFile", true);
+		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	public static String run(String... cmd) {
@@ -214,12 +213,13 @@ public final class utils {
 
 	public static void refreshRoot() {
 		if (foundRenderers == null) {
-			foundRenderers = getFoundRenderers();
+			foundRenderers = (ArrayList<RendererConfiguration>)
+				getField(PMS.get(), "foundRenderers");
 		}
 		for (RendererConfiguration r : foundRenderers) {
 			RootFolder root = r.getRootFolder();
 			root.getChildren().clear();
-			root.reset();
+			setField(root, "discovered", false);
 		}
 	}
 
