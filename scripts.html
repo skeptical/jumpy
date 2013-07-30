@@ -97,6 +97,7 @@ function preview(img, bg) {
 <li><a href="readme.html#WEBREADER">Webreader</a></li>
 <li><a href="readme.html#FEEDREADER">Feedreader</a></li>
 <li><a href="readme.html#RESOLVER">Resolver</a></li>
+<li><a href="readme.html#EARMARKER">Earmarker</a></li>
 <br/>
 <center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
 <li><a href="#QUICKSTART">Quick Start</a></li>
@@ -106,6 +107,7 @@ function preview(img, bg) {
 <option>addAction</option>
 <option>addAudio</option>
 <option>addAudiofeed</option>
+<option>addBookmark</option>
 <option>addCmd</option>
 <option>addConsoleCmd</option>
 <option>addFolder</option>
@@ -123,15 +125,18 @@ function preview(img, bg) {
 <option>err</option>
 <option>getFolderName</option>
 <option>getHome</option>
+<option>getHostIP</option>
 <option>getLogDir</option>
 <option>getPluginJar</option>
 <option>getProfileDir</option>
 <option>getProperty</option>
+<option>getResource</option>
 <option>getVar</option>
 <option>getXmbPath</option>
 <option>imgfx</option>
 <option>info</option>
 <option>log</option>
+<option>mkDirs</option>
 <option>ok</option>
 <option>refresh</option>
 <option>reboot</option>
@@ -252,6 +257,7 @@ The extremely basic python API is initialized on import
 defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
 <br/><br/>
 <li><a name="addFolder"></a><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addBookmark"></a><kbd>pms.addBookmark</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
@@ -274,12 +280,12 @@ where
 <pre>
 <i class="comment"># media items           # dynamic items</i>
 PMS_AUDIO               PMS_FOLDER
-PMS_IMAGE               PMS_ACTION
-PMS_VIDEO
-PMS_UNKNOWN             <i class="comment"># hybrid items</i>
-PMS_PLAYLIST            PMS_MEDIA
-PMS_ISO                 PMS_UNRESOLVED
-PMS_AUDIOFEED
+PMS_IMAGE               PMS_BOOKMARK
+PMS_VIDEO               PMS_ACTION
+PMS_UNKNOWN
+PMS_PLAYLIST            <i class="comment"># hybrid items</i>
+PMS_ISO                 PMS_MEDIA
+PMS_AUDIOFEED           PMS_UNRESOLVED
 PMS_IMAGEFEED
 PMS_VIDEOFEED
 </pre>
@@ -483,6 +489,11 @@ Define an environment variable to be set when the current folder or its descenda
 </ul>
 </li>
 <br/>
+<li><a name="getHostIP"><kbd>pms.HostIP</kbd><code>()</code></a>
+<ul>Get the local IP of PMS/UMS.
+</ul>
+</li>
+<br/>
 <li><a name="getFolderName"><kbd>pms.getFolderName</kbd><code>()</code></a>
 <ul>Get the name of the current xmb folder.
 </ul>
@@ -490,6 +501,12 @@ Define an environment variable to be set when the current folder or its descenda
 <br/>
 <li><a name="getXmbPath"><kbd>pms.getXmbPath</kbd><code>()</code></a>
 <ul>Get the full path of the current xmb folder.
+</ul>
+</li>
+<br/>
+<li><a name="mkDirs"><kbd>pms.mkDirs</kbd><code>(path, thumb<i>=None</i>)</code></a>
+<ul>Create the given (unix-style) <code>path</code> on the xmb and set
+<code>thumb</code> as the end folder's thumbnail.
 </ul>
 </li>
 <br/>
@@ -525,19 +542,22 @@ the folder on the xmb.
 </ul>
 </li>
 <br/>
-<li><a name="run"><kbd>pms.run</kbd><code>(cmd)</code></a>
+<li><a name="run"><kbd>pms.run</kbd><code>(cmd, name<i>=None</i>)</code></a>
 <ul>Run the given command and return its exit code as a string.
 <ul>
 <li>Commands with '<code>&</code>' as the last argument
 (whether in Windows or unix) are launched
 asynchronously and automatically killed if still alive at program shutdown.
 </li>
+<li>If given, <code>name</code> is used to identify the process in the log. Otherwise
+name is taken from the calling object or executable.
+</li>
 </ul>
 </ul>
 </li>
 <br/>
 <li><a name="getVar"><kbd>pms.getVar</kbd><code>(key)</code></a>
-<ul>Get a previously set variable from <i>jumpy</i>, including the predefined ones below:
+<ul>Get a previously set session variable from <i>jumpy</i>, including the predefined ones below:
 <br/>
 <ul>
 <table>
@@ -550,17 +570,29 @@ asynchronously and automatically killed if still alive at program shutdown.
 </li>
 <br/>
 <li><a name="setVar"><kbd>pms.setVar</kbd><code>(key, val)</code></a>
-<ul>Set a variable (for later retrieval via <code>getVar</code>)</i>.
+<ul>Set a session variable (for later retrieval via <code>getVar</code>)</i>.
 </ul>
 </li>
 <br/>
-<li><a name="getProperty"><kbd>pms.getProperty</kbd><code>(key)</code></a>
-<ul>Get a property from <i>PMS.conf</i>.
+<li><a name="getProperty"><kbd>pms.getProperty</kbd><code>(key, fallback<i>=''</i>)</code></a>
+<ul>Get a property from <i>PMS.conf</i>, or <code>fallback</code> if the property isn't set.
 </ul>
 </li>
 <br/>
 <li><a name="setProperty"><kbd>pms.setProperty</kbd><code>(key, val)</code></a>
 <ul>Set a property in <i>PMS.conf</i>.
+</ul>
+</li>
+<br/>
+<li><a name="getResource"><kbd>pms.getResource</kbd><code>(src)</code></a>
+<ul>Get the path to an existing local or cached resource, where <code>src</code> is either
+<ul>
+<li>an existing file
+</li>
+<li>an icon or image with an <i><a href="#FX">+fx string</a></i> added, in
+which case it will be generated and cached if it doesn't already exist.
+</li>
+</ul>
 </ul>
 </li>
 <br/>
