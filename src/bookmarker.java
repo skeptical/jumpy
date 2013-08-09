@@ -42,7 +42,7 @@ public class bookmarker {
 
 	public void add(scriptFolder folder, boolean copy, boolean save) {
 		String path = folder.getName();
-		String label = FilenameUtils.getName(path);
+		String label = utils.unesc(FilenameUtils.getName(path));
 		path = FilenameUtils.getFullPath(path);
 		DLNAResource parent = path == null ? Bookmarks : utils.mkdirs(path, Bookmarks);
 
@@ -90,7 +90,7 @@ public class bookmarker {
 			for (scriptFolder bookmark : bookmarks) {
 				String name =
 					(bookmark.getParent() == Bookmarks ? "" : (utils.getXMBPath(bookmark, null) + "/")) +
-					bookmark.getName();
+					utils.esc(bookmark.getName());
 				Section section = ini.add(name);
 				section.put("uri", bookmark.uri);
 				if (! (bookmark.thumbnail == null || bookmark.thumbnail.isEmpty()))

@@ -70,6 +70,9 @@ except NameError:
 	__builtin__.PMS_MISC_PLAYER = 4
 	__builtin__.PMS_NATIVE = "NATIVE"
 
+def esc(name):
+	return name.replace('/', '^|')
+
 def flatten(list):
 	a = []
 	for item in list:
@@ -83,7 +86,7 @@ def decode(s):
 			except: pass
 	return s
 
-def pms_addItem(itemtype, name, argv, thumb = None, data = None):
+def pms_addItem(itemtype, name, argv, thumb=None, data=None):
 	if type(argv).__name__ == 'list':
 		argv = flatten(argv)
 	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), decode(data))
@@ -269,6 +272,7 @@ __builtin__.pms.setIcon = pms_setIcon
 __builtin__.pms.setSubtitles = pms_setSubtitles
 __builtin__.pms.log = pms_log
 __builtin__.pms.addPlayer = pms_addPlayer
+__builtin__.pms.esc = esc
 
 lib = os.path.dirname(os.path.realpath(__file__))
 resources = os.path.join(lib, 'resources')

@@ -223,6 +223,14 @@ public final class utils {
 		}
 	}
 
+	public static String esc(String name) {
+		return name.replace("/", "^|");
+	}
+
+	public static String unesc(String name) {
+		return name.replace("^|", "/");
+	}
+
 	public static DLNAResource mkdirs(String path, DLNAResource pwd) {
 		return mkdirs(path, pwd, null);
 	}
@@ -233,6 +241,7 @@ public final class utils {
 		String[] dir = path.split("/");
 		int i;
 		for (i=0; i<dir.length; i++) {
+			dir[i] = unesc(dir[i]);
 			if (dir[i].equals("") || dir[i].equals("~")) continue;
 			if (! (exists && (child = parent.searchByName(dir[i])) != null)) {
 				if (atroot) {
@@ -261,7 +270,7 @@ public final class utils {
 			if (root || p == ancestor) {
 				break;
 			}
-			xmbpath = p.getName().trim() + "/" + xmbpath;
+			xmbpath = esc(p.getName().trim()) + "/" + xmbpath;
 		}
 		return (root ? "/" : "") + xmbpath.replace("//","").trim();
 	}

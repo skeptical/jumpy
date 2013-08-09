@@ -133,7 +133,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		}
 
 		filename = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
-		String label = FilenameUtils.getName(filename);
+		String label = utils.unesc(FilenameUtils.getName(filename));
 		String path = FilenameUtils.getFullPath(filename);
 		DLNAResource folder = path == null ? this : utils.mkdirs(path, this);
 		String thumb = jumpy.getResource(thumbnail);
@@ -313,7 +313,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			case FOLDERNAME:
 				return this.getName();
 			case XMBPATH:
-				return ("/" + utils.getXMBPath(this, jumpy.top.getParent()) + "/" + this.name).replace("//", "/");
+				return ("/" + utils.getXMBPath(this, jumpy.top.getParent()) + "/" + utils.unesc(this.name)).replace("//", "/");
 			case MKDIRS:
 				utils.mkdirs(arg1, this, arg2);
 				break;
