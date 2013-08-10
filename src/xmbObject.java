@@ -71,7 +71,7 @@ public class xmbObject extends DLNAResource {
 			try {
 				return downloadAndSend(thumbnail, true);
 			} catch (Exception e) {}
-			jumpy.logonce("can't get thumbnail: " + thumbnail, thumbnail);
+			jumpy.logonce("can't get thumbnail: " + thumbnail, thumbnail, false);
 		}
 		return null;
 	}

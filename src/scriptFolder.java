@@ -349,7 +349,12 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				}
 				break;
 			case LOG:
-				jumpy.log(arg1, true);
+				boolean minimal = arg2.contains("v");
+				if (arg2.contains("o")) {
+					jumpy.logonce(arg1, arg1, minimal);
+				} else {
+					jumpy.log(arg1, minimal);
+				}
 				break;
 		}
 		return "";

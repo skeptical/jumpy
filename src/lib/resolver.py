@@ -21,7 +21,7 @@ class resolver:
 		for scraper in scrapers:
 			scraper.resolve(url, self)
 			if self.url:
-				pms.log('%s : %s' % (scraper.name, self.url))
+				pms.log('%s : %s' % (scraper.name, self.url), True)
 				return self.url
 		return None
 

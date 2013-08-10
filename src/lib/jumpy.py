@@ -222,8 +222,8 @@ def pms_setIcon(fmt, img):
 def pms_setSubtitles(path):
 	pms_util(PMS_SUBTITLE, path)
 
-def pms_log(msg):
-	pms_util(PMS_LOG, msg)
+def pms_log(msg, verbose=False, once=False):
+	pms_util(PMS_LOG, msg, '%s%s' % ('v' if verbose else '', 'o' if once else ''))
 
 def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, icon=None, playback=None):
 	if type(cmd).__name__ == 'list':

@@ -266,9 +266,9 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		return utils.fakeroot.getChildren().iterator();
 	}
 
-	public static void logonce(String msg, String id) {
+	public static void logonce(String msg, String id, boolean minimal) {
 		if (! logspam.contains(id)) {
-			log(msg);
+			log(msg, minimal);
 			logspam.add(id);
 		}
 	}
