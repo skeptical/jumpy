@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -358,7 +360,20 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback);
 	}
 
+	protected CountDownLatch ready = null;
+
 	@Override
-	public synchronized void register(Object obj) {}
+	public void register(Object obj) {
+		if (obj == null) {
+			try {
+				ready = new CountDownLatch(1);
+				ready.await(500, TimeUnit.MILLISECONDS);
+			} catch (Exception e) {e.printStackTrace();}
+		} else if (ready != null) {
+			ready.countDown();
+			jumpy.log("\n");
+		}
+		ready = null;
+	}
 }
 

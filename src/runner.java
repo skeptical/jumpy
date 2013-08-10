@@ -116,9 +116,7 @@ public class runner {
 			if (cmdline.async) {
 				active.add(this);
 				new Thread(new outputlogger(), "outputlogger").start();
-				if (cmdline.has_callback) {
-					obj.register(null);
-				}
+				obj.register(null);
 				return 0;
 			}
 

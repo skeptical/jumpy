@@ -323,7 +323,6 @@ sys.stdout = flushed(sys.stdout)
 
 __builtin__.sys = sys
 
-
 if __name__ == "__main__" and len(sys.argv) == 1:
 
 	if sys.platform.startswith('win32'):
@@ -378,4 +377,7 @@ elif __name__ == "__main__":
 		traceback.print_exc(file=sys.stderr)
 		sys.stderr.write("Error: invalid syntax.\n")
 		sys.exit(-1)
+
+elif 'pms_await' not in sys.modules['__main__'].__dict__:
+	pms.register(True)
 

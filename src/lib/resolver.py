@@ -7,6 +7,7 @@ enable_get_flash_videos = False
 import os, sys, traceback, __builtin__
 from cStringIO import StringIO
 from subprocess import Popen, PIPE
+pms_await = True
 import jumpy
 
 

@@ -152,12 +152,12 @@ public class resolver extends xmbObject {
 
 	public static void startPyServer() {
 		if (pyResolver == null) {
-			final CountDownLatch ready = new CountDownLatch(1);
 			scriptFolder registrar = new scriptFolder(jumpy, "resolver", null, null) {
 				@Override
 				public void register(Object obj) {
 					if (obj == null) {
 						try {
+							ready = new CountDownLatch(1);
 							ready.await();
 						} catch (Exception e) {e.printStackTrace();}
 					} else {
