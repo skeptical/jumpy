@@ -337,7 +337,8 @@ public class command {
 			args[i] = expand(argv.get(i));
 		}
 		args[scriptarg] = StringUtils.fixFileSeparatorChar(args[scriptarg]);
-		startdir = absolute(args[scriptarg]).getParentFile().getAbsoluteFile();
+		startdir = absolute(args[scriptarg]).getParentFile();
+		startdir = (startdir == null ? new File("") : startdir).getAbsoluteFile();
 		return args;
 	}
 
