@@ -191,7 +191,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		player.out = logger;
 		players = new ArrayList<player>();
 		players.add(new player(this,
-			"@", "", "jump", "video/mpeg", Format.UNKNOWN, Player.MISC_PLAYER,
+			"@", "", "jump", "video/mpeg", Format.VIDEO, Player.MISC_PLAYER,
 			"Jumpy Video Action Player", "#checkmark", 0, 1) {
 				public ProcessWrapper launchTranscode(DLNAResource dlna,
 						DLNAMediaInfo media, OutputParams params) throws IOException {

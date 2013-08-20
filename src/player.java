@@ -123,6 +123,7 @@ public class player extends Player {
 					return self.id;
 				}
 			};
+			this.format.setType(this.type);
 			FormatFactory.getSupportedFormats().add(0, this.format/*.duplicate()*/);
 		}
 		if (this.mimetype == null) {
