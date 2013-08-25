@@ -377,10 +377,6 @@ public final class utils {
 		paths.addExec("tsmuxer", configuration.getTsmuxerPath());
 		paths.addExec("flac", configuration.getFlacPath());
 		paths.addExec("dcraw", configuration.getDCRawPath());
-		try {
-			paths.addExec("eac3to", configuration.getEac3toPath());
-			paths.addExec("convert", configuration.getIMConvertPath());
-		} catch (NoSuchMethodError e) {}
 		paths.add(PropertiesUtil.getProjectProperties().get("project.binaries.dir"));
 		paths.add(windows ? "win32" : mac ? "osx" : "linux");
 //		paths.remove("");

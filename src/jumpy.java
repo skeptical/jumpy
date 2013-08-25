@@ -28,7 +28,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.FilenameUtils;
 
 import net.pms.PMS;
-import net.pms.util.PMSUtil;
 import net.pms.dlna.DLNAResource;
 import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.configuration.PmsConfiguration;
