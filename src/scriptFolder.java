@@ -198,7 +198,11 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				break;
 			case Format.VIDEO:
 				media = (f == null ? "web " : "") + "video";
-				newItem = (f == null ? new WebVideoStream(label, uri, thumb) : new RealFile(f, label));
+				newItem = (f == null ?
+					new WebVideoStream(label, uri, thumb) {
+						public boolean isURLResolved() {return true;}
+					}
+					: new RealFile(f, label));
 				break;
 			case Format.AUDIO:
 				media = (f == null ? "web " : "") + "audio";

@@ -19,7 +19,9 @@ class resolver:
 	def resolve(self, url):
 		self.url = None
 		for scraper in scrapers:
-			scraper.resolve(url, self)
+			try:
+				scraper.resolve(url, self)
+			except: traceback.print_exc()
 			if self.url:
 				pms.log('%s : %s' % (scraper.name, self.url), True)
 				return self.url
@@ -37,6 +39,7 @@ class cbresolver(resolver):
 		implements = ['net.pms.external.infidel.jumpy.resolver$Resolver']
 
 	def __init__(self):
+		resolver.__init__(self)
 		try:
 			pms.register(self)
 		except: traceback.print_exc()
@@ -108,8 +111,10 @@ class _youtube_dl:
 			lib = os.path.join( \
 				os.path.dirname(os.path.dirname(os.path.dirname(home))), \
 				os.path.dirname(lib))
-			if os.path.exists(os.path.join(lib, 'youtube_dl')) and not lib in sys.path:
-				sys.path.append(lib)
+			if os.path.exists(os.path.join(lib, 'youtube_dl')):
+				if lib in sys.path:
+					sys.path.remove(lib)
+				sys.path.insert(1, lib)
 		try:
 			import youtube_dl
 			__builtin__.youtube_dl = youtube_dl
@@ -119,6 +124,8 @@ class _youtube_dl:
 				# omit the last extractor (GenericIE, which takes forever)
 				extractors = youtube_dl.gen_extractors()[:-1]
 				youtube_dl.gen_extractors = lambda:extractors
+				if '_ALL_CLASSES' in youtube_dl.extractor.__dict__:
+					youtube_dl.extractor._ALL_CLASSES = youtube_dl.extractor._ALL_CLASSES[:-1]
 				# set up redirection
 				self.devnull = open(os.devnull, 'w')
 				self.noexit = lambda m:None
@@ -127,11 +134,14 @@ class _youtube_dl:
 			sys.stderr.write('unable to open youtube-dl\n')
 
 	def resolve(self, url, resolver):
+		if 'plugin://' in url: return
 		stdout, stderr, exit = sys.stdout, sys.stderr, sys.exit
 		# prevent youtube_dl from shutting us down, discard stderr, capture stdout
 		sys.exit = self.noexit
 		sys.stderr = self.devnull
 		sys.stdout = capture = StringIO()
+		# TODO: --cookies (https://github.com/rg3/youtube-dl/issues/41)
+		#       --max-downloads (overuse triggers '402: Payment Required')
 		youtube_dl.main(['--get-title', '-g', '--get-thumbnail', url])
 		sys.stdout, sys.stderr, sys.exit = stdout, stderr, exit
 		o = capture.getvalue()
@@ -180,6 +190,8 @@ print 'scrapers: %s' % ' '.join([s.name for s in scrapers])
 if __name__ == "__main__":
 	if 'start' in sys.argv:
 		cbresolver()
+	elif 'test' in sys.argv:
+		resolver().resolve(sys.argv[2])
 	elif len(scrapers):
 		pms.setEnv('resolvers', ' '.join([s.name for s in scrapers]))
 
