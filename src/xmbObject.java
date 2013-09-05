@@ -32,6 +32,10 @@ public class xmbObject extends DLNAResource {
 			HTTPResource.PNG_TYPEMIME : HTTPResource.JPEG_TYPEMIME);
 	}
 
+	public void touch() {
+		lastmodified = 1;
+	}
+
 	@Override
 	public InputStream getInputStream() throws IOException {
 		return null;

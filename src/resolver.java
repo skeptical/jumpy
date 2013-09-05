@@ -20,7 +20,7 @@ import net.pms.util.PlayerUtil;
 public class resolver extends xmbObject {
 	public String uri0, uri = null, syspath = null;
 	public Map<String,String> env;
-	public boolean resolved = false;
+	public boolean resolved = false, isweb, iscmdarray;
 	public int type;
 
 	public static final int XBMC = 1;
@@ -48,14 +48,17 @@ public class resolver extends xmbObject {
 	}
 
 	public void reset(String u) {
-		Format f = FormatFactory.getAssociatedExtension(u);
-		if (f == null) {
-			if (u.matches("\\S+://.*")) {
-				f = new WEB();
-				// avoid URI.getScheme() parsing (in pms) by setting protocol explicitly,
-				// otherwise psuedo-urls (eg librtmp-style urls with spaces) will fail
-				f.setMatchedExtension(u.split("://")[0].toLowerCase());
-			} else {
+		Format f;
+		isweb = u.matches(".*\\S+://.*");
+		iscmdarray = u.startsWith("[");
+		if (isweb) {
+			f = new WEB();
+			// avoid URI.getScheme() parsing (in pms) by setting protocol explicitly,
+			// otherwise psuedo-urls (eg librtmp-style urls with spaces) will fail
+			f.setMatchedExtension(iscmdarray ? "http" : u.split("://")[0].toLowerCase());
+		} else {
+			f = FormatFactory.getAssociatedExtension(u);
+			if (f == null) {
 				f = FormatFactory.getAssociatedExtension(
 					type == Format.IMAGE ? ".jpg" : type == Format.AUDIO ? ".mp3" : ".mpg");
 			}
@@ -79,7 +82,7 @@ public class resolver extends xmbObject {
 
 	@Override
 	public String getSystemName() {
-		return uri != null ? uri : uri0;
+		return uri != null ? uri : (isweb && iscmdarray) ? "http://unresolved" : uri0;
 	}
 
 	@Override

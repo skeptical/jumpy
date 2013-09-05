@@ -275,6 +275,14 @@ public final class utils {
 		return (root ? "/" : "") + xmbpath.replace("//","").trim();
 	}
 
+	public static void touch(DLNAResource folder) {
+		try {
+			((xmbObject)folder).touch();
+		} catch (Exception e) {
+			setField(folder, "lastmodified", 1);
+		}
+	}
+
 	public static File download(String url, String destdir) {
 		System.out.println("downloading: " + url);
 		File dest=null, temp=null;

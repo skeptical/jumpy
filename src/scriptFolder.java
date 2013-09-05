@@ -40,6 +40,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	public boolean isBookmark = false;
 	public boolean refreshOnce = true;
 	public boolean refreshAlways = false;
+	private int lastcount;
 
 	public scriptFolder(jumpy jumpy, String name, String uri, String thumb) {
 		this(jumpy, name, uri, thumb, null, null);
@@ -69,6 +70,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		this.ex = null;
 		this.newItem = null;
 		this.refreshAlways = (jumpy.refresh == 0);
+		this.lastmodified = 0;
 	}
 
 	@Override
@@ -88,6 +90,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		}
 		List<DLNAResource> children = getChildren();
 		children.clear();
+		lastcount = 0;
 		jumpy.log("\n");
 		jumpy.log("Opening folder: " + name + ".\n");
 		ex = new runner();
@@ -106,6 +109,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			children.add(0, children.remove(children.size() - 1));
 		}
 		refreshOnce = false;
+		lastmodified = 0;
 	}
 
 	public void refresh() {
@@ -119,7 +123,18 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 
 	@Override
 	public boolean isRefreshNeeded() {
-		return true;
+		boolean isneeded = (lastmodified != 0);
+		lastmodified = 0;
+		return isneeded;
+	}
+
+	@Override
+	public boolean analyzeChildren(int count) {
+		int size = getChildren().size();
+		boolean ready = (ex != null && ex.running) ?
+			count == -1 ? false : (size - lastcount >= count) : true;
+		lastcount = size;
+		return ready;
 	}
 
 	public Object addItem(int type, String filename, String uri, String thumbnail) {
@@ -243,6 +258,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		}
 		if (newItem != null) {
 			folder.addChild(newItem);
+			utils.touch(folder);
 			jumpy.log("Adding " + media +  ": " + filename + ".");
 		}
 		return (ex != null && ex.running) ? null : folder.getChildren().get(folder.getChildren().size()-1);

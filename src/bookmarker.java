@@ -53,6 +53,7 @@ public class bookmarker {
 		}
 		bookmark.setName(label);
 		parent.addChild(bookmark);
+		utils.touch(parent);
 		bookmarks.add(bookmark);
 		jumpy.log("Adding bookmark: " + label);
 		if (save) {
@@ -62,7 +63,9 @@ public class bookmarker {
 
 	public void remove(scriptFolder folder) {
 		String name = folder.getName();
-		folder.getParent().getChildren().remove(folder);
+		DLNAResource parent = folder.getParent();
+		parent.getChildren().remove(folder);
+		utils.touch(parent);
 		bookmarks.remove(folder);
 		jumpy.log("Removing bookmark: " + name);
 		store();
