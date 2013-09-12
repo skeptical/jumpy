@@ -16,6 +16,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.dlna.DLNAMediaAudio;
+import net.pms.dlna.DLNAMediaSubtitle;
 import net.pms.dlna.VideosFeed;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.ImagesFeed;
@@ -138,14 +141,23 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	}
 
 	public Object addItem(int type, String filename, String uri, String thumbnail) {
-		return addItem(type, filename, uri, thumbnail, null);
+		return addItem(type, filename, uri, thumbnail, null, null);
+	}
+
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo) {
+		return addItem(type, filename, uri, thumbnail, mediainfo, null);
 	}
 
 	@Override
-	public Object addItem(int type, String filename, String uri, String thumbnail, String data) {
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
 
 		if (filename == null || uri == null) {
 			return null;
+		}
+
+		DLNAMediaInfo mediaInfo = mediainfo != null ? getMediaInfo(mediainfo) : null;
+		if (mediaInfo != null) {
+			jumpy.log("mediaInfo: " + mediaInfo);
 		}
 
 		filename = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
@@ -257,6 +269,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				}
 		}
 		if (newItem != null) {
+			if (mediaInfo != null) {
+				utils.setField(newItem, "media", mediaInfo);
+			}
 			folder.addChild(newItem);
 			utils.touch(folder);
 			jumpy.log("Adding " + media +  ": " + filename + ".");
@@ -398,6 +413,63 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			jumpy.log("\n");
 		}
 		ready = null;
+	}
+
+	public static DLNAMediaInfo getMediaInfo(Map mediainfo) {
+		DLNAMediaInfo m = new DLNAMediaInfo();
+		ArrayList<DLNAMediaAudio> audio = new ArrayList<DLNAMediaAudio>();
+		ArrayList<DLNAMediaSubtitle> subs = new ArrayList<DLNAMediaSubtitle>();
+
+		if (mediainfo.containsKey("duration")) {
+			m.setDuration(utils.duration((String)mediainfo.get("duration")));
+		} else if (mediainfo.containsKey("streams")) {
+			for (Map<String,String> s : (List<Map<String,String>>)mediainfo.get("streams")) {
+				try {
+					String type = s.get("type").toLowerCase();
+					if (type.equals("video")) {
+						if (s.containsKey("codec")) {
+							m.setCodecV(s.get("codec"));
+						}
+						if (s.containsKey("aspect")) {
+							m.setAspect(s.get("aspect"));
+						}
+						if (s.containsKey("width")) {
+							m.setWidth(Integer.parseInt(s.get("width")));
+						}
+						if (s.containsKey("height")) {
+							m.setHeight(Integer.parseInt(s.get("height")));
+						}
+						if (s.containsKey("duration")) {
+							m.setDuration(utils.duration(s.get("duration")));
+						}
+					} else if (type.equals("audio")) {
+						DLNAMediaAudio a = new DLNAMediaAudio();
+						if (s.containsKey("codec")) {
+							a.setCodecA(s.get("codec"));
+						}
+						if (s.containsKey("language")) {
+							a.setLang(s.get("language"));
+						}
+						if (s.containsKey("channels")) {
+							a.getAudioProperties().setNumberOfChannels(Integer.parseInt(s.get("channels")));
+						}
+						audio.add(a);
+					} else if (type.equals("subtitle")) {
+						DLNAMediaSubtitle t = new DLNAMediaSubtitle();
+						if (s.containsKey("language")) {
+							t.setLang(s.get("language"));
+						}
+						subs.add(t);
+					}
+				} catch (Exception e) {
+					net.pms.external.infidel.jumpy.jumpy.log("Error reading media info: " + e);
+				}
+			}
+		}
+		m.setAudioTracksList(audio);
+		m.setSubtitleTracksList(subs);
+		m.setMediaparsed(true);
+		return m;
 	}
 }
 

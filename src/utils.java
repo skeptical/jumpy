@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -466,5 +467,17 @@ public final class utils {
 			PMS.debug("Failed to open default viewer: " + f);
 			return false;
 		}
+	}
+
+	// parse duration strings in hh:mm:ss, mm:ss, or ss format
+	public static double duration(String d) {
+		String[] n = ("0:0:" + d.replace(",", ".")).split(":");
+		ArrayUtils.reverse(n);
+		try {
+			return Double.parseDouble(n[0]) + Double.parseDouble(n[1])*60 + Double.parseDouble(n[2])*3600;
+		} catch (Exception e) {
+			PMS.debug("Error parsing duration " + d + ": " + e.toString());
+		}
+		return 0;
 	}
 }

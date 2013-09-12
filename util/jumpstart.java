@@ -267,7 +267,7 @@ class item extends node implements jumpyAPI {
 	public String getName() {
 		return name;
 	}
-	public Object addItem(int type, String filename, String uri, String thumb, String data) {
+	public Object addItem(int type, String filename, String uri, String thumb, Map mediainfo, String data) {
 		File f = new File(filename);
 		String name = f.getName();
 		String path = f.getParent();

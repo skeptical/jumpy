@@ -102,7 +102,7 @@ public class resolver extends xmbObject {
 
 	@Override
 	public boolean isTranscodeFolderAvailable() {
-		return false;
+		return (media.getCodecV() != null || media.getFirstAudioTrack() != null);
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class resolver extends xmbObject {
 			final result r = new result();
 			scriptFolder s = new scriptFolder(jumpy, "Resolver", null, null) {
 				@Override
-				public Object addItem(int type, String filename, String uri, String thumbnail, String data) {
+				public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
 					r.uri = uri;
 					return null;
 				}

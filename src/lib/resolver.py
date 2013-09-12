@@ -90,7 +90,7 @@ class _xbmc:
 			if 'plugin://' in u:
 				pmsaddItem = __builtin__.pms.addItem
 				pmsutil = __builtin__.pms.util
-				def addItem(itemtype, name, argv, thumb=None, data=None):
+				def addItem(itemtype, name, argv, thumb=None, mediainfo=None, data=None):
 					if type(argv).__name__ == 'list':
 						argv = jumpy.flatten(argv)
 					resolver.add(argv, name, thumb)
@@ -152,7 +152,7 @@ class _youtube_dl:
 		sys.stdout = capture = StringIO()
 		# TODO: --cookies (https://github.com/rg3/youtube-dl/issues/41)
 		#       --max-downloads (overuse triggers '402: Payment Required')
-		youtube_dl.main(['--get-title', '-g', '--get-thumbnail', url])
+		youtube_dl.main(['-i', '--get-title', '-g', '--get-thumbnail', url])
 		sys.stdout, sys.stderr, sys.exit = stdout, stderr, exit
 		o = capture.getvalue()
 		if o:
