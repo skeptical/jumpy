@@ -52,7 +52,7 @@ import net.pms.external.DebugPacker;
 public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URLResolver {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.2.8";
+	public static final String version = "0.2.9";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	public PmsConfiguration configuration;
