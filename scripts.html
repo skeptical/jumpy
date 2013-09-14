@@ -123,6 +123,7 @@ function preview(img, bg) {
 <option>addVideo</option>
 <option>addVideofeed</option>
 <option>err</option>
+<option>esc</option>
 <option>getFolderName</option>
 <option>getHome</option>
 <option>getHostIP</option>
@@ -140,6 +141,7 @@ function preview(img, bg) {
 <option>ok</option>
 <option>refresh</option>
 <option>reboot</option>
+<option>register</option>
 <option>restart</option>
 <option>run</option>
 <option>setEnv</option>
@@ -252,7 +254,7 @@ For details see <a href="#addPlayer"><code>pms.addPlayer</code></a>, and
 
 <b><a name="API">API</a></b>
 <ul>
-The extremely basic python API is initialized on import
+The python API is initialized on import
 <pre>import jumpy</pre>
 defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the following methods:
 <br/><br/>
@@ -290,10 +292,17 @@ PMS_IMAGEFEED
 PMS_VIDEOFEED
 </pre>
 </li>
-<li><code>name</code> is the item's label.
+<li><a name="esc"></a><code>name</code> is the item's label.
 <ul><li><a name="UNIXPATH"/>Using a unix-style path as the label (e.g. '<code>myscripts/perl/foo</code>')
 will create the specified path on the xmb, branching from the current folder if relative or the xmb
-root if absolute. The <i>Jumpy</i> folder is '<code>~</code>'.</li>
+root if absolute. Also:
+<ul>
+<li>'<code>~</code>' is the <i>Jumpy</i> folder.</li>
+<li>If there's any chance your label may contain a literal '<code><span class="orange">/</span></code>'
+use <i><b>pms.esc</b></i> to escape it:
+<ul><code>pms.addVideo(pms.esc('<i>Part 1<span class="orange">/</span>2</i>'), '<i>part1.mpg</i>')</code></ul></li>
+</ul>
+</li>
 </ul>
 </li>
 <br/>
@@ -525,6 +534,21 @@ Define an environment variable to be set when the current folder or its descenda
 </ul>
 </li>
 <br/>
+<li><a name="register"><kbd>pms.register</kbd><code>(obj)</code></a>
+<ul>Register a python object with the java side. This is currently for
+asynchronous commands (i.e. with '<code>&</code>' as the last argument)
+to signal "ready" <i><u>if</u></i> they have first
+requested a temporary suspension of execution in java by setting
+<code>pms_await</code> prior to importing jumpy. For example:<pre>
+pms_await = True      <i class="comment"># request java execution to halt</i>
+import jumpy
+<i class="comment"># ...                 # init</i>
+pms.register(True)    <i class="comment"># signal java execution to proceed</i>
+<i class="comment"># ...                 # asynchronous activity</i>
+<pre>
+</ul>
+</li>
+<!--<br/>-->
 <li><a name="refresh"><kbd>pms.refresh</kbd><code>(up<i>=0</i>)</code></a>
 <ul>Mark the current folder and its ancestors <i>n</i> levels <code>up</code> for refresh. Note that how
 and when the refresh actually takes effect is renderer-dependent, usually requiring re-entry into
@@ -557,7 +581,7 @@ name is taken from the calling object or executable.
 </li>
 <br/>
 <li><a name="getVar"><kbd>pms.getVar</kbd><code>(key)</code></a>
-<ul>Get a previously set session variable from <i>jumpy</i>, including the predefined ones below:
+<ul>Get a previously set session variable from <i>jumpy</i> (or <code>''</code> if not found), including the predefined ones below:
 <br/>
 <ul>
 <table>
@@ -629,7 +653,7 @@ for example:
 </li>
 <br/>
 <li><code>supported</code> is a string specifying supported media in the same syntax used for configuring renderers
-(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L358"><i>PMS.conf</i></a>).
+(see <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L362"><i>PMS.conf</i></a>).
 For instance an "audio as video" player might use:
 <ul><code>"f:flac|wav m:video/mpeg"</code></ul>
 which means 'accept any <i>flac</i> or <i>wav</i> file and broadcast a <i>video/mpeg</i>
@@ -640,7 +664,7 @@ mimetype for it'. Some things to keep in mind:
 </li>
 <li>If <code>f:</code> specifies known formats, your player will override PMS' default
 player for those formats.  In this case, since the media is known and can be parsed, you can
-further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L423">etc</a>).
+further narrow <code>supported</code> using the other valid parameters (<code>v: a: n:</code> <a href="https://github.com/ps3mediaserver/ps3mediaserver/blob/master/src/main/external-resources/renderers/PS3.conf#L427">etc</a>).
 <li>If <code>f:</code> specifies unrecognised formats (real such as <code>f:txt</code> or
 imaginary such as <code>f:foo</code>), then only <code>m:</code> will be valid,
 since PMS obviously can't parse the media and presumably your player knows what to do
