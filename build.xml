@@ -29,7 +29,7 @@
 	<target name="compile" depends="init" >
 		<!-- note: Java 6 compatibility *may* be compromised when compiling under java 7
 			 if bootclasspath (e.g. /path/to/jdk1.6.0_21/jre/lib/rt.jar) is unspecified -->
-		<javac srcdir="${src}" destdir="${build}" classpathref="lib.path.ref"
+		<javac srcdir="${src}" destdir="${build}" classpathref="lib.path.ref" excludes="ignore/**"
 			source="1.6" target="1.6" bootclasspath="${env.JAVA6_BOOTCLASSPATH}"
 			includeantruntime="false">
 		</javac>
