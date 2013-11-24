@@ -65,6 +65,7 @@ public class resolver extends xmbObject {
 		}
 		setFormat(f);
 		resolveFormat();
+		getMedia().setContainer(f.getMatchedExtension());
 	}
 
 	@Override // (h/t SharkHunter)
