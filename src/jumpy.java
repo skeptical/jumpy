@@ -31,6 +31,7 @@ import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.external.AdditionalFoldersAtRoot;
 import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.RendererConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
@@ -77,6 +78,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
+		utils.setField(utils.fakeroot, "defaultRenderer", RendererConfiguration.getDefaultConf());
 		host = new File(configuration.getProfilePath()).getName().split("\\.conf")[0];
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)
