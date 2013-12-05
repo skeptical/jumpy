@@ -71,6 +71,10 @@ public class resolver extends xmbObject {
 	@Override // (h/t SharkHunter)
 	public InputStream getInputStream(Range range, RendererConfiguration mediarenderer) throws IOException {
 		if (! resolved) {
+			if (pyResolver == null) {
+				startPyServer();
+			}
+			registrar.newItem = this; //TODO: synchronization issues?
 			uri = resolve(uri0, syspath, env);
 			if (uri != null) {
 				resolved = true;
@@ -153,10 +157,11 @@ public class resolver extends xmbObject {
 	}
 
 	public static Resolver pyResolver = null;
+	public static scriptFolder registrar;
 
 	public static void startPyServer() {
 		if (pyResolver == null) {
-			scriptFolder registrar = new scriptFolder(jumpy, "resolver", null, null) {
+			registrar = new scriptFolder(jumpy, "resolver", null, null) {
 				@Override
 				public void register(Object obj) {
 					if (obj == null) {

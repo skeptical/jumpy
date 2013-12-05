@@ -34,7 +34,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 	public Map<String,String> env;
 	private jumpy jumpy;
 	private runner ex;
-	private DLNAResource newItem;
+	public DLNAResource newItem;
 
 	public boolean canBookmark = true;
 	public boolean isBookmark = false;

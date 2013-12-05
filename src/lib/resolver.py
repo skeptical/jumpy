@@ -14,7 +14,7 @@ import jumpy
 class resolver:
 
 	def __init__(self):
-		self.url = self.name = self.thumb = None
+		self.url = self.name = self.thumb = self.sub = None
 
 	def resolve(self, url):
 		self.url = None
@@ -27,10 +27,11 @@ class resolver:
 				return self.url
 		return None
 
-	def add(self, url, name=None, thumb=None):
+	def add(self, url, name=None, thumb=None, sub=None):
 		self.url = url.strip()
 		self.name = name.strip() if name else None
 		self.thumb = thumb.strip() if thumb else None
+		self.sub = sub.strip() if sub else None
 
 
 class cbresolver(resolver):
@@ -88,13 +89,22 @@ class _xbmc:
 		if u:
 			if 'plugin://' in u:
 				pmsaddItem = __builtin__.pms.addItem
+				pmsutil = __builtin__.pms.util
 				def addItem(itemtype, name, argv, thumb=None, data=None):
 					if type(argv).__name__ == 'list':
 						argv = jumpy.flatten(argv)
 					resolver.add(argv, name, thumb)
 				__builtin__.pms.addItem = addItem
+				def util(action, arg1=None, arg2=None):
+					if action == PMS_SUBTITLE:
+						resolver.sub = arg1.strip()
+						return ''
+					else:
+						return pmsutil(action, arg1, arg2)
+				__builtin__.pms.util = util
 				xbmcinit.run_addon(u)
 				__builtin__.pms.addItem = pmsaddItem
+				__builtin__.pms.util = pmsutil
 			else:
 				resolver.add(u)
 
