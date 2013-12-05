@@ -7,6 +7,10 @@ if here in sys.path:
 sys.path.insert(1, here)
 
 import imp, traceback, __builtin__
+try: import simplejson as json
+except: import json
+from ConfigParser import RawConfigParser
+from StringIO import StringIO
 from py4j.java_gateway import GatewayClient, JavaGateway
 import vmsg, imgfx
 
@@ -62,6 +66,7 @@ except NameError:
 	__builtin__.PMS_LOG = 20
 	__builtin__.PMS_MKDIRS = 21
 	__builtin__.PMS_HOST_IP = 22
+	__builtin__.PMS_INFO = 23
 # constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -222,6 +227,12 @@ def pms_getResource(src):
 def pms_setIcon(fmt, img):
 	pms_util(PMS_ICON, fmt, img)
 
+def pms_setInfo(settings, section=None):
+	settings = pms_util(PMS_INFO, json.dumps(
+		{k:([v] if isinstance(v, basestring) else v) for k,v in settings.items()}
+	), section)
+	return json.loads(settings.encode('utf-8')) if settings else None
+
 def pms_setSubtitles(path):
 	pms_util(PMS_SUBTITLE, path)
 
@@ -272,6 +283,7 @@ __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty
 __builtin__.pms.getResource = pms_getResource
 __builtin__.pms.setIcon = pms_setIcon
+__builtin__.pms.setInfo = pms_setInfo
 __builtin__.pms.setSubtitles = pms_setSubtitles
 __builtin__.pms.log = pms_log
 __builtin__.pms.addPlayer = pms_addPlayer
@@ -312,6 +324,16 @@ __builtin__.pms.info = pms_info
 __builtin__.pms.ok = pms_ok
 __builtin__.pms.warn = pms_warn
 __builtin__.pms.err = pms_err
+
+def pms_readConf(filename):
+	conf = RawConfigParser()
+	for c in [filename, os.path.join(pms.getProfileDir(), os.path.basename(filename))]:
+		if os.path.exists(c):
+			conf.readfp(StringIO('[.]\n'+open(c).read()))
+	return dict(conf.items('.'))
+
+__builtin__.pms.readConf = pms_readConf
+
 
 # flush regularly to stay in sync with java output
 class flushed(object):

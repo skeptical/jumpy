@@ -1,19 +1,15 @@
-################# configuration: use True/False #################
-enable_xbmc = True
-enable_youtube_dl = True
-enable_get_flash_videos = False
-#################################################################
-
 import os, sys, traceback, __builtin__
 from cStringIO import StringIO
 from subprocess import Popen, PIPE
 pms_await = True
 import jumpy
 
+version = '1.3'
 
 class resolver:
 
-	def __init__(self):
+	def __init__(self, s=None, enable=True):
+		init(s, enable)
 		self.url = self.name = self.thumb = self.sub = None
 
 	def resolve(self, url):
@@ -23,7 +19,7 @@ class resolver:
 				scraper.resolve(url, self)
 			except: traceback.print_exc()
 			if self.url:
-				pms.log('%s : %s' % (scraper.name, self.url), True)
+				pms.log('%s : %s' % (scraper.name(), self.url), True)
 				return self.url
 		return None
 
@@ -39,17 +35,19 @@ class cbresolver(resolver):
 	class Java:
 		implements = ['net.pms.external.infidel.jumpy.resolver$Resolver']
 
-	def __init__(self):
-		resolver.__init__(self)
+	def __init__(self, s=None, enable=True):
+		resolver.__init__(self, s, enable)
 		try:
 			pms.register(self)
 		except: traceback.print_exc()
 
 # scrapers
 
-class _xbmc:
+class _scraper:
+	def name(self):
+		return self.__class__.__name__[1:].replace('_', '-')
 
-	name = 'xbmc-urlresolver'
+class _xbmc_urlresolver(_scraper):
 
 	def __init__(self, enable):
 		lib = os.path.join(home, 'xbmc')
@@ -109,9 +107,7 @@ class _xbmc:
 				resolver.add(u)
 
 
-class _youtube_dl:
-
-	name = 'youtube-dl'
+class _youtube_dl(_scraper):
 
 	def __init__(self, enable):
 		lib = pms.getProperty('youtube-dl.lib.path')
@@ -161,9 +157,7 @@ class _youtube_dl:
 			resolver.add(o[1], o[0], o[2])
 
 
-class _get_flash_videos:
-
-	name = 'get-flash-videos'
+class _get_flash_videos(_scraper):
 
 	def __init__(self, enable):
 		self.gfv = pms.getProperty('get-flash-videos.path')
@@ -183,25 +177,34 @@ class _get_flash_videos:
 				info[k] = v
 			resolver.add(info['Content-Location'], info['Title'])
 
+def init(resolvers=None, enable=True):
+	if not resolvers:
+		resolvers = pms.getVar('_resolvers')
+	for s in resolvers.split(' '):
+		try: exec '_%s(%s)' %(s.replace('-', '_'), enable)
+		except: traceback.print_exc()
+
 
 scrapers = []
 home = pms.getHome()
-enable = (False if 'validate' in sys.argv else True)
-
-if enable_youtube_dl:
-	_youtube_dl(enable)
-if enable_xbmc:
-	_xbmc(enable)
-if enable_get_flash_videos:
-	_get_flash_videos(enable)
-
-print 'scrapers: %s' % ' '.join([s.name for s in scrapers])
 
 if __name__ == "__main__":
 	if 'start' in sys.argv:
 		cbresolver()
 	elif 'test' in sys.argv:
-		resolver().resolve(sys.argv[2])
-	elif len(scrapers):
-		pms.setEnv('resolvers', ' '.join([s.name for s in scrapers]))
+		resolver('youtube-dl xbmc-urlresolver').resolve(sys.argv[2])
+	elif 'validate' in sys.argv:
+		init('youtube-dl xbmc-urlresolver', False)
+		info = {
+			'_title'   : 'Resolver',
+			'_desc'    : 'Resolves media links using external scrapers.\n\nThis is a background sevice for WEB.conf as well as jumpy links. You can enable/disable or set the priority of each scraper below.',
+			'_link'    : '[Info](http://skeptical.github.io/jumpy/readme.html#RESOLVER)',
+			'_icon'    : '#question+f=#a6a8a4',
+			'_version' : str(version)
+		}
+		info.update({k.name():[str(scrapers.index(k)+1), 'priority (1=first|2=second|-1=disable)'] for k in scrapers})
+		settings = pms.setInfo(info, '.resolver')
+#		sys.stderr.write('settings: %s'%settings)
+		s = {k:v for k,v in settings.items() if v.isdigit()}
+		pms.setVar('_resolvers', ' '.join(sorted(s, key=s.get)))
 

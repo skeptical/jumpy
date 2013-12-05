@@ -8,6 +8,7 @@ import net.pms.network.HTTPResource;
 import net.pms.dlna.DLNAResource;
 
 public class xmbObject extends DLNAResource {
+	public Object tag = null;
 	public String name, thumbnail, thumbtype;
 	public boolean valid, isFolder;
 

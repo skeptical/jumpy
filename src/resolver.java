@@ -189,8 +189,8 @@ public class resolver extends xmbObject {
 
 	public static boolean verify() {
 		new runner(runner.QUIET).run(jumpy.top, "[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , 'validate']", null, null);
-		if (jumpy.top.env.containsKey("resolvers")) {
-			String found = jumpy.top.env.get("resolvers");
+		if (utils.properties.containsKey("_resolvers")) {
+			String found = utils.properties.get("_resolvers");
 			scrapers = (found.contains("xbmc") ? XBMC : 0) |
 				(found.contains("urlresolver") ? URLRESOLVER : 0) |
 				(found.contains("youtube-dl") ? YOUTUBE_DL : 0);

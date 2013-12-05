@@ -248,6 +248,7 @@ public final class utils {
 		boolean exists = true, atroot=path.startsWith("/"), rootchanged=false;
 		DLNAResource child, parent = atroot ? fakeroot : path.startsWith("~/") ? home : pwd;
 		String[] dir = path.split("/");
+		Object tag = pwd instanceof xmbObject ? ((xmbObject)pwd).tag : null;
 		int i;
 		for (i=0; i<dir.length; i++) {
 			dir[i] = unesc(dir[i]);
@@ -258,6 +259,7 @@ public final class utils {
 					atroot = false;
 				}
 				child = new xmbObject(dir[i], i == dir.length-1 ? thumb : null, true);
+				((xmbObject)child).tag = tag;
 				parent.addChild(child);
 				exists = false;
 			}

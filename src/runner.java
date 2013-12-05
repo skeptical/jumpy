@@ -24,7 +24,7 @@ public class runner {
 	public boolean running = false;
 	public boolean cache = false;
 	public String output;
-	public static ArrayList<runner> active = new ArrayList<runner>();
+	public static HashMap<runner,Object> active = new HashMap();
 	public String name;
 
 	public runner() {
@@ -114,7 +114,7 @@ public class runner {
 			p = pb.start();
 
 			if (cmdline.async) {
-				active.add(this);
+				active.put(this, obj.getTag());
 				new Thread(new outputlogger(), "outputlogger").start();
 				obj.register(null);
 				return 0;

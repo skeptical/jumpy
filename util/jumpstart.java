@@ -168,7 +168,7 @@ public class jumpstart {
 		} catch (Exception e) {}
 
 		if (runner.active.size() > 0) {
-			for (runner r : runner.active) {
+			for (runner r : runner.active.keySet()) {
 				runner.stop(r);
 			}
 		}
@@ -360,6 +360,11 @@ class item extends node implements jumpyAPI {
 	}
 	@Override
 	public synchronized void register(Object obj) {}
+
+	@Override
+	public Object getTag() {
+		return null;
+	}
 }
 
 

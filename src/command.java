@@ -43,7 +43,7 @@ public class command {
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
 	public File startdir;
 	public Map<String,String> env = null;
-	public static Map basesubs = null;
+	public static Map<String,String> basesubs = null;
 	public Map substitutions = null;
 	private GatewayServer server = null;
 	private CallbackClient client = null;
@@ -328,7 +328,22 @@ public class command {
 	}
 
 	private String expand(final String arg) {
-		return StringUtils.stringSubstitution(arg, substitutions, true).toString();
+		return expand(arg, substitutions);
+	}
+
+	public static String expand(String arg, Map m) {
+		return arg == null ? null :
+			StringUtils.stringSubstitution(arg, m != null ? m : basesubs, true).toString();
+	}
+
+	public String getScript(boolean editableonly) {
+		String s = expand(argv.get(scriptarg));
+		if (editableonly && (jumpypy.equals(s) ||
+				executables.containsKey(s) || executables.containsValue(s) ||
+				(! new File(s).exists()))) {
+			s = null;
+		}
+		return s;
 	}
 
 	public String[] toStrings() {

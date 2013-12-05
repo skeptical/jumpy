@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
+import com.google.gson.Gson;
+
 import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DLNAMediaInfo;
@@ -269,6 +271,9 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 				}
 		}
 		if (newItem != null) {
+			if (newItem instanceof xmbObject) {
+				((xmbObject)newItem).tag = this.tag;
+			}
 			if (mediaInfo != null) {
 				utils.setField(newItem, "media", mediaInfo);
 			}
@@ -369,6 +374,30 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 			case ICON:
 				jumpy.setIcon(arg1, arg2);
 				break;
+			case INFO:
+				Object section = tag;
+				boolean defer = false;
+				if (arg2 != null) {
+					if (! userscripts.meta.containsKey(arg2)) {
+						userscripts.meta.add(arg2);
+					}
+					section = userscripts.meta.get(arg2);
+					defer = true;
+				}
+				userscripts.hideNonEdit(section);
+				HashMap<String,List<String>> args = new HashMap();
+				args = (HashMap<String,List<String>>) new Gson().fromJson(arg1, args.getClass());
+//				jumpy.log(args.toString(), true);
+				for (String key : args.keySet()) {
+					if (defer && ((Map)section).containsKey(key)) {
+						continue;
+					}
+					List<String> s = args.get(key);
+					String val = s.get(0);
+					String comment = s.size() > 1 ? s.get(1) : null;
+					jumpy.userscripts._put(section, key, val, comment);
+				}
+				return defer ? new Gson().toJson((Map)section) : "";
 			case RESOURCE:
 				return jumpy.getResource(arg1);
 			case SETPMS:
@@ -470,6 +499,11 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		m.setSubtitleTracksList(subs);
 		m.setMediaparsed(true);
 		return m;
+	}
+
+	@Override
+	public Object getTag() {
+		return tag;
 	}
 }
 

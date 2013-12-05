@@ -1,8 +1,6 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -23,8 +21,6 @@ import java.util.TimerTask;
 import javax.swing.JComponent;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.io.FilenameUtils;
 
 import net.pms.PMS;
@@ -66,11 +62,10 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	private FileOutputStream logfile;
 	private static quickLog logger;
 	private static HashSet<String> logspam = new HashSet<String>();
-	private File[] scripts;
 	public static scriptFolder top;
 	public static xmbObject util;
 	public bookmarker bookmarks;
-	private userscripts userscripts;
+	public userscripts userscripts;
 	public List<player> players;
 	public static Map<String,String> icons = new HashMap<String,String>();
 	public static File cache;
@@ -83,11 +78,11 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)
 			.getAbsolutePath();
-		jumpyconf = configuration.getProfileDirectory() + File.separator + appName + ".conf";
+		jumpyconf = getProfileDirectory() + File.separator + appName + ".conf";
 		readconf();
 		config.init(this);
-		bookmarksini = configuration.getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
-		scriptsini = configuration.getProfileDirectory() + File.separator + appName + "-scripts.ini";
+		bookmarksini = getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
+		scriptsini = getProfileDirectory() + File.separator + appName + "-scripts.ini";
 		resolver.jumpy = this;
 
 		try {
@@ -186,9 +181,6 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		top.env.clear();
 		log("\n");
 
-		resolver.verify();
-		log("\n");
-
 		player.out = logger;
 		players = new ArrayList<player>();
 		players.add(new player(this,
@@ -215,6 +207,10 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			});
 
 		userscripts = new userscripts(this);
+
+		resolver.verify();
+		log("\n");
+
 		userscripts.autorun(true);
 
 		if (showBookmarks) {
@@ -235,24 +231,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			refresh(false);
 		}
 
-		scripts = new File(home).listFiles(
-			new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".py") && new File(dir.getPath() + File.separatorChar + name).isFile();
-				}
-			}
-		);
-
-		log("\n");
-		log("Found " + scripts.length + " python scripts.", true);
-
-		for (File script:scripts) {
-			log("\n");
-			log("starting " + script.getName() + ".", true);
-			log("\n");
-			new runner().run(top, "[" + script.getPath() + "]", null);
-			top.env.clear();
-		}
+		userscripts.autoload();
 
 		for (DLNAResource item : top.getChildren()) {
 			if (item instanceof scriptFolder) {
@@ -300,7 +279,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		userscripts.autorun(false);
 
 		if (runner.active.size() > 0) {
-			for (runner r : runner.active) {
+			for (runner r : runner.active.keySet()) {
 				runner.stop(r);
 			}
 		}
@@ -311,6 +290,10 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			}
 			if (changed) pms.save();
 		}
+	}
+
+	public static String getProfileDirectory() {
+		return PMS.getConfiguration().getProfileDirectory(); // + File.separator + appName;
 	}
 
 	public void readconf() {

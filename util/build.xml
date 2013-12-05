@@ -23,6 +23,7 @@
 		<javac srcdir="${src}:${src2}" destdir="${build}" classpathref="lib.path.ref"
 			includes="jumpstart.java runner.java command.java jumpyAPI.java"
 			source="1.6" target="1.6" bootclasspath="${env.JAVA6_BOOTCLASSPATH}"
+			debug="true"
 			includeantruntime="false">
 		</javac>
 	</target>
