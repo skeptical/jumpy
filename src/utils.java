@@ -25,6 +25,7 @@ import java.lang.ProcessBuilder;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -112,12 +113,19 @@ public final class utils {
 			try {
 				Field field = clazz.getDeclaredField(name);
 				field.setAccessible(true);
+				if ((field.getModifiers() & Modifier.FINAL) == Modifier.FINAL) {
+					Field modifiers = Field.class.getDeclaredField("modifiers");
+					modifiers.setAccessible(true);
+					modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+				}
 				return field;
-			} catch (NoSuchFieldException e) {
+			} catch (NoSuchFieldException n) {
 				clazz = clazz.getSuperclass();
 				if (clazz == null) {
-					throw e;
+					throw n;
 				}
+			} catch (Exception e) {
+				return null;
 			}
 		}
 	}
