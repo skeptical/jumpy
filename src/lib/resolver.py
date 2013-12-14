@@ -8,8 +8,8 @@ version = '1.3'
 
 class resolver:
 
-	def __init__(self, s=None, enable=True):
-		init(s, enable)
+	def __init__(self, s=None):
+		init(s)
 		self.url = self.name = self.thumb = self.sub = None
 
 	def resolve(self, url):
@@ -35,8 +35,8 @@ class cbresolver(resolver):
 	class Java:
 		implements = ['net.pms.external.infidel.jumpy.resolver$Resolver']
 
-	def __init__(self, s=None, enable=True):
-		resolver.__init__(self, s, enable)
+	def __init__(self, s=None):
+		resolver.__init__(self, s)
 		try:
 			pms.register(self)
 		except: traceback.print_exc()
@@ -49,7 +49,8 @@ class _scraper:
 
 class _xbmc_urlresolver(_scraper):
 
-	def __init__(self, enable):
+	def __init__(self):
+		self.started = False
 		lib = os.path.join(home, 'xbmc')
 		if os.path.exists(lib):
 			if lib in sys.path:
@@ -60,21 +61,29 @@ class _xbmc_urlresolver(_scraper):
 			__builtin__.xbmcinit = xbmcinit
 			addondir = os.path.join(_special['home'], 'addons', 'script.module.urlresolver')
 			id = xbmcinit.read_addon(dir=addondir, full=True)
-			scrapers.append(self)
+			sys.path.extend([p for p in _info[id]['_pythonpath'] if p not in sys.path])
 			sys.stderr.write('%s version %s\n' % (_info[id]['name'], _info[id]['version']))
-			if enable:
-				sys.path.extend([p for p in _info[id]['_pythonpath'] if p not in sys.path])
-				argv = sys.argv
-				sys.argv = [sys.argv[0], '?']
-				import urlresolver
-				__builtin__.urlresolver = urlresolver
-				sys.argv = argv
+			scrapers.append(self)
 		except:
 			if self in scrapers: scrapers.remove(self)
 			sys.stderr.write('unable to open xbmc-urlresolver\n')
 			traceback.print_exc()
 
+	def start(self):
+		try:
+			argv = sys.argv
+			sys.argv = [sys.argv[0], '?']
+			import urlresolver
+			__builtin__.urlresolver = urlresolver
+			sys.argv = argv
+			self.started = True
+		except:
+			if self in scrapers: scrapers.remove(self)
+			sys.stderr.write('unable to start xbmc-urlresolver\n')
+			traceback.print_exc()
+
 	def resolve(self, url, resolver):
+		if not self.started: self.start()
 		u = None
 		if 'plugin://' in url:
 			if url.startswith('plugin://'):
@@ -109,7 +118,8 @@ class _xbmc_urlresolver(_scraper):
 
 class _youtube_dl(_scraper):
 
-	def __init__(self, enable):
+	def __init__(self):
+		self.started = False
 		lib = pms.getProperty('youtube-dl.lib.path')
 		if not lib:
 			lib = pms.getProperty('youtube-dl.path')
@@ -126,21 +136,29 @@ class _youtube_dl(_scraper):
 			__builtin__.youtube_dl = youtube_dl
 			sys.stderr.write('youtube-dl version %s\n' % youtube_dl.__version__)
 			scrapers.append(self)
-			if enable:
-				# omit the last extractor (GenericIE, which takes forever)
-				extractors = youtube_dl.gen_extractors()[:-1]
-				youtube_dl.gen_extractors = lambda:extractors
-				if '_ALL_CLASSES' in youtube_dl.extractor.__dict__:
-					youtube_dl.extractor._ALL_CLASSES = youtube_dl.extractor._ALL_CLASSES[:-1]
-				# set up redirection
-				self.devnull = open(os.devnull, 'w')
-				self.noexit = lambda m:None
 		except:
 			if self in scrapers: scrapers.remove(self)
 			sys.stderr.write('unable to open youtube-dl\n')
 
+	def start(self):
+		try:
+			# omit the last extractor (GenericIE, which takes forever)
+			extractors = youtube_dl.gen_extractors()[:-1]
+			youtube_dl.gen_extractors = lambda:extractors
+			if '_ALL_CLASSES' in youtube_dl.extractor.__dict__:
+				youtube_dl.extractor._ALL_CLASSES = youtube_dl.extractor._ALL_CLASSES[:-1]
+			# set up redirection
+			self.devnull = open(os.devnull, 'w')
+			self.noexit = lambda m:None
+			self.started = True
+		except:
+			if self in scrapers: scrapers.remove(self)
+			sys.stderr.write('unable to start youtube-dl\n')
+			traceback.print_exc()
+
 	def resolve(self, url, resolver):
 		if 'plugin://' in url: return
+		if not self.started: self.start()
 		stdout, stderr, exit = sys.stdout, sys.stderr, sys.exit
 		# prevent youtube_dl from shutting us down, discard stderr, capture stdout
 		sys.exit = self.noexit
@@ -177,11 +195,11 @@ class _get_flash_videos(_scraper):
 				info[k] = v
 			resolver.add(info['Content-Location'], info['Title'])
 
-def init(resolvers=None, enable=True):
+def init(resolvers=None):
 	if not resolvers:
 		resolvers = pms.getVar('_resolvers')
 	for s in resolvers.split(' '):
-		try: exec '_%s(%s)' %(s.replace('-', '_'), enable)
+		try: exec '_%s()' %(s.replace('-', '_'))
 		except: traceback.print_exc()
 
 
@@ -194,7 +212,7 @@ if __name__ == "__main__":
 	elif 'test' in sys.argv:
 		resolver('youtube-dl xbmc-urlresolver').resolve(sys.argv[2])
 	elif 'validate' in sys.argv:
-		init('youtube-dl xbmc-urlresolver', False)
+		init('youtube-dl xbmc-urlresolver')
 		info = {
 			'_title'   : 'Resolver',
 			'_desc'    : 'Resolves media links using external scrapers.\n\nThis is a background sevice for WEB.conf as well as jumpy links. You can enable/disable or set the priority of each scraper below.',
