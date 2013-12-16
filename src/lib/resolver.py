@@ -120,6 +120,7 @@ class _youtube_dl(_scraper):
 
 	def __init__(self):
 		self.started = False
+		self.info_dicts = []
 		lib = pms.getProperty('youtube-dl.lib.path')
 		if not lib:
 			lib = pms.getProperty('youtube-dl.path')
@@ -150,6 +151,14 @@ class _youtube_dl(_scraper):
 			# set up redirection
 			self.devnull = open(os.devnull, 'w')
 			self.noexit = lambda m:None
+			ydl_prepare_filename = youtube_dl.YoutubeDL.prepare_filename
+			this = self
+			def prepare_filename(self, info_dict):
+				filename = ydl_prepare_filename(self, info_dict)
+				info_dict['_filename'] = filename
+				this.info_dicts.append(info_dict)
+				return filename
+			youtube_dl.YoutubeDL.prepare_filename = prepare_filename
 			self.started = True
 		except:
 			if self in scrapers: scrapers.remove(self)
@@ -159,20 +168,19 @@ class _youtube_dl(_scraper):
 	def resolve(self, url, resolver):
 		if 'plugin://' in url: return
 		if not self.started: self.start()
+		self.info_dicts = []
 		stdout, stderr, exit = sys.stdout, sys.stderr, sys.exit
-		# prevent youtube_dl from shutting us down, discard stderr, capture stdout
+		# prevent youtube_dl from shutting us down, discard stderr/stdout
 		sys.exit = self.noexit
-		sys.stderr = self.devnull
-		sys.stdout = capture = StringIO()
+		sys.stderr = sys.stdout = self.devnull
 		# TODO: --cookies (https://github.com/rg3/youtube-dl/issues/41)
 		#       --max-downloads (overuse triggers '402: Payment Required')
-		youtube_dl.main(['-i', '--get-title', '-g', '--get-thumbnail', url])
+		youtube_dl.main(['-s', url])
 		sys.stdout, sys.stderr, sys.exit = stdout, stderr, exit
-		o = capture.getvalue()
-		if o:
-			# note: output order is always title, url, thumb
-			o = o.splitlines()[:3]
-			resolver.add(o[1], o[0], o[2])
+		u = '\n'.join([(i['url'] + i.get('play_path', '')) for i in self.info_dicts])
+		if u:
+			i = self.info_dicts[0]
+			resolver.add(u, i.get('fulltitle'), i.get('thumbnail'))
 
 
 class _get_flash_videos(_scraper):
