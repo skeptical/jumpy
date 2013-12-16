@@ -54,7 +54,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	private PMS pms;
 	public PmsConfiguration configuration;
 	private Properties conf = null;
-	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini, host;
+	public static String home, jumpylog, jumpyconf, bookmarksini, scriptsini, metaini, host;
 	public String lasturi;
 	public boolean debug, check_update, showBookmarks, verboseBookmarks;
 	public int refresh;
@@ -83,6 +83,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		config.init(this);
 		bookmarksini = getProfileDirectory() + File.separator + appName + "-bookmarks.ini";
 		scriptsini = getProfileDirectory() + File.separator + appName + "-scripts.ini";
+		metaini = getProfileDirectory() + File.separator + appName + "-meta.ini";
 		resolver.jumpy = this;
 
 		try {
@@ -293,7 +294,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	}
 
 	public static String getProfileDirectory() {
-		return PMS.getConfiguration().getProfileDirectory(); // + File.separator + appName;
+		return PMS.getConfiguration().getProfileDirectory() + File.separator + appName;
 	}
 
 	public void readconf() {
@@ -418,7 +419,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	}
 
 	public Object dbgpack_cb() {
-		return new String[] {jumpylog, jumpyconf, scriptsini};
+		return new String[] {jumpylog, jumpyconf, scriptsini, metaini};
 	}
 
 	@Override

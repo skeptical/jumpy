@@ -41,7 +41,7 @@ public class userscripts {
 	public userscripts(jumpy jumpy) {
 		this.jumpy = jumpy;
 		inis = new ArrayList<Ini>();
-		meta = new metaIni(jumpy.scriptsini.replace("-scripts.ini", "-meta.ini"));
+		meta = new metaIni(jumpy.metaini);
 		inis.add(meta);
 		scriptsini = jumpy.scriptsini;
 		load(scriptsini);
