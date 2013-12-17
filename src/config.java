@@ -39,8 +39,7 @@ abstract class multiListener implements ItemListener, ChangeListener, ActionList
 
 public class config {
 
-	static final String updateurl = "http://127.0.0.1:8000/";
-//	static final String updateurl = "http://skeptical.github.com/jumpy/";
+	static final String updateurl = "http://skeptical.github.com/jumpy/";
 	static final String websiteurl = "https://github.com/skeptical/jumpy";
 	static final String forumurl = "http://www.universalmediaserver.com/forum/viewtopic.php?f=6&t=288";
 	static final String xbmcurl = "http://xbmc.org";
