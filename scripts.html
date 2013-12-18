@@ -139,13 +139,15 @@ function preview(img, bg) {
 <option>log</option>
 <option>mkDirs</option>
 <option>ok</option>
-<option>refresh</option>
+<option>readConf</option>
 <option>reboot</option>
+<option>refresh</option>
 <option>register</option>
 <option>restart</option>
 <option>run</option>
 <option>setEnv</option>
 <option>setIcon</option>
+<option>setInfo</option>
 <option>setPath</option>
 <option>setProperty</option>
 <option>setSubtitles</option>
@@ -260,9 +262,9 @@ defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the f
 <br/><br/>
 <li><a name="addFolder"></a><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addBookmark"></a><kbd>pms.addBookmark</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
+<a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
+<a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
+<a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
 <a name="addPlaylist"></a><kbd>pms.addPlaylist</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addISO"></a><kbd>pms.addISO</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addAudiofeed"></a><kbd>pms.addAudiofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
@@ -273,9 +275,9 @@ defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the f
 </li>
 
 <br/>
-<li><a name="addItem"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>)</code></a>
+<li><a name="addItem"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code></a>
 <br/>or<br/>
-<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>)</code><br/><br/>
+<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/><br/>
 where
 <ul>
 <li><code>type</code> is one of these constants:
@@ -354,11 +356,40 @@ processing.
 To control color, shading and other effects an optional <a href="#FX"><i>+fx string</i></a> can be
 appended here (see <a href="#ICONS">icons</a> for syntax examples).
 </li>
+<br/>
+<li><a name="mediainfo"></a><code>mediainfo</code> is a python dict describing the item's media
+properties with any of the following keys:
+<ul>
+<li><code>duration</code>: a time string in <i>seconds</i> or <i>hh:mm:ss</i> format.</li>
+<li><code>streams</code>: a list of dicts each describing one stream and containing the
+mandatory key <code>type</code> which determines what other keys are valid (all values are strings).
+<code>type</code> can be:
+<ul>
+<li><code>video</code>, where associated keys are <code>codec</code>, <code>aspect</code>, <code>width</code>, <code>height</code>, <code>duration</code>.
+Only one video stream is allowed.
+</li>
+<li><code>audio</code>, where associated keys are <code>codec</code>, <code>language</code>, <code>channels</code>.
+</li>
+<li><code>subtitle</code>, where the associated key is <code>language</code>.
+</li>
+</ul>
+</li>
+</ul>
+</li>
+for example
+<ul>
+<code>{'duration': '<i>12:34</i>', 'streams': [
+	{'type': '<i>video</i>', 'width': '<i>720</i>, 'height': '<i>480</i>'},
+	{'type': '<i>audio</i>', 'channels': '<i>2</i>'},
+	{'type': '<i>subtitle</i>', 'language': '<i>eng</i>'},
+	{'type': '<i>subtitle</i>', 'language': '<i>jpn</i>'}]
+}</code>
+</ul>
 </ul>
 </li>
 <br/>
 
-<li><a name="addUnresolved"><kbd>pms.addUnresolved</kbd><code>(name, cmd, thumb<i>=None</i>, type<i>=PMS_VIDEO</i>)</code></a>
+<li><a name="addUnresolved"><kbd>pms.addUnresolved</kbd><code>(name, cmd, thumb<i>=None</i>, type<i>=PMS_VIDEO</i>, mediainfo<i>=None</i>)</code></a>
 <ul>
 Add an incomplete media item whose final uri/url will be resolved at playback, where
 <ul>
@@ -374,7 +405,7 @@ or by printing it to stdout.
 </li>
 <li><code>type</code> is the item's expected media type - see <a href="#addItem"><code>addItem</code></a>.
 </li>
-<li><code>name</code>, <code>thumb</code> - see <a href="#addItem"><code>addItem</code></a>.
+<li><code>name</code>, <code>thumb</code>, <code>mediainfo</code> - see <a href="#addItem"><code>addItem</code></a>.
 </li>
 </ul>
 </ul>
@@ -625,8 +656,59 @@ which case it will be generated and cached if it doesn't already exist.
 before adding any other items (<i>requires UMS > <i class=comment>2.3.0</i> and ffmpeg compiled with <i class=comment>--enable-libass</i></i>).
 </ul>
 </li>
-
 <br/>
+
+<li><a name="setInfo"><kbd>pms.setInfo</kbd><code>(settings, section<i>=None</i>)</code></a>
+<ul>Set script metadata and options, where
+<ul>
+<li><code>settings</code> is a python dict containing any of the following reserved
+keywords for creating the script's gui panel:
+<ul>
+<li><code>_title</code>: a display name.</li>
+<li><code>_desc</code>: a description.</li>
+<li><code>_icon</code>: a path to an image file.</li>
+<li><code>_link</code>: link(s) in <a href="http://daringfireball.net/projects/markdown/syntax#link">markdown <i>inline</i></a>
+format, i.e. <code><b>[</b><i class='comment'>link text</i><b>](</b><i class='comment'>url</i><b>)</b></code>, separated
+by newline characters if more than one.
+</li>
+<li><code>_version</code>: its version.</li>
+<li><code>_conf</code>: a path to a conf or properties file containing script-specific settings.
+Jumpy will read the file and include its items in the script's gui panel as follows:
+<ul>
+<li>any comments will become tooltips.</li>
+<li>values will be placed in text boxes by default.</li>
+<li>if a setting's comment contains the exact text '<i class='comment'>(true|false)</i>' its value will be
+rendered as a checkbox instead.</li>
+</ul>
+Note that jumpy will store any edits or changes to a user copy of this file in the profile folder and
+leave the original "master" copy unchanged. Use <a href="#readConf"><code>readConf</code></a> to read user-edited settings correctly.
+</li>
+
+</ul>
+Also please note:
+<ul>
+<li>any other keys found in the dict will be displayed as regular script settings.</li>
+<li>any setting name beginning with '<code>$</code>' will be considered "global" and saved to
+<i>PMS.conf</i> instead.</li>
+</ul>
+</li>
+<li><code>section</code>, if given, designates a configuration section to be internally maintained
+by jumpy, meant mostly for its own built-in components (e.g. <i>Resolver</i>) and would not typically
+be set by an external user script.
+</li>
+</ul>
+</li>
+</li>
+</ul>
+<br/>
+
+<li><a name="readConf"><kbd>pms.readConf</kbd><code>(filename)</code></a>
+<ul>Read the conf file <code>filename</code> as well as its user copy, if any, in the profile section
+and return the current settings as a python dict.
+</ul>
+</li>
+<br/>
+
 <li><a name="addPlayer"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, icon<i>=None</i>, playback<i>=None</i>)</code></a>
 <br/><br/>
 where

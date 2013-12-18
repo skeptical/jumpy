@@ -126,10 +126,10 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.9.exe/download" title="Windows: jumpy-0.2.9.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.9.run/download" title="Linux: jumpy-0.2.9.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
-<!-- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.9.app.zip/download" title="Mac: jumpy-0.2.9.app"><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
- <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, my Mac is on vacation. Please launch the linux installer (jumpy-0.2.9.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
+<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.0.exe/download" title="Windows: jumpy-0.3.0.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
+ <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.0.run/download" title="Linux: jumpy-0.3.0.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
+ <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.0.osx.app.zip/download" title="Mac: jumpy-0.3.0.osx.app"><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
+<!-- <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, my Mac is on vacation. Please launch the linux installer (jumpy-0.3.0.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
  <span style="visibility: hidden">.</span> )<span style="visibility: hidden">.</span> in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -202,7 +202,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.2.9.zip/download">jumpy-0.2.9.zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.0.zip/download">jumpy-0.3.0.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -484,16 +484,10 @@ addons if you like.
 <br/>
 <li><b>youtube-dl</b>: There's no general reason to change anything in Linux/OS-X,
 but <u><i>If you're on Windows and have the Channels Plugin</i></u> (which
-already resolves using youtube-dl in Windows) you may want to disable it in jumpy by
-editing <i>plugins/jumpy/lib/resolver.py</i>:
-<pre>
-<i class="comment">################# configuration: use True/False #################</i>
-enable_xbmc = True
-enable_youtube_dl = <i><span class="orange">False</span></i>
-<i class="comment">#################################################################</i>
-</pre>
+already resolves using youtube-dl in Windows) you may want to disable it in the jumpy config gui.
 </li>
 </ul>
+<br/>
 Alternatively, you can of course install these resolvers by hand:
 <br/><br/>
 <ul>
