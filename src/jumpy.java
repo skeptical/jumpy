@@ -389,13 +389,19 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 				+ "icon" + File.separatorChar + src.substring(1) + ".png";
 		}
 		if (! new File(src).exists()) {
+			jumpy.log("Failed to find resource " + src);
 			return name;
 		}
 		if (val.length > 1) {
 			String dest = cache.getAbsolutePath() + File.separatorChar +
 				FilenameUtils.getBaseName(src) + "+" + val[1] + "." + FilenameUtils.getExtension(src);
-			if (! new File(dest).exists()) {
+			File f = new File(dest);
+			if (! f.exists()) {
 				new runner().run(top, "[pms , imgfx , " + src + " , " + val[1] + " , " + cache + "]", null);
+				if (! f.exists()) {
+					jumpy.log("Failed to generate resource " + dest);
+					return src;
+				}
 			}
 			src = dest;
 		}
