@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
 
 import java.lang.reflect.Method;
 
@@ -32,6 +34,7 @@ import net.pms.encoders.PlayerFactory;
 import net.pms.encoders.PlayerPurpose;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
+import net.pms.newgui.LooksFrame;
 
 public class player extends Player {
 
@@ -288,12 +291,23 @@ public class player extends Player {
 		boolean add = (on && index != 0);
 		if (remove) {
 			engines.removeAll(Arrays.asList(id));
+			configuration.setEnginesAsList(new ArrayList(engines));
 		}
 		if (add) {
 			engines.add(0, id);
+			// store the gui's reload button state
+			AbstractButton reload = PMS.get().isHeadless() ? null : ((LooksFrame)PMS.get().getFrame()).getReload();
+			Icon icon = reload != null ? reload.getIcon() : null;
+			String tooltip = reload != null ? reload.getToolTipText() : null;
+			// modify the engine list
+			configuration.setEnginesAsList(new ArrayList(engines));
+			if (reload != null) {
+				// restore the reload button state
+				reload.setIcon(icon);
+				reload.setToolTipText(tooltip);
+			}
 		}
 		if (add || remove) {
-			configuration.setEnginesAsList(new ArrayList(engines));
 			jumpy.log((on ? "en" : "dis") + "abling " + id + " player.", true);
 			return true;
 		}
