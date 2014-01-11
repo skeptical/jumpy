@@ -91,12 +91,21 @@ def decode(s):
 			except: pass
 	return s
 
+def stringify(obj, container=None, index=None):
+	iterable = obj if isinstance(obj, dict) else xrange(0, len(obj)) if isinstance(obj, list) else None
+	if iterable:
+		for i in iterable:
+			stringify(obj[i], obj, i)
+	elif obj:
+		container[index] = str(obj)
+	return obj
+
 def pms_addItem(itemtype, name, argv, thumb=None, mediainfo=None, data=None):
 	global gateway
 	if type(argv).__name__ == 'list':
 		argv = flatten(argv)
 	if mediainfo: print mediainfo
-	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), mediainfo, decode(data))
+	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), stringify(mediainfo), decode(data))
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
