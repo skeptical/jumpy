@@ -388,8 +388,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 			src = home + "lib" + File.separatorChar + "resources" + File.separatorChar
 				+ "icon" + File.separatorChar + src.substring(1) + ".png";
 		}
-		if (! new File(src).exists()) {
-			jumpy.log("Failed to find resource " + src);
+		if (! src.contains("://") && ! new File(src).exists()) {
+			jumpy.log("Resource not found: " + src);
 			return name;
 		}
 		if (val.length > 1) {
