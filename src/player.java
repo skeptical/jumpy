@@ -296,12 +296,13 @@ public class player extends Player {
 		if (add) {
 			engines.add(0, id);
 			// store the gui's reload button state
-			AbstractButton reload = PMS.get().isHeadless() ? null : ((LooksFrame)PMS.get().getFrame()).getReload();
-			Icon icon = reload != null ? reload.getIcon() : null;
-			String tooltip = reload != null ? reload.getToolTipText() : null;
+			boolean isGui = (PMS.get().getFrame() instanceof LooksFrame);
+			AbstractButton reload = isGui ? ((LooksFrame)PMS.get().getFrame()).getReload() : null;
+			Icon icon = isGui ? reload.getIcon() : null;
+			String tooltip = isGui ? reload.getToolTipText() : null;
 			// modify the engine list
 			configuration.setEnginesAsList(new ArrayList(engines));
-			if (reload != null) {
+			if (isGui) {
 				// restore the reload button state
 				reload.setIcon(icon);
 				reload.setToolTipText(tooltip);
