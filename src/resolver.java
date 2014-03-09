@@ -56,6 +56,12 @@ public class resolver extends xmbObject {
 			// avoid URI.getScheme() parsing (in pms) by setting protocol explicitly,
 			// otherwise psuedo-urls (eg librtmp-style urls with spaces) will fail
 			f.setMatchedExtension(iscmdarray ? "http" : u.split("://")[0].toLowerCase());
+			if (type == Format.UNKNOWN) {
+				// infer type from extension or default to video
+				Format ext = iscmdarray ? null : FormatFactory.getAssociatedFormat(uri.split("://")[1]);
+				type = ext == null ? Format.VIDEO : ext.getType();
+			}
+			setSpecificType(type);
 		} else {
 			f = FormatFactory.getAssociatedExtension(u);
 			if (f == null) {
