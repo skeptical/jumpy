@@ -397,7 +397,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 					String comment = s.size() > 1 ? s.get(1) : null;
 					jumpy.userscripts._put(section, key, val, comment);
 				}
-				return defer ? new Gson().toJson((Map)section) : "";
+				return new Gson().toJson((Map)section);
 			case RESOURCE:
 				return jumpy.getResource(arg1);
 			case SETPMS:
@@ -435,7 +435,7 @@ public class scriptFolder extends xmbObject implements jumpyAPI {
 		if (obj == null) {
 			try {
 				ready = new CountDownLatch(1);
-				ready.await(500, TimeUnit.MILLISECONDS);
+				ready.await(2000, TimeUnit.MILLISECONDS);
 			} catch (Exception e) {e.printStackTrace();}
 		} else if (ready != null) {
 			ready.countDown();
