@@ -2,7 +2,7 @@
 <addons>
 <addon id="script.module.jumpy"
 		name="jumpy"
-		version="0.2.7"
+		version="2.0.0"
 		provider-name="infidel">
 	<requires>
 		<import addon="script.module.urlresolver" version="0.0.1"/>
@@ -15,6 +15,13 @@
 		<platform>all</platform>
 		<summary lang="en">Installs a few addons for the PMS/UMS jumpy-xbmc plugin.</summary>
 		<description lang="en">Updating the jumpy program addon ensures that the urlresolver and youtube addon are installed.</description>
+		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+		<website>http://skeptical.github.io/jumpy/readme.html</website>
+		<source>https://github.com/skeptical/jumpy</source>
+		<disclaimer lang="en"></disclaimer>
+		<language></language>
+		<forum></forum>
+		<email></email>
 	</extension>
 </addon>
 </addons>
