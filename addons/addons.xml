@@ -2,7 +2,7 @@
 <addons>
 <addon id="script.module.jumpy"
 		name="jumpy"
-		version="2.0.0"
+		version="0.2.7"
 		provider-name="infidel">
 	<requires>
 		<import addon="script.module.urlresolver" version="0.0.1"/>
