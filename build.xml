@@ -14,7 +14,7 @@
 	<property name="src" location="src"/>
 	<property name="build" location="build"/>
 	<property name="dist" location="dist"/>
-	<property name="py4j.jar" value="py4j0.8.jar"/>
+	<property name="py4j.jar" value="py4j0.8.1.jar"/>
 	<property environment="env"/>
 
 	<path id="lib.path.ref">
@@ -44,7 +44,7 @@
 		<jar jarfile="${jumpy}.jar" basedir="${build}">
 			<manifest>
 				<!--<attribute name="Main-Class" value="net.pms.external.infidel.jumpy"/>-->
-				<attribute name="Class-Path" value="jumpy/lib/${py4j.jar} jumpy/lib/py4j0.7-97b47c.jar jumpy/lib/py4j0.7.jar jumpy/lib/ini4j-0.5.2.jar jumpy/lib/commons-exec-1.1.jar jumpy/lib/winp-1.14.jar"/>
+				<attribute name="Class-Path" value="jumpy/lib/${py4j.jar} jumpy/lib/py4j0.8.jar jumpy/lib/ini4j-0.5.2.jar jumpy/lib/commons-exec-1.1.jar jumpy/lib/winp-1.14.jar"/>
 				<attribute name="Implementation-Version" value="${ver}"/>
 			</manifest>
 		</jar>

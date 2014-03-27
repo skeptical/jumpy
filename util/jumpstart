@@ -2,5 +2,5 @@
 
 #lib=$(dirname $(readlink -f $0))/lib
 lib=$(cd "$(dirname "$0")"; pwd)/lib
-java -cp "$lib/jumpstart.jar:$lib/py4j0.8.jar:$lib/py4j0.7-97b47c.jar:$lib/py4j0.7.jar:$lib/commons-exec-1.1.jar:$lib/winp-1.14.jar" jumpstart "$@"
+java -cp "$lib/jumpstart.jar:$lib/py4j0.8.1.jar:$lib/py4j0.8.jar:$lib/commons-exec-1.1.jar:$lib/winp-1.14.jar" jumpstart "$@"
 
