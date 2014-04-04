@@ -75,7 +75,7 @@ public class bookmarker {
 		Wini ini = new Wini();
 		ini.getConfig().setMultiSection(true);
 		ini.setFile(new File(bookmarksini));
-		boolean oldstyle = false;
+
 		try {
 			ini.load();
 		} catch (IOException e) {} catch (Exception e) {e.printStackTrace();}

@@ -3,6 +3,7 @@ from cStringIO import StringIO
 from subprocess import Popen, PIPE
 pms_await = True
 import jumpy
+from pageScanner import scanner
 
 version = '1.3'
 
@@ -10,9 +11,13 @@ class resolver:
 
 	def __init__(self, s=None):
 		init(s)
+
 		self.url = self.name = self.thumb = self.sub = None
 
 	def resolve(self, url):
+		return self._resolve(url)
+
+	def _resolve(self, url):
 		self.url = None
 		for scraper in scrapers:
 			try:
@@ -30,13 +35,18 @@ class resolver:
 		self.sub = sub.strip() if sub else None
 
 
-class cbresolver(resolver):
+class cbresolver(scanner):
 
 	class Java:
 		implements = ['net.pms.external.infidel.jumpy.resolver$Resolver']
 
+	def resolve(self, url):
+		if 'plugin://' in url or url.startswith('['):
+			return self.resolver.resolve(url)
+		return self.scan(url)
+
 	def __init__(self, s=None):
-		resolver.__init__(self, s)
+		scanner.__init__(self, resolver(s), scanner.SINGLE)
 		try:
 			pms.register(self)
 		except: traceback.print_exc()
@@ -213,6 +223,7 @@ def init(resolvers=None):
 
 scrapers = []
 home = pms.getHome()
+
 
 if __name__ == "__main__":
 	if 'start' in sys.argv:
