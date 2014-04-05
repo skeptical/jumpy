@@ -198,9 +198,11 @@ public class player extends Player {
 		PipeProcess pipe = new PipeProcess(System.currentTimeMillis() + id);
 		cmdline.substitutions.put("outfile", pipe.getInputPipe());
 
+		DLNAResource parent = dlna.getParent();
+
 		jumpy.log("\n");
 
-		if (! cmdline.startAPI(jumpy.top)) {
+		if (! cmdline.startAPI(parent instanceof jumpyAPI ? (jumpyAPI)parent : jumpy.top)) {
 			return null;
 		}
 

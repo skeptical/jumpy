@@ -221,7 +221,7 @@ public class userscripts {
 
 	public static void remove(Section script) {
 		shutdown(script);
-		clear(script, utils.fakeroot);
+		clear(script, xmb.fakeroot);
 	}
 
 	public static void shutdown(Section script) {

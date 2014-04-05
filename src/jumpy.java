@@ -73,7 +73,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
-		utils.setField(utils.fakeroot, "defaultRenderer", RendererConfiguration.getDefaultConf());
+		utils.setField(xmb.fakeroot, "defaultRenderer", RendererConfiguration.getDefaultConf());
 		host = new File(configuration.getProfilePath()).getName().split("\\.conf")[0];
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)
@@ -172,8 +172,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		log("\n");
 		log("Adding root folder.", true);
 		top = new scriptFolder(this, "Jumpy", null, null);
-		utils.fakeroot.addChild(top);
-		utils.home = top;
+		xmb.fakeroot.addChild(top);
+		xmb.home = top;
 
 		new runner(runner.QUIET).run(top, "[" + command.pms + "]", null, null);
 		if (top.env.containsKey("imconvert")) {
@@ -239,12 +239,12 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 				((scriptFolder)item).canBookmark = false;
 			}
 		}
-		utils.startup = false;
+		xmb.startup = false;
 	}
 
 	@Override
 	public Iterator<DLNAResource> getChildren() {
-		return utils.fakeroot.getChildren().iterator();
+		return xmb.fakeroot.getChildren().iterator();
 	}
 
 	public static void logonce(String msg, String id, boolean minimal) {

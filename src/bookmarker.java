@@ -42,9 +42,9 @@ public class bookmarker {
 
 	public void add(scriptFolder folder, boolean copy, boolean save) {
 		String path = folder.getName();
-		String label = utils.unesc(FilenameUtils.getName(path));
+		String label = xmb.unesc(FilenameUtils.getName(path));
 		path = FilenameUtils.getFullPath(path);
-		DLNAResource parent = path == null ? Bookmarks : utils.mkdirs(path, Bookmarks);
+		DLNAResource parent = path == null ? Bookmarks : xmb.mkdirs(path, Bookmarks);
 
 		scriptFolder bookmark = copy ? new scriptFolder(folder) : folder;
 		bookmark.isBookmark = true;
@@ -52,8 +52,7 @@ public class bookmarker {
 			label += (" :" + topName(folder));
 		}
 		bookmark.setName(label);
-		parent.addChild(bookmark);
-		utils.touch(parent);
+		xmb.add(parent, bookmark);
 		bookmarks.add(bookmark);
 		jumpy.log("Adding bookmark: " + label);
 		if (save) {
@@ -62,12 +61,9 @@ public class bookmarker {
 	}
 
 	public void remove(scriptFolder folder) {
-		String name = folder.getName();
-		DLNAResource parent = folder.getParent();
-		parent.getChildren().remove(folder);
-		utils.touch(parent);
+		xmb.remove(folder);
 		bookmarks.remove(folder);
-		jumpy.log("Removing bookmark: " + name);
+		jumpy.log("Removing bookmark: " + folder.getName());
 		store();
 	}
 
@@ -92,8 +88,8 @@ public class bookmarker {
 			ini.setFile(new File(bookmarksini));
 			for (scriptFolder bookmark : bookmarks) {
 				String name =
-					(bookmark.getParent() == Bookmarks ? "" : (utils.getXMBPath(bookmark, null) + "/")) +
-					utils.esc(bookmark.getName());
+					(bookmark.getParent() == Bookmarks ? "" : (xmb.getPath(bookmark, null) + "/")) +
+					xmb.esc(bookmark.getName());
 				Section section = ini.add(name);
 				section.put("uri", bookmark.uri);
 				if (! (bookmark.thumbnail == null || bookmark.thumbnail.isEmpty()))
@@ -115,7 +111,7 @@ public class bookmarker {
 	}
 
 	public String topName(scriptFolder folder) {
-		String[] dirs = utils.getXMBPath(folder, jumpy.top.getParent()).split("/");
+		String[] dirs = xmb.getPath(folder, jumpy.top.getParent()).split("/");
 		return dirs[dirs.length > 2 ? 2 : 1].replace("[xbmc]","").trim();
 	}
 }

@@ -36,12 +36,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
-import net.pms.configuration.RendererConfiguration;
 import net.pms.util.PropertiesUtil;
 import net.pms.dlna.DLNAResource;
-import net.pms.dlna.RootFolder;
 import net.pms.dlna.DLNAMediaSubtitle;
-import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.formats.v2.SubtitleType;
 import net.pms.formats.WEB;
@@ -50,10 +47,6 @@ public final class utils {
 
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
-	public static DLNAResource fakeroot = new xmbObject("fakeroot", null, true);
-	public static DLNAResource home = null;
-	static ArrayList<RendererConfiguration> foundRenderers = null;
-	public static boolean startup = true;
 	public static HashMap<String,String> properties = new HashMap<String,String>();
 
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
@@ -217,80 +210,6 @@ public final class utils {
 		}
 		if (ffmpeg_hdr.contains("--enable-libass")) {
 			properties.put("libass", "true");
-		}
-	}
-
-	public static void refreshRoot() {
-		if (foundRenderers == null) {
-			foundRenderers = (ArrayList<RendererConfiguration>)
-				getField(PMS.get(), "foundRenderers");
-		}
-		for (RendererConfiguration r : foundRenderers) {
-			RootFolder root = r.getRootFolder();
-			root.getChildren().clear();
-			setField(root, "discovered", false);
-		}
-	}
-
-	public static String esc(String name) {
-		return name.replace("/", "^|");
-	}
-
-	public static String unesc(String name) {
-		return name.replace("^|", "/");
-	}
-
-	public static DLNAResource mkdirs(String path, DLNAResource pwd) {
-		return mkdirs(path, pwd, null);
-	}
-
-	public static DLNAResource mkdirs(String path, DLNAResource pwd, String thumb) {
-		boolean exists = true, atroot=path.startsWith("/"), rootchanged=false;
-		DLNAResource child, parent = atroot ? fakeroot : path.startsWith("~/") ? home : pwd;
-		String[] dir = path.split("/");
-		Object tag = pwd instanceof xmbObject ? ((xmbObject)pwd).tag : null;
-		int i;
-		for (i=0; i<dir.length; i++) {
-			dir[i] = unesc(dir[i]);
-			if (dir[i].equals("") || dir[i].equals("~")) continue;
-			if (! (exists && (child = parent.searchByName(dir[i])) != null)) {
-				if (atroot) {
-					rootchanged = true;
-					atroot = false;
-				}
-				child = new xmbObject(dir[i], i == dir.length-1 ? thumb : null, true);
-				((xmbObject)child).tag = tag;
-				parent.addChild(child);
-				exists = false;
-			}
-			parent = child;
-		}
-		if (! startup && (rootchanged || atroot)) {
-			refreshRoot();
-		}
-		return parent;
-	}
-
-	public static String getXMBPath(DLNAResource folder, DLNAResource ancestor) {
-		DLNAResource p = folder;
-		String xmbpath = "/";
-		boolean root;
-		while (true) {
-			p = p.getParent();
-			root = (p == null || p == fakeroot || p instanceof net.pms.dlna.RootFolder);
-			if (root || p == ancestor) {
-				break;
-			}
-			xmbpath = esc(p.getName().trim()) + "/" + xmbpath;
-		}
-		return (root ? "/" : "") + xmbpath.replace("//","").trim();
-	}
-
-	public static void touch(DLNAResource folder) {
-		try {
-			((xmbObject)folder).touch();
-		} catch (Exception e) {
-			setField(folder, "lastmodified", 1);
 		}
 	}
 
