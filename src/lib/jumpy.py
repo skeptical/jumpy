@@ -67,6 +67,7 @@ except NameError:
 	__builtin__.PMS_MKDIRS = 21
 	__builtin__.PMS_HOST_IP = 22
 	__builtin__.PMS_INFO = 23
+	__builtin__.PMS_PLAY = 24
 # constants from net.pms.encoders.Player
 	__builtin__.PMS_VIDEO_SIMPLEFILE_PLAYER = 0
 	__builtin__.PMS_AUDIO_SIMPLEFILE_PLAYER = 1
@@ -248,6 +249,9 @@ def pms_setSubtitles(path):
 def pms_log(msg, verbose=False, once=False):
 	pms_util(PMS_LOG, msg, '%s%s' % ('v' if verbose else '', 'o' if once else ''))
 
+def pms_play(uri, renderer):
+	pms_util(PMS_PLAY, uri, renderer)
+
 def pms_addPlayer(name, cmd, supported, mediatype=PMS_VIDEO, purpose=PMS_MISC_PLAYER, desc=None, icon=None, playback=None):
 	if type(cmd).__name__ == 'list':
 		cmd = flatten(cmd)
@@ -295,6 +299,7 @@ __builtin__.pms.setIcon = pms_setIcon
 __builtin__.pms.setInfo = pms_setInfo
 __builtin__.pms.setSubtitles = pms_setSubtitles
 __builtin__.pms.log = pms_log
+__builtin__.pms.play = pms_play
 __builtin__.pms.addPlayer = pms_addPlayer
 __builtin__.pms.esc = esc
 

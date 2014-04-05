@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import java.net.InetAddress;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -34,6 +36,8 @@ import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.DVDISOFile;
+import net.pms.configuration.RendererConfiguration;
+import net.pms.network.UPNPHelper;
 
 import static net.pms.external.infidel.jumpy.jumpyAPI.*;
 
@@ -267,9 +271,9 @@ public final class xmb {
 		return (obj.ex != null && obj.ex.running) ? null : pwd.getChildren().get(pwd.getChildren().size()-1);
 	}
 
-	public static String util(xmbObject obj, int action, String arg1, String arg2) {
+	public static String util(xmbObject obj, int action, final String arg1, final String arg2) {
 
-		jumpy jumpy = obj.jumpy;
+		final jumpy jumpy = obj.jumpy;
 
 		if (action != LOG) {
 			jumpy.log(apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
@@ -383,6 +387,17 @@ public final class xmb {
 				} else {
 					jumpy.log(arg1, minimal);
 				}
+				break;
+			case PLAY:
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							UPNPHelper.play(arg1, RendererConfiguration.getRendererConfigurationBySocketAddress(InetAddress.getByName(arg2)));
+						} catch (Exception e) {
+							jumpy.log("Error playing uri: " + e);
+						}
+					}
+				}).start();
 				break;
 		}
 		return "";
