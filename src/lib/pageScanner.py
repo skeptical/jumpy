@@ -48,9 +48,19 @@ class scanner:
 			self.depth -= 1
 			return
 
-		src = urllib2.urlopen(url, timeout=self.timeout).read()
+		obj = urllib2.urlopen(url, timeout=self.timeout)
+		content = obj.info()['content-type']
 
-		# if could be rss
+		# if the content-type is media we're done
+		if content.startswith('video/') or content.startswith('audio/') or content.startswith('image/'):
+			self.add(url)
+			self.depth -= 1
+			return
+
+		# it's (hopefully) text
+		src = obj.read()
+
+		# it could be rss
 		if src.startswith('<?xml'):
 			try:
 				import feedparser
