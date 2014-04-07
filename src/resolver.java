@@ -103,7 +103,8 @@ public class resolver extends xmbObject {
 
 	@Override
 	public long length() {
-		return -1; //DLNAMediaInfo.TRANS_SIZE;
+		long size = getMedia().getSize();
+		return size > 0 ? size : DLNAMediaInfo.TRANS_SIZE;
 	}
 
 	@Override
