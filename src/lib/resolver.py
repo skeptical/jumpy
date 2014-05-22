@@ -187,10 +187,15 @@ class _youtube_dl(_scraper):
 		#       --max-downloads (overuse triggers '402: Payment Required')
 		youtube_dl.main(['-s', url])
 		sys.stdout, sys.stderr, sys.exit = stdout, stderr, exit
-		u = '\n'.join([(i['url'] + i.get('play_path', '')) for i in self.info_dicts])
-		if u:
+		# return the first result
+		if len(self.info_dicts) > 0:
 			i = self.info_dicts[0]
-			resolver.add(u, i.get('fulltitle'), i.get('thumbnail'))
+			resolver.add(i['url'] + i.get('play_path', ''), i.get('fulltitle'), i.get('thumbnail'))
+#		# TODO: return all results (i.e. multi-part or playlist)
+#		u = '\n'.join([(i['url'] + i.get('play_path', '')) for i in self.info_dicts])
+#		if u:
+#			i = self.info_dicts[0]
+#			resolver.add(u, i.get('fulltitle'), i.get('thumbnail'))
 
 
 class _get_flash_videos(_scraper):
