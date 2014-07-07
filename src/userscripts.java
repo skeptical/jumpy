@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.PrintWriter;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import org.ini4j.BasicProfile;
 import org.ini4j.Options;
 import org.ini4j.OptionMap;
 import org.ini4j.Persistable;
+import org.ini4j.spi.OptionsFormatter;
+import org.ini4j.Config;
 
 import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
@@ -310,16 +314,16 @@ public class userscripts {
 			}
 		}
 
-		public static void glob(Section section) {
+		public static void glob(OptionMap section) {
 			for (String key : section.keySet()) {
 				String[] values = section.getAll(key, String[].class);
 				if (values.length > 1) {
-					String val = values[0].trim();
+					LinkedHashSet<String> v = new LinkedHashSet();
 					int i;
 					for (i=1; i < values.length; i++) {
-						val += ("\n" + section.remove(key, 1).trim());
+						v.add(section.remove(key, 1).trim());
 					}
-					section.put(key, val, 0);
+					section.put(key, org.apache.commons.lang.StringUtils.join(v, "\n"), 0);
 				}
 			}
 		}
@@ -382,6 +386,8 @@ public class userscripts {
 
 		public Options(File f) throws IOException, InvalidFileFormatException {
 			super(f);
+			getConfig().setMultiSection(false);
+			getConfig().setMultiOption(true);
 		}
 
 		@Override
@@ -389,12 +395,11 @@ public class userscripts {
 			super.load();
 			if (usercopy == null) {
 				usercopy = new File(jumpy.getProfileDirectory(), getFile().getName());
-				getConfig().setMultiSection(false);
-				getConfig().setMultiOption(false);
 			}
 			if (usercopy.exists()) {
 				load(usercopy);
 			}
+			Ini.glob(this);
 		}
 
 		@Override
@@ -402,10 +407,25 @@ public class userscripts {
 			store(usercopy);
 		}
 
+		class unglobber extends OptionsFormatter {
+			unglobber(Writer out, Config config) {
+				setOutput((out instanceof PrintWriter) ? (PrintWriter) out : new PrintWriter(out));
+				setConfig(config);
+			}
+
+			@Override
+			public void handleOption(String optionName, String optionValue) {
+				// unglob
+				for (String val : optionValue.split("\n")) {
+					super.handleOption(optionName, val);
+				}
+			}
+		}
+
 		@Override
 		public void store(Writer output) throws IOException {
 			writer = output;
-			super.store(output);
+			store(new unglobber(output, getConfig()));
 			writer = null;
 		}
 

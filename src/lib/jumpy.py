@@ -11,6 +11,7 @@ try: import simplejson as json
 except: import json
 from ConfigParser import RawConfigParser
 from StringIO import StringIO
+from UserDict import DictMixin
 from py4j.java_gateway import GatewayClient, JavaGateway
 import vmsg, imgfx
 
@@ -340,11 +341,30 @@ __builtin__.pms.warn = pms_warn
 __builtin__.pms.err = pms_err
 
 def pms_readConf(filename):
-	conf = RawConfigParser()
+	class multiKeyDict(DictMixin):
+		def __init__(self, d=None):
+			self._data = d or {}
+		def __setitem__(self, key, value):
+			if key in self._data and isinstance(self._data[key], list) and isinstance(value, list):
+				self._data[key].extend(value)
+			else:
+				self._data[key] = value
+		def __getitem__(self, key):
+			return self._data[key]
+		def __delitem__(self, key):
+			del self._data[key]
+		def keys(self):
+			return self._data.keys()
+		def copy(self):
+			return multiKeyDict(self._data.copy())
+	conf = RawConfigParser(dict_type=multiKeyDict)
 	for c in [filename, os.path.join(pms.getProfileDir(), os.path.basename(filename))]:
 		if os.path.exists(c):
 			conf.readfp(StringIO('[.]\n'+open(c).read()))
-	return dict(conf.items('.'))
+	try:
+		return dict(conf.items('.'))
+	except:
+		return {}
 
 __builtin__.pms.readConf = pms_readConf
 
