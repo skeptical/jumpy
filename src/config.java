@@ -956,6 +956,7 @@ class script {
 			changed = true;
 			save.setEnabled(true);
 			SwingUtilities.getRootPane(save).setDefaultButton(save);
+			SwingUtilities.getWindowAncestor(save).pack();
 		}
 
 		public void insertUpdate(DocumentEvent e) {changed();}

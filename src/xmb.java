@@ -195,7 +195,7 @@ public final class xmb {
 				break;
 			case UNRESOLVED:
 				media = "unresolved." + utype + " item";
-				if (resolver.playback) {
+				if (resolver.playback && utype != FOLDER) {
 					obj.newItem = new resolver(jumpy, utype, label, uri, thumb, obj.syspath, obj.env);
 				} else {
 					obj.newItem = new scriptFolder(jumpy, label, uri, thumb, obj.syspath, obj.env);
@@ -392,7 +392,7 @@ public final class xmb {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
-							UPNPHelper.play(arg1, RendererConfiguration.getRendererConfigurationBySocketAddress(InetAddress.getByName(arg2)));
+							UPNPHelper.play(arg1, null, RendererConfiguration.getRendererConfigurationBySocketAddress(InetAddress.getByName(arg2)));
 						} catch (Exception e) {
 							jumpy.log("Error playing uri: " + e);
 						}
