@@ -19,6 +19,9 @@ public class jumpstart {
 	public static HashMap<String,String> vars = new HashMap<String,String>();
 	public static String home = null;
 	public static Properties pmsconf = null;
+	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
+	public static boolean mac = System.getProperty("os.name").contains("OS X");
+	public static boolean ums;
 
 	public static void main(String[] argv) {
 
@@ -74,6 +77,7 @@ public class jumpstart {
 		} catch (Exception e) {}
 
 		home = lib.substring(0, lib.lastIndexOf(File.separator));
+		ums = new File(new File(home).getParentFile().getParentFile(), "ums.jar").exists();
 
 		// jumpy.py is always located alongside the jar
 		command.pms = lib + File.separatorChar + "jumpy.py";
@@ -175,29 +179,21 @@ public class jumpstart {
 	}
 
 	public static String getProfileDir() {
-		File debug_log = new File(new File(home).getParentFile().getParentFile(), "debug.log");
-		try {
-			FileInputStream is = new FileInputStream(debug_log);
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			String line;
-			while ((line = br.readLine()) != null) {
-				if (line.contains("Profile directory: ")) {
-					return line.split("Profile directory: ")[1];
-				}
-			}
-		} catch (Exception e) {}
-		return null;
+		String dir = ums ? "UMS" : "PMS";
+		dir = windows ? String.format("%s\\%s\\jumpy", System.getenv("ALLUSERSPROFILE"), dir) :
+			mac ? String.format("%s/Library/Application Support/%s/jumpy", System.getProperty("user.home"), dir) :
+			String.format("%s/.config/%s/jumpy", System.getProperty("user.home"), dir);
+		System.out.println("getProfileDir: " + dir);
+		return dir;
 	}
 
 	public static void readconf() {
 		// TODO: this only finds properties explicitly declared in PMS.conf
-		File conf;
-		String profiledir = getProfileDir();
+		File conf = new File(new File(getProfileDir()).getParent(), ums ? "UMS.conf" : "PMS.conf");
+		System.out.println("reading " + conf);
 		pmsconf = new Properties();
 		try {
-			FileInputStream conf_file =
-				new FileInputStream(new File(profiledir,
-					profiledir.endsWith("PMS") ? "PMS.conf" : "UMS.conf"));
+			FileInputStream conf_file = new FileInputStream(conf);
 			pmsconf.load(conf_file);
 			conf_file.close();
 		} catch (IOException e) {}
@@ -280,6 +276,7 @@ class item extends node implements jumpyAPI {
 		syspath = (path == null ? basepath : syspath + File.pathSeparator + path);
 	}
 	public void setEnv(String name, String val) {
+		System.out.println("setEnv: " + name + "=" + val);
 		if (name == null) env.clear();
 		else env.put(name, val);
 	}

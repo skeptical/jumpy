@@ -286,7 +286,7 @@ public final class xmb {
 			case HOST_IP:
 				return PMS.get().getServer().getHost();
 			case PROFILEDIR:
-				return new File(jumpy.jumpyconf).getParent();
+				return jumpy.getProfileDirectory();
 			case LOGDIR:
 				return new File(jumpy.jumpylog).getParent();
 			case PLUGINJAR:
