@@ -142,14 +142,15 @@ class _youtube_dl(_scraper):
 				if lib in sys.path:
 					sys.path.remove(lib)
 				sys.path.insert(1, lib)
-		try:
-			import youtube_dl
-			__builtin__.youtube_dl = youtube_dl
-			sys.stderr.write('youtube-dl version %s\n' % youtube_dl.__version__)
-			scrapers.append(self)
-		except:
-			if self in scrapers: scrapers.remove(self)
-			sys.stderr.write('unable to open youtube-dl\n')
+				try:
+					import youtube_dl
+					__builtin__.youtube_dl = youtube_dl
+					sys.stderr.write('youtube-dl version %s\n' % youtube_dl.version.__version__)
+					scrapers.append(self)
+					return
+				except: traceback.print_exc()
+		sys.stderr.write('unable to open youtube-dl\n')
+		if self in scrapers: scrapers.remove(self)
 
 	def start(self):
 		try:

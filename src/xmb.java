@@ -392,7 +392,7 @@ public final class xmb {
 				new Thread(new Runnable() {
 					public void run() {
 						try {
-							UPNPHelper.play(arg1, null, RendererConfiguration.getRendererConfigurationBySocketAddress(InetAddress.getByName(arg2)));
+							UPNPHelper.play(arg1, null, (net.pms.configuration.DeviceConfiguration)RendererConfiguration.getRendererConfigurationBySocketAddress(InetAddress.getByName(arg2)));
 						} catch (Exception e) {
 							jumpy.log("Error playing uri: " + e);
 						}
