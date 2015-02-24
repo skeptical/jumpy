@@ -401,4 +401,13 @@ public final class utils {
 		}
 		return 0;
 	}
+
+	public static String getExtension(String uri) {
+		// Omit the query string, if any
+		String p = StringUtils.substringBefore(uri, "?");
+		// And check for protocol, if any
+		int i = p.indexOf("://");
+		return FilenameUtils.getExtension(i == -1 ? p : p.substring(i + 3));
+	}
+
 }

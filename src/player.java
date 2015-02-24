@@ -275,8 +275,14 @@ public class player extends Player {
 					dlna instanceof xmbAction ? ((xmbAction)dlna).syspath : null,
 					dlna instanceof xmbAction ? ((xmbAction)dlna).env : null);
 			}
-			cmdline.substitutions.put("format", isMediaitem ?
-				((mediaItem)dlna).fmt : dlna.getFormat().getSupportedExtensions()[0]);
+			String fmt = null;
+			if (isMediaitem) {
+				fmt = ((mediaItem)dlna).fmt;
+			} else {
+				String[] fmts = dlna.getFormat().getSupportedExtensions();
+				fmt = fmts != null ? fmts[0] : utils.getExtension(filename);
+			}
+			cmdline.substitutions.put("format", fmt);
 			cmdline.substitutions.put("filename", filename.replace("\\","\\\\"));
 			cmdline.substitutions.put("userdata", isMediaitem && ((mediaItem)dlna).userdata != null ?
 				((mediaItem)dlna).userdata : "");
