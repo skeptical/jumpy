@@ -29,7 +29,7 @@ public class jumpstart {
 
 		runner ex = new runner(new command());
 
-		runner.version = "0.2.5";
+		runner.version = "0.2.6";
 		System.out.println("jumpstart " + runner.version);
 
 		Console c = System.console();
@@ -63,9 +63,11 @@ public class jumpstart {
 
 		String lib = null;
 		// get the current jar location without resolving symlinks
-		for (String cp : ManagementFactory.getRuntimeMXBean().getClassPath().split(File.pathSeparator)) {
-			if (cp.contains("jumpstart") && cp.contains(File.separator)) {
-				lib = cp.substring(0, cp.lastIndexOf(File.separator));
+		for (String cp : ManagementFactory.getRuntimeMXBean().getClassPath().replace("\\", "/").split(File.pathSeparator)) {
+			int i = cp.indexOf("/jumpstart");
+			if (i > -1) {
+				lib = cp.substring(0, i);
+				break;
 			}
 		}
 		if (lib == null) {
@@ -76,7 +78,11 @@ public class jumpstart {
 			lib = URLDecoder.decode(lib, "UTF-8");
 		} catch (Exception e) {}
 
-		home = lib.substring(0, lib.lastIndexOf(File.separator));
+		if (windows) {
+			lib = lib.replace("/", "\\");
+		}
+
+		home = lib.substring(0, lib.lastIndexOf(File.separatorChar));
 		ums = new File(new File(home).getParentFile().getParentFile(), "ums.jar").exists();
 
 		// jumpy.py is always located alongside the jar
