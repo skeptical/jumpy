@@ -358,7 +358,7 @@ class item extends node implements jumpyAPI {
 		}
 		return parent;
 	}
-	public int addPlayer(String name, String cmdline, String supported, int type, int purpose, String desc, String icon, String playback) {
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback, int priority) {
 		return 0;
 	}
 	@Override

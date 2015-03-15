@@ -140,8 +140,8 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 	}
 
 	@Override
-	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback) {
-		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback);
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback, int priority) {
+		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback, priority);
 	}
 
 	protected CountDownLatch ready = null;

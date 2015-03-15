@@ -43,6 +43,7 @@ public class player extends Player {
 	public boolean isnative = false;
 	public boolean dynamic, isMediaitem = false;
 	public String id;
+	public int priority = 0;
 	public int type = Format.UNKNOWN;
 	public int purpose = MISC_PLAYER;
 	public Format format = null;
@@ -59,15 +60,15 @@ public class player extends Player {
 	public jumpy jumpy;
 
 	public player(jumpy jumpy, String name, String cmdline, String fmt, String mimetype, int type,
-			int purpose, String desc, String icon, int delay, int buffersize) {
+			int purpose, String desc, String icon, int delay, int buffersize, int priority) {
 		isnative = true;
-		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc, icon, null);
+		init(jumpy, name, cmdline, fmt, mimetype, "f:" + fmt + " m:" + mimetype, type, purpose, desc, icon, null, priority);
 		this.delay = delay;
 		this.buffersize = buffersize;
 	}
 
 	public player(jumpy jumpy, String name, String cmdline, String supported, int type,
-			int purpose, String desc, String icon, String playback) {
+			int purpose, String desc, String icon, String playback, int priority) {
 		String fmt = null, mimetype = null;
 		if (supported.matches(".*f:\\w+.*")) {
 			fmt = supported.split("f:")[1].split("\\s")[0];
@@ -79,15 +80,16 @@ public class player extends Player {
 		if (supported.matches(".*m:\\w+.*")) {
 			mimetype = supported.split("m:")[1].split("\\s")[0];
 		}
-		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc, icon, playback);
+		init(jumpy, name, cmdline, fmt, mimetype, supported, type, purpose, desc, icon, playback, priority);
 	}
 
 	private void init(jumpy jumpy, String name, String cmdline, String fmt, String mimetype,
-			String supported, int type, int purpose, String desc, String icon, String playback) {
+			String supported, int type, int purpose, String desc, String icon, String playback, int priority) {
 
 		this.jumpy = jumpy;
 		this.name = name;
 		this.id = name;
+		this.priority = priority;
 		this.mimetype = mimetype;
 		this.type = type;
 		this.purpose = purpose;
@@ -141,8 +143,10 @@ public class player extends Player {
 		this.delay = playvars.length > 0 ? Integer.valueOf(playvars[0]) : -1;
 		this.buffersize = playvars.length > 1 ? Integer.valueOf(playvars[1]) : -1;
 
-		PlayerFactory.getAllPlayers().add(0, this);
-		PlayerFactory.getPlayers().add(0, this);
+		int last = PlayerFactory.getAllPlayers().size();
+		PlayerFactory.getAllPlayers().add(priority > -1 && priority < last ? priority : last, this);
+		last = PlayerFactory.getPlayers().size();
+		PlayerFactory.getPlayers().add(priority > -1 && priority < last ? priority : last, this);
 		if (icon != null) {
 			if (Format_setIcon != null) {
 				try {
@@ -302,7 +306,8 @@ public class player extends Player {
 			configuration.setEnginesAsList(new ArrayList(engines));
 		}
 		if (add) {
-			engines.add(0, id);
+			int last = engines.size();
+			engines.add(priority > -1 && priority < last ? priority : last, id);
 			// store the gui's reload button state
 			boolean isGui = (PMS.get().getFrame() instanceof LooksFrame);
 			AbstractButton reload = isGui ? ((LooksFrame)PMS.get().getFrame()).getReload() : null;
