@@ -3,6 +3,8 @@
 import sys, os, tempfile
 from subprocess import Popen, PIPE
 
+version = '1.1'
+
 class vmsg:
 	def __init__(
 				self,
@@ -21,6 +23,8 @@ class vmsg:
 				img = None,
 				imggrav = 'center',
 				resize = False,
+				native = False,
+				silence = False,
 				#TODO: size = 'SD'/'HD'
 			):
 
@@ -50,8 +54,11 @@ class vmsg:
 		sys.stderr.write('mode: %s\n' % ('file' if filemode else 'caption'))
 
 		ffmpeg = [
-			'ffmpeg', '-f', 'image2pipe', '-vcodec', 'ppm', '-r', str(rate),
-			 '-i', '-', '-target', target, '-aspect', '16:9', '-an', '-y',
+			'ffmpeg', '-re' if native else '-y',
+			'-f', 'image2pipe', '-vcodec', 'ppm', '-r', str(rate),
+			'-i', '-',
+			'-f lavfi -i aevalsrc=0' if silence else '-an',
+			'-target', target, '-aspect', '16:9',  '-y',
 			'-y' if filemode else '-t', '-y' if filemode else str(seconds - 1),
 			out
 		]
@@ -113,19 +120,23 @@ if __name__ == "__main__":
 
 	import getopt
 
+	sys.stderr.write('vmsg %s\n\n' % version)
+
 	def usage(err=None):
 		if err: sys.stderr.write('%s\n' % err)
 		sys.stderr.write( """
 usage: vmsg [-m message | -i textfile] [-t seconds] [-c color] [-b background]
-				[-f font] [-p pointsize] [-d density] [-g gravity] [-x]
+				[-f font] [-p pointsize] [-d density] [-g gravity] [-n] [-s] [-x]
 				[-rate r] [-a imagefile] [-y image_gravity] [-z] [-o outputfile]
+		 -n: generate output at native (real time) frame rate
+		 -s: generate a silent audio track
 		 -x: show a countdown in seconds if -m is used
 		 -z: resize the background image to fit the screen
 """		)
 		sys.exit(1)
 
 	try:
-		opts = getopt.getopt(sys.argv[1:], "m:i:t:o:c:b:f:p:d:g:r:a:y:xz")
+		opts = getopt.getopt(sys.argv[1:], "m:i:t:o:c:b:f:p:d:g:r:a:y:nsxz")
 	except getopt.GetoptError, err:
 		usage(err)
 
@@ -145,13 +156,15 @@ usage: vmsg [-m message | -i textfile] [-t seconds] [-c color] [-b background]
 		'-a' : 'img',
 		'-y' : 'imggrav',
 		'-z' : 'resize',
+		'-s' : 'silence',
+		'-n' : 'native',
 #		'-s' : 'size'
 	}
 
 	kwargs = dict([(keys.get(k), v) for k, v in opts[0]])
 	for i in ['seconds', 'pointsize', 'density']:
 		if i in kwargs: kwargs[i] = int(kwargs[i])
-	for i in ['countdown', 'resize']:
+	for i in ['countdown', 'resize', 'silence', 'native']:
 		if i in kwargs: kwargs[i] = True
 	sys.stderr.write('args=%s\n' % kwargs)
 

@@ -842,7 +842,9 @@ to the current <code>${outfile}</code>.
 		rate <i>= '1'</i>,                      <i class="comment"># input rate (images/sec)</i>
 		img <i>= None</i>,                      <i class="comment"># background image (file or <a href="#ICONS">named icon</a>)</i>
 		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity">-gravity</a> for img</i>
-		resize <i>= False</i>                   <i class="comment"># whether to 'best fit' img</i>
+		resize <i>= False</i>,                  <i class="comment"># whether to 'best fit' img</i>
+		native <i>= False</i>,                  <i class="comment"># whether to generate output at native (real time) frame rate</i>
+		silence <i>= False</i>                  <i class="comment"># whether to generate a silent audio track</i>
 	)</code>
 <br/>
 <ul>Output a custom dvd-ntsc video showing <code>msg</code> with an optional countdown and
