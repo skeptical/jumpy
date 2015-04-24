@@ -709,7 +709,7 @@ and return the current settings as a python dict.
 </li>
 <br/>
 
-<li><a name="addPlayer"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, icon<i>=None</i>, playback<i>=None</i>)</code></a>
+<li><a name="addPlayer"><kbd>pms.addPlayer</kbd><code>(name, cmd, supported, type=<i>PMS_VIDEO</i>, purpose=<i>PMS_MISC_PLAYER</i>, desc<i>=None</i>, icon<i>=None</i>, playback<i>=None</i>, priority<i>=0</i>)</code></a>
 <br/><br/>
 where
 <ul>
@@ -791,6 +791,13 @@ identical to <a href="#img"><code>img</code></a> in <code>pms.setIcon()</code>.
 <li>you can omit buffer, e.g. just <code>15</code> for a 15 second delay</li>
 <li><code>-1</code> means 'default' for either variable, e.g. <code>-1:20</code> for default delay and 20mb buffer.</li>
 </ul>
+<br/>
+<li><code>priority</code> is the player's relative position in the PMS engine list, where
+<ul>
+<li><code>0</code> sets it as the default player for its supported formats , i.e. at the front of the list.</li>
+<li><code>-1</code> means it's a secondary player (i.e. included in the <i>#--TRANSCODE--#</i> folder).</li>
+</ul>
+</li>
 </ul>
 </li>
 
@@ -842,7 +849,9 @@ to the current <code>${outfile}</code>.
 		rate <i>= '1'</i>,                      <i class="comment"># input rate (images/sec)</i>
 		img <i>= None</i>,                      <i class="comment"># background image (file or <a href="#ICONS">named icon</a>)</i>
 		imggrav <i>= 'center'</i>,              <i class="comment"># ** i.e. <a href="http://www.imagemagick.org/Usage/option_link.cgi?gravity">-gravity</a> for img</i>
-		resize <i>= False</i>                   <i class="comment"># whether to 'best fit' img</i>
+		resize <i>= False</i>,                  <i class="comment"># whether to 'best fit' img</i>
+		native <i>= False</i>,                  <i class="comment"># whether to generate output at native (real time) frame rate</i>
+		silence <i>= False</i>                  <i class="comment"># whether to generate a silent audio track</i>
 	)</code>
 <br/>
 <ul>Output a custom dvd-ntsc video showing <code>msg</code> with an optional countdown and
