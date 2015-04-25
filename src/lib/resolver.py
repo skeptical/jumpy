@@ -59,8 +59,12 @@ class _scraper:
 
 class _xbmc_urlresolver(_scraper):
 
-	def __init__(self):
+	def name(self):
+		return 'xbmc%s' % ('-urlresolver' if self.urlresolver else '')
+
+	def __init__(self, with_urlresolver=True):
 		self.started = False
+		self.urlresolver = False
 		lib = os.path.join(home, 'xbmc')
 		if os.path.exists(lib):
 			if lib in sys.path:
@@ -69,28 +73,36 @@ class _xbmc_urlresolver(_scraper):
 		try:
 			import xbmcinit
 			__builtin__.xbmcinit = xbmcinit
-			addondir = os.path.join(_special['home'], 'addons', 'script.module.urlresolver')
-			id = xbmcinit.read_addon(dir=addondir, full=True)
-			sys.path.extend([p for p in _info[id]['_pythonpath'] if p not in sys.path])
-			sys.stderr.write('%s version %s\n' % (_info[id]['name'], _info[id]['version']))
 			scrapers.append(self)
 		except:
 			if self in scrapers: scrapers.remove(self)
-			sys.stderr.write('unable to open xbmc-urlresolver\n')
+			sys.stderr.write('unable to open xbmc\n')
 			traceback.print_exc()
+		if with_urlresolver:
+			try:
+				addondir = os.path.join(_special['home'], 'addons', 'script.module.urlresolver')
+				id = xbmcinit.read_addon(dir=addondir, full=True)
+				sys.path.extend([p for p in _info[id]['_pythonpath'] if p not in sys.path])
+				sys.stderr.write('%s version %s\n' % (_info[id]['name'], _info[id]['version']))
+				self.urlresolver = True
+			except:
+				sys.stderr.write('unable to start xbmc-urlresolver\n')
+				traceback.print_exc()
 
 	def start(self):
-		try:
-			argv = sys.argv
-			sys.argv = [sys.argv[0], '?']
-			import urlresolver
-			__builtin__.urlresolver = urlresolver
-			sys.argv = argv
-			self.started = True
-		except:
-			if self in scrapers: scrapers.remove(self)
-			sys.stderr.write('unable to start xbmc-urlresolver\n')
-			traceback.print_exc()
+		self.started = True
+		if self.urlresolver:
+			try:
+				argv = sys.argv
+				sys.argv = [sys.argv[0], '?']
+				import urlresolver
+				__builtin__.urlresolver = urlresolver
+				sys.argv = argv
+				self.started = True
+			except:
+				self.urlresolver = False
+				sys.stderr.write('unable to start xbmc-urlresolver\n')
+				traceback.print_exc()
 
 	def resolve(self, url, resolver):
 		if not self.started: self.start()
@@ -101,7 +113,7 @@ class _xbmc_urlresolver(_scraper):
 			elif url.startswith('['):
 				argv = url[1:-1].split(' , ')
 				u = (argv[1] if len(argv) > 1 and argv[1].startswith('plugin://') else None)
-		else:
+		elif self.urlresolver:
 			u = urlresolver.resolve(url)
 		if u:
 			if 'plugin://' in u:
@@ -124,6 +136,11 @@ class _xbmc_urlresolver(_scraper):
 				__builtin__.pms.util = pmsutil
 			else:
 				resolver.add(u)
+
+# only resolves 'plugin://' urls
+class _xbmc(_xbmc_urlresolver):
+	def __init__(self):
+		_xbmc_urlresolver.__init__(self, False)
 
 
 class _youtube_dl(_scraper):
@@ -245,9 +262,13 @@ if __name__ == "__main__":
 			'_icon'    : '#question+f=#a6a8a4',
 			'_version' : str(version)
 		}
-		info.update({k.name():[str(scrapers.index(k)+1), 'priority (1=first|2=second|-1=disable)'] for k in scrapers})
+		info.update({k.name():[str(scrapers.index(k)+1), 'priority (1=first|2=second|-1=disable)'] for k in scrapers if not k.name() == 'xbmc'})
 		settings = pms.setInfo(info, '.resolver')
 #		sys.stderr.write('settings: %s'%settings)
-		s = {k:v for k,v in settings.items() if v.isdigit()}
+		resolvers = [k.name() for k in scrapers]
+#		sys.stderr.write('resolvers: %s'%resolvers)
+		s = {k:v for k,v in settings.items() if k in resolvers and v.isdigit()}
+		if 'xbmc' in resolvers:
+			s['xbmc'] = '3'
 		pms.setVar('_resolvers', ' '.join(sorted(s, key=s.get)))
 
