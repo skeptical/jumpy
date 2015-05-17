@@ -5,7 +5,7 @@ pms_await = True
 import jumpy
 from pageScanner import scanner
 
-version = '1.3'
+version = '1.4'
 
 class resolver:
 
@@ -71,8 +71,9 @@ class _xbmc_urlresolver(_scraper):
 				sys.path.remove(lib)
 			sys.path.insert(1, lib)
 		try:
-			import xbmcinit
+			import xbmcinit, xbmc
 			__builtin__.xbmcinit = xbmcinit
+			__builtin__.xbmc = xbmc
 			scrapers.append(self)
 		except:
 			if self in scrapers: scrapers.remove(self)
@@ -95,7 +96,9 @@ class _xbmc_urlresolver(_scraper):
 			try:
 				argv = sys.argv
 				sys.argv = [sys.argv[0], '?']
+				loglevel = self.setloglevel(xbmc.LOGINFO)
 				import urlresolver
+				self.setloglevel(loglevel)
 				__builtin__.urlresolver = urlresolver
 				sys.argv = argv
 				self.started = True
@@ -114,7 +117,9 @@ class _xbmc_urlresolver(_scraper):
 				argv = url[1:-1].split(' , ')
 				u = (argv[1] if len(argv) > 1 and argv[1].startswith('plugin://') else None)
 		elif self.urlresolver:
+			loglevel = self.setloglevel(xbmc.LOGINFO)
 			u = urlresolver.resolve(url)
+			self.setloglevel(loglevel)
 		if u:
 			if 'plugin://' in u:
 				pmsaddItem = __builtin__.pms.addItem
@@ -136,6 +141,12 @@ class _xbmc_urlresolver(_scraper):
 				__builtin__.pms.util = pmsutil
 			else:
 				resolver.add(u)
+
+	def setloglevel(self, level):
+		# backward compatibility
+		try: return xbmc.setloglevel(level)
+		except: return 0
+
 
 # only resolves 'plugin://' urls
 class _xbmc(_xbmc_urlresolver):
@@ -203,12 +214,22 @@ class _youtube_dl(_scraper):
 		sys.stderr = sys.stdout = self.devnull
 		# TODO: --cookies (https://github.com/rg3/youtube-dl/issues/41)
 		#       --max-downloads (overuse triggers '402: Payment Required')
-		youtube_dl.main(['-s', url])
+		# v2015.04.26+: explicitly setting '-f best' to avoid new 'merged format' separate a/v urls
+		youtube_dl.main(['-s', '--no-playlist', '-f', 'best', url])
 		sys.stdout, sys.stderr, sys.exit = stdout, stderr, exit
-		# return the first result
+
 		if len(self.info_dicts) > 0:
+			# get the first result
 			i = self.info_dicts[0]
+			if i.get('url') is None and i.get('requested_formats') is not None:
+				# v 2014.12.10+ (shouldn't happen, but just in case)
+				req = info_dict.get('requested_formats')
+				if len(req) == 1:
+					i = req[0]
+				else:
+					raise 'Error: multiple "merged format" urls received'
 			resolver.add(i['url'] + i.get('play_path', ''), i.get('fulltitle'), i.get('thumbnail'))
+
 #		# TODO: return all results (i.e. multi-part or playlist)
 #		u = '\n'.join([(i['url'] + i.get('play_path', '')) for i in self.info_dicts])
 #		if u:
