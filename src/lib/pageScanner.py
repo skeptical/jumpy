@@ -8,6 +8,12 @@ sys.path.append(os.path.abspath(os.path.join('..', 'webreader'))) # FIXME
 def isRelativeFolderPath(url):
 	return url.endswith('/') and not '://' in url
 
+def ismedia(mime):
+	return mime.startswith('video/') or mime.startswith('audio/') or mime.startswith('image/')
+
+def istext(mime):
+	return 'text' in mime or 'xml' in mime or 'json' in mime or 'charset' in mime.lower()
+
 class ResultFound(Exception):
 	pass
 
@@ -23,8 +29,7 @@ class scanner:
 		self.mode = mode or scanner.FULL
 		self.timeout = float(timeout or 10)
 		self.items = {}
-		self.media = re.compile(r'([a-z]+://.+?\.(wma|wmv|mpg|mpeg|mp3|mp2|mp4|vob|divx|avi|ogg|ogv|flac|speex|mkv|3gp|flv))')
-		self.depth = 0
+		self.media = re.compile(r'([a-z]+://.+?\.(wma|wmv|mpg|mpeg|mp3|mp2|mp4|vob|divx|avi|ogg|ogv|flac|speex|mkv|3gp|flv|ts))')
 
 	def scan(self, url):
 		self.items = {}
@@ -36,29 +41,43 @@ class scanner:
 			pms.log(traceback.format_exc())
 		return None
 
-	def scrape(self, url):
-		print 'scraping: %s' % url
+	def scrape(self, url, depth=1):
+		print 'scanning: %s' % url
 
-		self.depth += 1
 		prev = len(self.items)
 
 		# if the url itself generates a hit we're done
 		self.check(url, url)
 		if len(self.items) > prev:
-			self.depth -= 1
 			return
 
-		obj = urllib2.urlopen(url, timeout=self.timeout)
-		content = obj.info()['content-type']
+		# send a head request to see the content-type
+		req = urllib2.Request(url)
+		req.get_method = lambda : 'HEAD'
+		info = urllib2.urlopen(req, timeout=self.timeout).info()
+		if info:
+			print '\nHEAD:\n%s' % info
+			content = info['content-type']
+			if content:
+				if ismedia(content):
+					# found it
+					self.add(url)
+					return
+				elif not istext(content):
+					print 'content is "%s", skipping...' % content
+					return
 
-		# if the content-type is media we're done
-		if content.startswith('video/') or content.startswith('audio/') or content.startswith('image/'):
-			self.add(url)
-			self.depth -= 1
+		print 'scraping: %s' % url
+
+		# it's (hopefully) text, fetch at most 100k
+		req = urllib2.Request(url)
+		req.headers['Range'] = 'bytes=0-102399'
+		req = urllib2.urlopen(req, timeout=self.timeout)
+		src = req.read(102400)
+
+		if not src:
+			print 'error downloading content'
 			return
-
-		# it's (hopefully) text
-		src = obj.read()
 
 		# it could be rss
 		if src.startswith('<?xml'):
@@ -78,7 +97,6 @@ class scanner:
 			except: pass
 			# if we have any new items we're done
 			if len(self.items) > prev:
-				self.depth -= 1
 				return
 
 		# treat it as html
@@ -114,7 +132,7 @@ class scanner:
 
 		# remove any iframes
 		iframes = [tag.extract()['src'] for tag in soup('iframe') if 'src' in tag.attrs] \
-			if self.depth < 2 else []
+			if depth < 2 else []
 
 		# and check remaining likely link locations
 		urls = [tag['src'] for tag in soup.findAll(src=True)]
@@ -128,9 +146,7 @@ class scanner:
 
 		# recurse into iframes
 		for u in iframes:
-			self.scrape(urljoin(base, u))
-
-		self.depth -= 1
+			self.scrape(urljoin(base, u), depth + 1)
 
 	def check(self, base, url, name=None, thumb=None, sub=None):
 		u = urljoin(base, url)
