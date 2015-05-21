@@ -83,7 +83,7 @@ def esc(name):
 def flatten(list):
 	a = []
 	for item in list:
-		a.append(item.replace(' , ',' ,, '))
+		a.append(item.replace(' , ',' ,, ') if item else '""')
 	return '[%s]' % ' , '.join(a)
 
 def decode(s):

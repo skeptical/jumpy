@@ -76,7 +76,7 @@ public final class xmb {
 		int i;
 		for (i=0; i<dir.length; i++) {
 			dir[i] = unesc(dir[i]);
-			if (dir[i].equals("") || dir[i].equals("~")) continue;
+			if (dir[i].equals("") || dir[i].equals(".") || dir[i].equals("~")) continue;
 			if (! (exists && (child = parent.searchByName(dir[i])) != null)) {
 				if (atroot) {
 					rootchanged = true;
