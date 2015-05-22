@@ -368,29 +368,35 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public static String getResource(String name) {
 		if (StringUtils.isBlank(name)) {
 			return null;
+		} else if (name.contains("://") || (! name.startsWith("#") && new File(name).exists())) {
+			return name;
 		}
-		String[] val = name.split("\\+", 2);
-		String src = val[0];
-		if (src != null && src.startsWith("#")) {
+		// parse imgfx names, if any, e.g. '#smile+f=gold;s' or '/home/x/foo+h.png'
+		int plus = name.lastIndexOf("+");
+		int dot = plus > -1 ? name.lastIndexOf(".", plus) : -1;
+		String src = (plus > -1 ? name.substring(0, plus) : name);
+		String fx = plus > -1 ? name.substring(plus + 1) : null;
+		// resolve icon names, e.g. '#smile'
+		if (src.startsWith("#")) {
 			src = home + "lib" + File.separatorChar + "resources" + File.separatorChar
 				+ "icon" + File.separatorChar + src.substring(1) + ".png";
 		}
-		if (! src.contains("://") && ! new File(src).exists()) {
+		if (! new File(src).exists()) {
 			jumpy.log("Resource not found: " + src);
 			return name;
 		}
-		if (val.length > 1) {
+		if (fx != null) {
 			String dest = cache.getAbsolutePath() + File.separatorChar +
-				FilenameUtils.getBaseName(src) + "+" + val[1] + "." + FilenameUtils.getExtension(src);
+				FilenameUtils.getBaseName(src) + "+" + fx + "." + FilenameUtils.getExtension(src);
 			File f = new File(dest);
 			if (! f.exists()) {
-				new runner().run(top, "[pms , imgfx , " + src + " , " + val[1] + " , " + cache + "]", null);
+				new runner().run(top, "[pms , imgfx , " + src + " , " + fx + " , " + cache + "]", null);
 				if (! f.exists()) {
 					jumpy.log("Failed to generate resource " + dest);
 					return src;
 				}
 			}
-			src = dest;
+			return dest;
 		}
 		return src;
 	}

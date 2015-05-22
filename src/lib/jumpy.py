@@ -432,6 +432,8 @@ elif __name__ == "__main__":
 	try:
 		exec code
 		if output: print output
+	except SystemExit as e:
+		sys.exit(e)
 	except:
 		traceback.print_exc(file=sys.stderr)
 		sys.stderr.write("Error: invalid syntax.\n")
