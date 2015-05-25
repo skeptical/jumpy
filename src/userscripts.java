@@ -312,6 +312,7 @@ public class userscripts {
 				String[] values = section.getAll(key, String[].class);
 				if (values.length > 1) {
 					LinkedHashSet<String> v = new LinkedHashSet();
+					v.add(section.get(key, 0).trim());
 					int i;
 					for (i=1; i < values.length; i++) {
 						v.add(section.remove(key, 1).trim());
