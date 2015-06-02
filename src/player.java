@@ -12,8 +12,10 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
+import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
+import net.pms.encoders.FFmpegVideo;
 import net.pms.encoders.Player;
 import net.pms.encoders.PlayerFactory;
 import net.pms.encoders.PlayerPurpose;
@@ -26,6 +28,7 @@ import net.pms.io.ProcessWrapperImpl;
 import net.pms.io.ProcessWrapperLiteImpl;
 import net.pms.newgui.LooksFrame;
 import net.pms.PMS;
+import org.apache.commons.lang3.StringUtils;
 
 public class player extends Player {
 
@@ -47,6 +50,7 @@ public class player extends Player {
 	public static PrintStream out = System.out;
 	public int delay, buffersize;
 	public static Method Format_setIcon = utils.getFormatSetIconMethod();
+	public static FFmpegVideo ffmpeg = new FFmpegVideo();
 
 	public jumpy jumpy;
 
@@ -189,6 +193,8 @@ public class player extends Player {
 		if (buffersize > 0) {
 			params.minBufferSize = buffersize;
 		}
+
+		getFFmpegOutputOptions(dlna, media, params);
 
 		PipeProcess pipe = new PipeProcess(System.currentTimeMillis() + id);
 		cmdline.substitutions.put("outfile", pipe.getInputPipe());
@@ -365,6 +371,21 @@ public class player extends Player {
 	@Override
 	public JComponent config() {
 		return config.playerPanel(this, true);
+	}
+
+	public void getFFmpegOutputOptions(DLNAResource dlna, DLNAMediaInfo media, OutputParams params) {
+		RendererConfiguration renderer = params.mediaRenderer;
+		List<String> opts = new ArrayList<String>();
+		opts.addAll(ffmpeg.getVideoTranscodeOptions(dlna, media, params));
+		opts.addAll(ffmpeg.getVideoBitrateOptions(dlna, media, params));
+		String customOpts = renderer.getCustomFFmpegOptions();
+		if (! customOpts.isEmpty()) {
+			opts.add(customOpts);
+		}
+		opts.addAll(ffmpeg.getAudioBitrateOptions(dlna, media, params));
+		if (! opts.isEmpty()) {
+			cmdline.env.put("ffmpeg_out", StringUtils.join(opts, " "));
+		}
 	}
 }
 

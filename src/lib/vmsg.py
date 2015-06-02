@@ -53,12 +53,16 @@ class vmsg:
 
 		sys.stderr.write('mode: %s\n' % ('file' if filemode else 'caption'))
 
+		out_opts = os.environ['ffmpeg_out'] if 'ffmpeg_out' in os.environ else '-target %s' % target
+		if 'libx264' in out_opts and not 'zerolatency' in out_opts:
+			out_opts = out_opts + ' -tune zerolatency'
+
 		ffmpeg = [
 			'ffmpeg', '-re' if native else '-y',
 			'-f', 'image2pipe', '-vcodec', 'ppm', '-r', str(rate),
 			'-i', '-',
 			'-f lavfi -i aevalsrc=0' if silence else '-an',
-			'-target', target, '-aspect', '16:9',  '-y',
+			out_opts, '-aspect', '16:9',  '-y',
 			'-y' if filemode else '-t', '-y' if filemode else str(seconds - 1),
 			out
 		]
