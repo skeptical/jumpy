@@ -263,24 +263,27 @@ public final class xmb {
 	public static String util(xmbObject obj, int action, final String arg1, final String arg2) {
 
 		final jumpy jumpy = obj.jumpy;
+		String result = null;
 
-		if (action != LOG) {
-			jumpy.log(apiName[action] + (arg1 == null ? "" : " " + arg1) + (arg2 == null ? "" : " " + arg2));
-		}
 		switch (action) {
 			case VERSION:
-				return jumpy.version;
+				result = jumpy.version;
+				break;
 			case HOME:
-				return jumpy.home;
+				result = jumpy.home;
+				break;
 			case HOST_IP:
-				return PMS.get().getServer().getHost();
+				result = PMS.get().getServer().getHost();
+				break;
 			case PROFILEDIR:
-				return jumpy.getProfileDirectory();
+				result = jumpy.getProfileDirectory();
+				break;
 			case LOGDIR:
-				return new File(jumpy.jumpylog).getParent();
+				result = new File(jumpy.jumpylog).getParent();
+				break;
 			case PLUGINJAR:
 				try {
-					return obj.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().normalize().getPath();
+					result = obj.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().normalize().getPath();
 				} catch(Exception e) {}
 				break;
 			case REFRESH:
@@ -308,24 +311,28 @@ public final class xmb {
 				utils.restart();
 				break;
 			case RUN:
-				return Integer.toString(new runner(arg2, 0).run(obj, arg1, obj.syspath, obj.env));
+				result = Integer.toString(new runner(arg2, 0).run(obj, arg1, obj.syspath, obj.env));
+				break;
 			case FOLDERNAME:
-				return pwd(obj).getName();
+				result = pwd(obj).getName();
+				break;
 			case XMBPATH:
-				return ("/" + getPath(obj, jumpy.top.getParent()) + "/" + unesc(obj.name)).replace("//", "/");
+				result = ("/" + getPath(obj, jumpy.top.getParent()) + "/" + unesc(obj.name)).replace("//", "/");
+				break;
 			case MKDIRS:
 				mkdirs(arg1, pwd(obj), arg2);
 				break;
 			case GETVAR:
 				if (utils.properties.containsKey(arg1)) {
-					return utils.properties.get(arg1);
+					result = utils.properties.get(arg1);
 				}
 				break;
 			case SETVAR:
 				utils.properties.put(arg1, arg2);
 				break;
 			case GETPROPERTY:
-				return utils.getCustomProperty(arg1, arg2);
+				result = utils.getCustomProperty(arg1, arg2);
+				break;
 			case SETPROPERTY:
 				PMS.getConfiguration().setCustomProperty(arg1, arg2);
 				break;
@@ -355,9 +362,11 @@ public final class xmb {
 					String comment = s.size() > 1 ? s.get(1) : null;
 					jumpy.userscripts._put(section, key, val, comment);
 				}
-				return new Gson().toJson((Map)section);
+				result = new Gson().toJson((Map)section);
+				break;
 			case RESOURCE:
-				return jumpy.getResource(arg1);
+				result = jumpy.getResource(arg1);
+				break;
 			case SETPMS:
 				command.pms = arg1;
 				break;
@@ -389,7 +398,10 @@ public final class xmb {
 				}).start();
 				break;
 		}
-		return "";
+		if (action != LOG) {
+			jumpy.log(apiName[action] + " " + (arg1 == null ? "" : arg1) + (arg2 == null ? "" : " " + arg2) + (result == null ? "" : ": " + result));
+		}
+		return result != null ? result : "";
 	}
 
 	public static DLNAMediaInfo getMediaInfo(Map mediainfo) {
