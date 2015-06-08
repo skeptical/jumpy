@@ -22,6 +22,7 @@ import net.pms.encoders.PlayerPurpose;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.io.OutputParams;
+import net.pms.io.OutputTextLogger;
 import net.pms.io.PipeProcess;
 import net.pms.io.ProcessWrapper;
 import net.pms.io.ProcessWrapperImpl;
@@ -47,6 +48,7 @@ public class player extends Player {
 	private FormatConfiguration supported;
 	public String desc, supportStr, cmdStr;
 	private ProcessWrapperImpl pw;
+	private OutputTextLogger stderrlogger;
 	public static PrintStream out = System.out;
 	public int delay, buffersize;
 	public static Method Format_setIcon = utils.getFormatSetIconMethod();
@@ -244,6 +246,21 @@ public class player extends Player {
 			}
 		});
 		try {
+			// UMS
+			stderrlogger = new OutputTextLogger(null) {
+				@Override
+				public boolean filter(String line) {
+					out.println(line);
+					return true; // keep filtering
+				}
+			};
+			stderrlogger.setFiltered(true);
+			pw.setStderrConsumer(stderrlogger);
+		} catch (Throwable e) {
+			// PMS
+			stderrlogger = null;
+		}
+		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e) {}
 		pipe.deleteLater();
@@ -252,13 +269,16 @@ public class player extends Player {
 		return pw;
 	}
 
+
 	public void stop() {
 		if (! pw.isDestroyed()) {
 			cmdline.stopAPI();
-			List<String> results;
-			if ((results = pw.getResults()) != null) {
-				for (String line : results) {
-					out.println(line);
+			if (stderrlogger == null) {
+				List<String> results;
+				if ((results = pw.getResults()) != null) {
+					for (String line : results) {
+						out.println(line);
+					}
 				}
 			}
 		}
