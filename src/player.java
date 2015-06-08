@@ -1,5 +1,6 @@
 package net.pms.external.infidel.jumpy;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -31,7 +33,7 @@ import net.pms.newgui.LooksFrame;
 import net.pms.PMS;
 import org.apache.commons.lang3.StringUtils;
 
-public class player extends Player {
+public class player extends Player implements jumpyAPI {
 
 	public String name;
 	public command cmdline;
@@ -53,6 +55,7 @@ public class player extends Player {
 	public int delay, buffersize;
 	public static Method Format_setIcon = utils.getFormatSetIconMethod();
 	public static FFmpegVideo ffmpeg = new FFmpegVideo();
+	private jumpyAPI apiObj;
 
 	public jumpy jumpy;
 
@@ -96,6 +99,7 @@ public class player extends Player {
 		} else {
 			this.dynamic = true;
 		}
+		this.env = new HashMap<String,String>();
 		final String[] fmts = fmt.split("\\|");
 		this.format = FormatFactory.getAssociatedFormat("." + fmts[0]);
 
@@ -202,28 +206,33 @@ public class player extends Player {
 		cmdline.substitutions.put("outfile", pipe.getInputPipe());
 
 		DLNAResource parent = dlna.getParent();
+		apiObj = parent instanceof jumpyAPI ? (jumpyAPI)parent : jumpy.top;
 
 		jumpy.log("\n");
 
-		if (! cmdline.startAPI(parent instanceof jumpyAPI ? (jumpyAPI)parent : jumpy.top)) {
+		if (! cmdline.startAPI(this)) {
 			return null;
 		}
 
 		String[] argv = cmdline.toStrings();
 
 		params.workDir = cmdline.startdir;
-		params.env = cmdline.env;
 		params.env = new HashMap<String,String>();
 		params.env.putAll(cmdline.env);
+		params.env.putAll(this.env);
 		params.env.put("OUTFILE", pipe.getInputPipe());
-		if (cmdline.syspath != null ) {
-			params.env.put("PATH", cmdline.syspath);
+		String path = syspath;
+		if (cmdline.syspath != null) {
+			path = (path == null ? "" : (path + File.pathSeparator)) + cmdline.syspath;
+		}
+		if (StringUtils.isNotBlank(path)) {
+			params.env.put("PATH", path);
 		}
 
 		jumpy.log("starting " + name() + " player (" + (params.waitbeforestart/1000)
 			+ "s " + (int)params.minBufferSize
 			+ "mb).\n\nrunning " + Arrays.toString(argv)
-			+ cmdline.envInfo());
+			+ cmdline.envInfo(params.env));
 
 //		final player self = this;
 //		pw = new ProcessWrapperImpl(argv, params, false, true) {
@@ -406,6 +415,64 @@ public class player extends Player {
 		if (! opts.isEmpty()) {
 			cmdline.env.put("ffmpeg_out", StringUtils.join(opts, " "));
 		}
+	}
+
+	// jumpyAPI
+
+	// TODO: set player path/env-vars outside launchTranscode phase
+
+	public Map<String,String> env;
+	public String basepath = null, syspath = null;
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void addPath(String path) {
+		syspath = path == null ? basepath : (syspath == null ? "" : syspath + File.pathSeparator) + path;
+	}
+
+	@Override
+	public void setEnv(String key, String val) {
+		if (key == null || key.isEmpty()) {
+			jumpy.log("setEnv: clear all.");
+			env.clear();
+		} else if (val == null || val.isEmpty()) {
+			jumpy.log("setEnv: remove '" + key + "'");
+			env.remove(key);
+		} else {
+			jumpy.log("setEnv: " + key + "=" + val);
+			env.put(key, val);
+		}
+	}
+
+	// pass thru
+
+	@Override
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
+		return apiObj.addItem(type, filename, uri, thumbnail, mediainfo, data);
+	}
+
+	@Override
+	public String util(int action, String arg1, String arg2) {
+		return apiObj.util(action, arg1, arg2);
+	}
+
+	@Override
+	public int addPlayer(String name, String cmd, String supported, int mediatype, int purpose, String desc, String icon, String playback, int priority) {
+		return apiObj.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback, priority);
+	}
+
+	@Override
+	public void register(Object obj) {
+		apiObj.register(obj);
+	}
+
+	@Override
+	public Object getTag() {
+		return apiObj.getTag();
 	}
 }
 

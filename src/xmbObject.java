@@ -120,7 +120,7 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 
 	@Override
 	public void addPath(String path) {
-		syspath = (path == null ? basepath : syspath + File.pathSeparator + path);
+		syspath = path == null ? basepath : (syspath == null ? "" : syspath + File.pathSeparator) + path;
 	}
 
 	@Override

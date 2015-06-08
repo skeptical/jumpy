@@ -352,12 +352,16 @@ public class command {
 	}
 
 	public String envInfo() {
+		return envInfo(env);
+	}
+
+	public String envInfo(Map<String, String> env) {
 		String e = "";
 		for (Map.Entry<String,String> var : env.entrySet()) {
 			e += (var.getKey() + "=" + var.getValue() + "\n");
 		}
 		return "\nin directory '" + startdir.getAbsolutePath() + "'\n"
-			+ (syspath != null ? ("PATH=" + syspath + "\n") : "")
+			+ (env == this.env && syspath != null ? ("PATH=" + syspath + "\n") : "")
 			+ e;
 	}
 }
