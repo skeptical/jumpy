@@ -24,8 +24,8 @@ Jumpy itself is general-purpose, of course, and you can use it to plug <a href="
 <ul>
 Place or symlink the following dependencies in 'lib' before running ant:
 <ul>
-<li><i>pms.jar</i> (<a href="http://www.ps3mediaserver.org/">ps3mediaserver.org</a>) or <i>ums.jar</i> (<a href="http://www.universalmediaserver.com/">universalmediaserver.com</a>)</li>
-<li><i>py4j0.8.1.jar</i> (<a href="http://py4j.sourceforge.net">py4j.sourceforge.net</a>)</li>
+<li><i>ums.jar</i> (<a href="http://www.universalmediaserver.com/">universalmediaserver.com</a>)</li>
+<li><i>py4j0.9.jar</i> (<a href="http://py4j.sourceforge.net">py4j.sourceforge.net</a>)</li>
 <li><i>ini4j-0.5.2.jar</i> (<a href="http://ini4j.sourceforge.net">ini4j.sourceforge.net</a>)</li>
 <li><i>commons-exec-1.1.jar</i> (<a href="http://commons.apache.org/exec/">commons.apache.org/exec</a>)</li>
 <li><i>winp-1.14.jar</i> (<a href="http://winp.kohsuke.org/">winp.kohsuke.org</a>)</li>
