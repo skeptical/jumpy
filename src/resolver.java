@@ -26,7 +26,6 @@ public class resolver extends xmbObject {
 
 	public static int scrapers = 0;
 	public static jumpy jumpy;
-	public static command server;
 	public static boolean enabled = false, playback = true;
 
 	public resolver(jumpy jumpy, int type, String name, String uri, String thumb, String syspath, Map<String,String> env) {
@@ -77,7 +76,7 @@ public class resolver extends xmbObject {
 			if (pyResolver == null) {
 				startPyServer();
 			}
-			registrar.newItem = this; //TODO: synchronization issues?
+			root.newItem = this; //TODO: synchronization issues?
 			uri = resolve(uri0, syspath, env);
 			if (uri != null) {
 				resolved = true;
@@ -161,33 +160,20 @@ public class resolver extends xmbObject {
 	}
 
 	public static Resolver pyResolver = null;
-	public static scriptFolder registrar;
+	public static scriptFolder root;
 
 	public static void startPyServer() {
 		if (pyResolver == null) {
-			registrar = new scriptFolder(jumpy, "resolver", null, null) {
-				@Override
-				public void register(Object obj) {
-					if (obj == null) {
-						try {
-							ready = new CountDownLatch(1);
-							ready.await();
-						} catch (Exception e) {e.printStackTrace();}
-					} else {
-						jumpy.log("registering " + obj.getClass().getName(), true);
-						pyResolver = (Resolver)obj;
-						ready.countDown();
-					}
-				}
-			};
-			server = new command();
-			server.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , start , &]",
-				registrar.syspath, registrar.env);
-			server.has_callback = true;
-//			server.needs_listener = true;
-//			server.py4jlog(true, registrar);
+			root = new scriptFolder(jumpy, "resolver", null, null);
+			command cmd = new command();
+			cmd.init("[" + jumpy.home + "lib" + File.separatorChar + "resolver.py , start , &]",
+				root.syspath, root.env);
+			cmd.has_callback = true;
+//			cmd.needs_listener = true;
+//			cmd.py4jlog(true, registrar);
 			jumpy.log("\n");
-			new runner().run(registrar, server);
+			new runner().run(root, cmd);
+			pyResolver = (Resolver)root.registeredObject;
 		}
 	}
 

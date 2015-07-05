@@ -142,20 +142,24 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 		return jumpy.addPlayer(name, cmd, supported, mediatype, purpose, desc, icon, playback, priority);
 	}
 
+	public /*volatile*/ Object registeredObject;
 	protected CountDownLatch ready = null;
 
 	@Override
 	public void register(Object obj) {
-		if (obj == null) {
+		if (obj == null && ready == null) {
 			try {
 				ready = new CountDownLatch(1);
 				ready.await(2000, TimeUnit.MILLISECONDS);
+				ready = null;
 			} catch (Exception e) {e.printStackTrace();}
 		} else if (ready != null) {
-			ready.countDown();
+			registeredObject = obj;
+			String className = obj.getClass().getName();
+			jumpy.log("[" + name + "] registering " + (className.contains("$Proxy") ? className : obj), true);
 			jumpy.log("\n");
+			ready.countDown();
 		}
-		ready = null;
 	}
 
 	@Override
