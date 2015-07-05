@@ -223,6 +223,9 @@ def pms_mkDirs(path, thumb=None):
 def pms_getVar(key):
 	return pms_util(PMS_GETVAR, key)
 
+def pms_popVar(key):
+	return pms_util(PMS_GETVAR, key, 'POP')
+
 def pms_setVar(key, val):
 	pms_util(PMS_SETVAR, key, val)
 
@@ -292,6 +295,7 @@ __builtin__.pms.getFolderName = pms_getFolderName
 __builtin__.pms.getXmbPath = pms_getXmbPath
 __builtin__.pms.mkDirs = pms_mkDirs
 __builtin__.pms.getVar = pms_getVar
+__builtin__.pms.popVar = pms_popVar
 __builtin__.pms.setVar = pms_setVar
 __builtin__.pms.getProperty = pms_getProperty
 __builtin__.pms.setProperty = pms_setProperty

@@ -324,7 +324,7 @@ public final class xmb {
 				break;
 			case GETVAR:
 				if (utils.properties.containsKey(arg1)) {
-					result = utils.properties.get(arg1);
+					result = "POP".equals(arg2) ? utils.properties.remove(arg1) : utils.properties.get(arg1);
 				}
 				break;
 			case SETVAR:
