@@ -2,7 +2,6 @@ package net.pms.external.infidel.jumpy;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 

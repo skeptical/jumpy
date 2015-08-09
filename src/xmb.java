@@ -1,10 +1,6 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -19,7 +15,6 @@ import com.google.gson.Gson;
 
 import net.pms.PMS;
 import net.pms.configuration.RendererConfiguration;
-import net.pms.network.HTTPResource;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.dlna.DLNAResource;
@@ -36,7 +31,6 @@ import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
 import net.pms.dlna.PlaylistFolder;
 import net.pms.dlna.DVDISOFile;
-import net.pms.configuration.RendererConfiguration;
 import net.pms.network.UPNPHelper;
 
 import static net.pms.external.infidel.jumpy.jumpyAPI.*;
@@ -165,7 +159,7 @@ public final class xmb {
 		}
 
 		if (type == MEDIA && data == null) {
-			Format format = FormatFactory.getAssociatedExtension("." + FilenameUtils.getExtension(uri));
+			Format format = FormatFactory.getAssociatedFormat("." + FilenameUtils.getExtension(uri));
 			if (format == null) {
 				return null;
 			}
@@ -338,7 +332,7 @@ public final class xmb {
 			case GETPROPERTY:
 				return utils.getCustomProperty(arg1, arg2);
 			case SETPROPERTY:
-				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
+				PMS.getConfiguration().setCustomProperty(arg1, arg2);
 				break;
 			case ICON:
 				jumpy.setIcon(arg1, arg2);
@@ -419,7 +413,7 @@ public final class xmb {
 							m.setCodecV(s.get("codec"));
 						}
 						if (s.containsKey("aspect")) {
-							m.setAspect(s.get("aspect"));
+							m.setAspectRatioDvdIso(s.get("aspect"));
 						}
 						if (s.containsKey("width")) {
 							m.setWidth(Integer.parseInt(s.get("width")));

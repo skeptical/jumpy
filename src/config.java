@@ -1,38 +1,27 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
-import java.io.IOException;
-
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.metal.MetalIconFactory;
 import javax.imageio.ImageIO;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-
 import org.ini4j.Wini;
 import org.ini4j.Options;
 import org.ini4j.Persistable;
 import org.ini4j.OptionMap;
 import org.ini4j.Profile.Section;
-
+import org.slf4j.LoggerFactory;
 import net.pms.PMS;
-import net.pms.io.SystemUtils;
-import net.pms.io.BasicSystemUtils;
-import net.pms.io.MacSystemUtils;
 
 // convenience class to combine interfaces for inlining
 abstract class multiListener implements ItemListener, ChangeListener, ActionListener, DocumentListener {}
@@ -55,6 +44,8 @@ public class config {
 	public static String latest, latesturl;
 	static JPanel statusbar;
 
+	private static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(multiListener.class);
+
 	public static multiListener listener = new multiListener() {
 		public void stateChanged(ChangeEvent e) {
 			setopt(((JComponent)e.getSource()), 0);
@@ -64,7 +55,7 @@ public class config {
 		}
 		public void setopt(JComponent c, int state) {
 			String opt = c.getToolTipText();
-			PMS.debug("setopt " + opt);
+			LOGGER.debug("{Jumpy} setopt: {}", opt);
 			if (opt.equals("bookmarks")) {
 				jumpy.showBookmarks = (state == ItemEvent.DESELECTED ? false : true);
 			} else if (opt.equals("verbose_bookmarks")) {
@@ -83,14 +74,14 @@ public class config {
 		public void actionPerformed(ActionEvent e) {
 			String cmd = e.getActionCommand();
 			if (cmd.equals("Save")) {
-				PMS.debug("Save");
+				LOGGER.debug("{Jumpy} Save");
 				jumpy.writeconf();
 			} else if (cmd.equals("Revert")) {
-				PMS.debug("Revert");
+				LOGGER.debug("{Jumpy} Revert");
 				jumpy.readconf();
 				rebuild((JComponent)e.getSource());
 			} else if (cmd.equals("Update")) {
-				PMS.debug("Update");
+				LOGGER.debug("{Jumpy} Update");
 				update();
 			}
 		}

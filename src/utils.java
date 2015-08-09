@@ -2,23 +2,17 @@ package net.pms.external.infidel.jumpy;
 
 import java.io.InputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
-
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection ;
-import java.net.ConnectException;
-
 import java.lang.System;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
@@ -26,14 +20,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.ArrayUtils;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FilenameUtils;
-
+import org.slf4j.LoggerFactory;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.util.PropertiesUtil;
@@ -48,6 +40,7 @@ public final class utils {
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
 	public static HashMap<String,String> properties = new HashMap<String,String>();
+	private static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(utils.class);
 
 	//http://stackoverflow.com/questions/4159802/how-can-i-restart-a-java-application
 	//http://stackoverflow.com/questions/1518213/read-java-jvm-startup-parameters-eg-xmx
@@ -181,7 +174,7 @@ public final class utils {
 
 	public static String getCustomProperty(String key, String fallback) {
 		Object obj;
-		if ((obj = PMS.get().getConfiguration().getCustomProperty(key)) != null) {
+		if ((obj = PMS.getConfiguration().getCustomProperty(key)) != null) {
 			// return last occurrence
 			return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
 		}
@@ -192,7 +185,7 @@ public final class utils {
 		String ffmpeg_hdr = run(PMS.getConfiguration().getFfmpegPath());
 		if (ffmpeg_hdr.contains("--enable-librtmp")) {
 			properties.put("librtmp", "true");
-			if (FormatFactory.getAssociatedExtension("rtmp://?") == null) {
+			if (FormatFactory.getAssociatedFormat("rtmp://?") == null) {
 				FormatFactory.getSupportedFormats().add(0, new WEB() {
 					@Override
 					public String[] getSupportedExtensions() {
@@ -327,14 +320,14 @@ public final class utils {
 		// see if we have a user-specified editor
 		String[] cmd;
 		String editor;
-		if ((editor = (String)PMS.get().getConfiguration().getCustomProperty("text.editor")) != null) {
+		if ((editor = (String)PMS.getConfiguration().getCustomProperty("text.editor")) != null) {
 			cmd = new String[] {editor, file};
 			try {
 				Runtime.getRuntime().exec(cmd);
-				PMS.debug("Opening editor: " + Arrays.toString(cmd));
+				LOGGER.debug("{Jumpy} Opening editor: {}", Arrays.toString(cmd));
 				return;
 			} catch (Exception e) {
-				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
+				LOGGER.error("{Jumpy} Failed to open editor: {}", Arrays.toString(cmd));
 			}
 		}
 		// try a default desktop edit and failing that an explicit system cmd
@@ -344,9 +337,9 @@ public final class utils {
 					new String[] {"xdg-open", file};
 			try {
 				Runtime.getRuntime().exec(cmd);
-				PMS.debug("Opening editor: " + Arrays.toString(cmd));
+				LOGGER.debug("{Jumpy} Opening editor: {}", Arrays.toString(cmd));
 			} catch (Exception e) {
-				PMS.debug("Failed to open editor: " + Arrays.toString(cmd));
+				LOGGER.error("{Jumpy} Failed to open editor: {}", Arrays.toString(cmd));
 			}
 		}
 	}
@@ -357,11 +350,11 @@ public final class utils {
 				return open(uri.substring(7));
 			} else {
 				java.awt.Desktop.getDesktop().browse(new URI(uri));
-				PMS.debug("Opening default browser: " + uri);
+				LOGGER.debug("{Jumpy} Opening default browser: {}", uri);
 			}
 			return true;
 		} catch (Exception e) {
-			PMS.debug("Failed to open default browser: " + uri);
+			LOGGER.error("{Jumpy} Failed to open default browser: {}", uri);
 			return false;
 		}
 	}
@@ -370,10 +363,10 @@ public final class utils {
 		File f = new File(file);
 		try {
 			java.awt.Desktop.getDesktop().edit(f);
-			PMS.debug("Opening default editor: " + f);
+			LOGGER.debug("{Jumpy} Opening default editor: {}", f);
 			return true;
 		} catch (Exception e) {
-			PMS.debug("Failed to open default editor: " + f);
+			LOGGER.error("{Jumpy} Failed to open default editor: {}", f);
 			return false;
 		}
 	}
@@ -382,10 +375,10 @@ public final class utils {
 		File f = new File(file);
 		try {
 			java.awt.Desktop.getDesktop().open(f);
-			PMS.debug("Opening default viewer: " + f);
+			LOGGER.debug("{Jumpy} Opening default viewer: {}", f);
 			return true;
 		} catch (Exception e) {
-			PMS.debug("Failed to open default viewer: " + f);
+			LOGGER.error("{Jumpy} Failed to open default viewer: {}", f);
 			return false;
 		}
 	}
@@ -397,7 +390,7 @@ public final class utils {
 		try {
 			return Double.parseDouble(n[0]) + Double.parseDouble(n[1])*60 + Double.parseDouble(n[2])*3600;
 		} catch (Exception e) {
-			PMS.debug("Error parsing duration " + d + ": " + e.toString());
+			LOGGER.debug("Error parsing duration {}: {}", d, e);
 		}
 		return 0;
 	}

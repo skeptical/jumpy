@@ -5,24 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.IOException;
-
 import java.util.Properties;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.swing.JComponent;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.io.FilenameUtils;
-
+import org.slf4j.LoggerFactory;
 import net.pms.PMS;
 import net.pms.dlna.DLNAResource;
 import net.pms.external.AdditionalFoldersAtRoot;
@@ -30,18 +26,11 @@ import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.logging.LoggingConfigFileLoader;
 import net.pms.formats.Format;
-import net.pms.formats.FormatFactory;
 import net.pms.encoders.Player;
-import net.pms.encoders.PlayerFactory;
-import net.pms.external.ExternalListener;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.io.OutputParams;
 import net.pms.io.ProcessWrapper;
 import net.pms.external.URLResolver;
-
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import net.pms.external.dbgpack;
 import net.pms.external.DebugPacker;
 
@@ -69,6 +58,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public List<player> players;
 	public static Map<String,String> icons = new HashMap<String,String>();
 	public static File cache;
+	private static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(jumpy.class);
 
 	public jumpy() {
 		pms = PMS.get();
@@ -260,7 +250,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 
 	public static synchronized void log(String msg, boolean minimal) {
 		if (minimal) {
-			PMS.minimal(msgtag + msg);
+			LOGGER.info("{Jumpy} {}{}", msgtag, msg);
 		}
 		logger.log(msg);
 	}
