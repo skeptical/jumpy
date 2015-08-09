@@ -4,15 +4,11 @@ import java.io.PrintStream;
 import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 
@@ -21,7 +17,6 @@ import java.lang.reflect.Method;
 import net.pms.PMS;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.FormatConfiguration;
-import net.pms.network.HTTPResource;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAResource;
 import net.pms.io.OutputParams;
@@ -100,7 +95,7 @@ public class player extends Player {
 			this.dynamic = true;
 		}
 		final String[] fmts = fmt.split("\\|");
-		this.format = FormatFactory.getAssociatedExtension("." + fmts[0]);
+		this.format = FormatFactory.getAssociatedFormat("." + fmts[0]);
 
 		// create the format if it doesn't exist
 		if (this.format == null) {

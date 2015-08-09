@@ -42,7 +42,7 @@ public class scriptFolder extends xmbObject {
 		this.ex = null;
 		this.newItem = null;
 		this.refreshAlways = (jumpy.refresh == 0);
-		this.lastmodified = 0;
+		setLastModified(0);
 		this.isFolder = true;
 	}
 
@@ -82,7 +82,7 @@ public class scriptFolder extends xmbObject {
 			children.add(0, children.remove(children.size() - 1));
 		}
 		refreshOnce = false;
-		lastmodified = 0;
+		setLastModified(0);
 	}
 
 	public void refresh() {
@@ -91,13 +91,13 @@ public class scriptFolder extends xmbObject {
 
 	@Override
 	public void resolve() {
-		discovered = !(refreshOnce || refreshAlways);
+		setDiscovered(!(refreshOnce || refreshAlways));
 	}
 
 	@Override
 	public boolean isRefreshNeeded() {
-		boolean isneeded = (lastmodified != 0);
-		lastmodified = 0;
+		boolean isneeded = (getLastModified() != 0);
+		setLastModified(0);
 		return isneeded;
 	}
 

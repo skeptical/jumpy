@@ -25,7 +25,7 @@ public class mediaItem extends xmbObject {
 			this.delay = this.buffersize = -1;
 			this.userdata = null;
 		}
-		setFormat(FormatFactory.getAssociatedExtension("." + this.fmt));
+		setFormat(FormatFactory.getAssociatedFormat("." + this.fmt));
 		if (this.thumbnail == null) {
 			setThumbnail(jumpy.getIcon(this.fmt));
 		}

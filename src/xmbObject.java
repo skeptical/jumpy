@@ -46,7 +46,7 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 	}
 
 	public void touch() {
-		lastmodified = 1;
+		setLastModified(1);
 	}
 
 	// DLNAResource

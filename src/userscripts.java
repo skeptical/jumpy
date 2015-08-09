@@ -18,12 +18,10 @@ import java.util.regex.Matcher;
 
 import org.apache.commons.exec.util.StringUtils;
 
-import org.ini4j.Wini;
 import org.ini4j.Profile.Section;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.spi.IniHandler;
 import org.ini4j.BasicProfile;
-import org.ini4j.Options;
 import org.ini4j.OptionMap;
 import org.ini4j.Persistable;
 import org.ini4j.spi.OptionsFormatter;
@@ -43,7 +41,7 @@ public class userscripts {
 	public static metaIni meta;
 
 	public userscripts(jumpy jumpy) {
-		this.jumpy = jumpy;
+		userscripts.jumpy = jumpy;
 		inis = new ArrayList<Ini>();
 		meta = new metaIni(jumpy.metaini);
 		inis.add(meta);
@@ -269,7 +267,7 @@ public class userscripts {
 			if (disabled || isMetaSection(s)) {
 				super.store(formatter, s);
 			} else if (s == changed_sec) {
-				PmsConfiguration configuration = PMS.get().getConfiguration();
+				PmsConfiguration configuration = PMS.getConfiguration();
 				for (String option : s.keySet()) {
 					if (super.getType(option) == PMSPROPERTY) {
 						configuration.setCustomProperty(option.substring(1), s.get(option));
@@ -359,7 +357,7 @@ public class userscripts {
 				// skip
 			} else if (type == PMSPROPERTY) {
 				if (isEnabled(section)) {
-					PMS.get().getConfiguration().setCustomProperty(option.substring(1), val);
+					PMS.getConfiguration().setCustomProperty(option.substring(1), val);
 					pms_save = true;
 				}
 				super.store(formatter, section, option, index);
