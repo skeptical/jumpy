@@ -1,35 +1,29 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-
 import java.lang.Process;
 import java.lang.ProcessBuilder;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.util.StringUtils;
-
 import java.net.InetAddress;
 import java.net.Socket;
-
-import py4j.GatewayServer;
-import py4j.CallbackClient;
-import py4j.Py4JNetworkException;
-import py4j.DefaultGatewayServerListener;
-
-//import net.pms.PMS;
-//import net.pms.io.WinUtils;
-
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
+import java.util.Map;
+//import net.pms.io.WinUtils;
+//import net.pms.PMS;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.util.StringUtils;
+import py4j.CallbackClient;
+import py4j.DefaultGatewayServerListener;
+import py4j.GatewayServer;
+import py4j.Py4JNetworkException;
 
 public class command {
 

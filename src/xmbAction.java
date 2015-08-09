@@ -1,7 +1,7 @@
 package net.pms.external.infidel.jumpy;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import net.pms.dlna.DLNAResource;
 
 public class xmbAction extends mediaItem {

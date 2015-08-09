@@ -2,19 +2,14 @@ package net.pms.external.infidel.jumpy;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
-
-import org.apache.commons.io.FilenameUtils;
-
-import org.ini4j.Wini;
-import org.ini4j.Profile.Section;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import net.pms.dlna.DLNAResource;
-
+import org.apache.commons.io.FilenameUtils;
+import org.ini4j.Profile.Section;
+import org.ini4j.Wini;
 
 public class bookmarker {
 	private jumpy jumpy;

@@ -1,14 +1,11 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-
 import java.lang.Process;
 import java.lang.ProcessBuilder;
-
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.jvnet.winp.WinProcess;
 
 public class runner {

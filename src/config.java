@@ -1,38 +1,26 @@
 package net.pms.external.infidel.jumpy;
 
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.Border;
-import javax.swing.plaf.metal.MetalIconFactory;
 import javax.imageio.ImageIO;
-
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.*;
+import javax.swing.plaf.metal.MetalIconFactory;
+import net.pms.PMS;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
-
-import org.ini4j.Wini;
+import org.ini4j.OptionMap;
 import org.ini4j.Options;
 import org.ini4j.Persistable;
-import org.ini4j.OptionMap;
 import org.ini4j.Profile.Section;
-
-import net.pms.PMS;
-import net.pms.io.SystemUtils;
-import net.pms.io.BasicSystemUtils;
-import net.pms.io.MacSystemUtils;
+import org.ini4j.Wini;
 
 // convenience class to combine interfaces for inlining
 abstract class multiListener implements ItemListener, ChangeListener, ActionListener, DocumentListener {}

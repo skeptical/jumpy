@@ -1,16 +1,14 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
-
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import net.pms.network.HTTPResource;
+import java.util.Map;
 import net.pms.dlna.DLNAResource;
+import net.pms.network.HTTPResource;
 
 public class xmbObject extends DLNAResource implements jumpyAPI {
 	public Object tag = null;

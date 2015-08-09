@@ -1,11 +1,9 @@
 package net.pms.external.infidel.jumpy;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-
 import net.pms.dlna.DLNAResource;
-
 
 public class scriptFolder extends xmbObject {
 

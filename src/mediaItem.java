@@ -1,10 +1,9 @@
 package net.pms.external.infidel.jumpy;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import net.pms.formats.FormatFactory;
 import net.pms.dlna.DLNAMediaInfo;
+import net.pms.formats.FormatFactory;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class mediaItem extends xmbObject {
 	public String fmt, uri, userdata;
@@ -25,7 +24,7 @@ public class mediaItem extends xmbObject {
 			this.delay = this.buffersize = -1;
 			this.userdata = null;
 		}
-		setFormat(FormatFactory.getAssociatedExtension("." + this.fmt));
+		setFormat(FormatFactory.getAssociatedFormat("." + this.fmt));
 		if (this.thumbnail == null) {
 			setThumbnail(jumpy.getIcon(this.fmt));
 		}

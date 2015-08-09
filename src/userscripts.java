@@ -3,36 +3,29 @@ package net.pms.external.infidel.jumpy;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.Writer;
 import java.io.PrintWriter;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.HashSet;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.Pattern;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.regex.Matcher;
-
+import java.util.regex.Pattern;
+import java.util.Set;
+import net.pms.configuration.PmsConfiguration;
+import net.pms.dlna.DLNAResource;
+import net.pms.PMS;
 import org.apache.commons.exec.util.StringUtils;
-
-import org.ini4j.Wini;
-import org.ini4j.Profile.Section;
-import org.ini4j.InvalidFileFormatException;
-import org.ini4j.spi.IniHandler;
 import org.ini4j.BasicProfile;
-import org.ini4j.Options;
+import org.ini4j.Config;
+import org.ini4j.InvalidFileFormatException;
 import org.ini4j.OptionMap;
 import org.ini4j.Persistable;
+import org.ini4j.Profile.Section;
+import org.ini4j.spi.IniHandler;
 import org.ini4j.spi.OptionsFormatter;
-import org.ini4j.Config;
-
-import net.pms.PMS;
-import net.pms.dlna.DLNAResource;
-import net.pms.configuration.PmsConfiguration;
-
 
 public class userscripts {
 	private static jumpy jumpy;
@@ -43,7 +36,7 @@ public class userscripts {
 	public static metaIni meta;
 
 	public userscripts(jumpy jumpy) {
-		this.jumpy = jumpy;
+		userscripts.jumpy = jumpy;
 		inis = new ArrayList<Ini>();
 		meta = new metaIni(jumpy.metaini);
 		inis.add(meta);
@@ -269,7 +262,7 @@ public class userscripts {
 			if (disabled || isMetaSection(s)) {
 				super.store(formatter, s);
 			} else if (s == changed_sec) {
-				PmsConfiguration configuration = PMS.get().getConfiguration();
+				PmsConfiguration configuration = PMS.getConfiguration();
 				for (String option : s.keySet()) {
 					if (super.getType(option) == PMSPROPERTY) {
 						configuration.setCustomProperty(option.substring(1), s.get(option));
@@ -359,7 +352,7 @@ public class userscripts {
 				// skip
 			} else if (type == PMSPROPERTY) {
 				if (isEnabled(section)) {
-					PMS.get().getConfiguration().setCustomProperty(option.substring(1), val);
+					PMS.getConfiguration().setCustomProperty(option.substring(1), val);
 					pms_save = true;
 				}
 				super.store(formatter, section, option, index);

@@ -1,44 +1,33 @@
 package net.pms.external.infidel.jumpy;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-
-import java.net.InetAddress;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-
 import com.google.gson.Gson;
-
-import net.pms.PMS;
+import java.io.File;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.pms.configuration.RendererConfiguration;
-import net.pms.network.HTTPResource;
-import net.pms.formats.Format;
-import net.pms.formats.FormatFactory;
-import net.pms.dlna.DLNAResource;
-import net.pms.dlna.DLNAMediaInfo;
+import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.DLNAMediaAudio;
+import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.DLNAMediaSubtitle;
+import net.pms.dlna.DLNAResource;
+import net.pms.dlna.DVDISOFile;
+import net.pms.dlna.FeedItem;
+import net.pms.dlna.ImagesFeed;
+import net.pms.dlna.PlaylistFolder;
+import net.pms.dlna.RealFile;
 import net.pms.dlna.RootFolder;
 import net.pms.dlna.VideosFeed;
-import net.pms.dlna.AudiosFeed;
-import net.pms.dlna.ImagesFeed;
-import net.pms.dlna.RealFile;
-import net.pms.dlna.FeedItem;
-import net.pms.dlna.WebVideoStream;
 import net.pms.dlna.WebAudioStream;
-import net.pms.dlna.PlaylistFolder;
-import net.pms.dlna.DVDISOFile;
-import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.WebVideoStream;
+import net.pms.formats.Format;
+import net.pms.formats.FormatFactory;
 import net.pms.network.UPNPHelper;
-
+import net.pms.PMS;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import static net.pms.external.infidel.jumpy.jumpyAPI.*;
 
 public final class xmb {
@@ -165,7 +154,7 @@ public final class xmb {
 		}
 
 		if (type == MEDIA && data == null) {
-			Format format = FormatFactory.getAssociatedExtension("." + FilenameUtils.getExtension(uri));
+			Format format = FormatFactory.getAssociatedFormat("." + FilenameUtils.getExtension(uri));
 			if (format == null) {
 				return null;
 			}
@@ -338,7 +327,7 @@ public final class xmb {
 			case GETPROPERTY:
 				return utils.getCustomProperty(arg1, arg2);
 			case SETPROPERTY:
-				PMS.get().getConfiguration().setCustomProperty(arg1, arg2);
+				PMS.getConfiguration().setCustomProperty(arg1, arg2);
 				break;
 			case ICON:
 				jumpy.setIcon(arg1, arg2);

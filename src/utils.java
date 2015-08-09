@@ -1,47 +1,38 @@
 package net.pms.external.infidel.jumpy;
 
-import java.io.InputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection ;
-import java.net.ConnectException;
-
-import java.lang.System;
+import java.lang.management.ManagementFactory;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.ArrayUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import net.pms.PMS;
+import java.lang.System;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection ;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import net.pms.configuration.PmsConfiguration;
-import net.pms.util.PropertiesUtil;
-import net.pms.dlna.DLNAResource;
 import net.pms.dlna.DLNAMediaSubtitle;
+import net.pms.dlna.DLNAResource;
 import net.pms.formats.FormatFactory;
 import net.pms.formats.v2.SubtitleType;
 import net.pms.formats.WEB;
+import net.pms.PMS;
+import net.pms.util.PropertiesUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 public final class utils {
 
@@ -181,7 +172,7 @@ public final class utils {
 
 	public static String getCustomProperty(String key, String fallback) {
 		Object obj;
-		if ((obj = PMS.get().getConfiguration().getCustomProperty(key)) != null) {
+		if ((obj = PMS.getConfiguration().getCustomProperty(key)) != null) {
 			// return last occurrence
 			return (String)(obj instanceof ArrayList ? (((ArrayList)obj).get(((ArrayList)obj).size()-1)) : obj);
 		}
@@ -192,7 +183,7 @@ public final class utils {
 		String ffmpeg_hdr = run(PMS.getConfiguration().getFfmpegPath());
 		if (ffmpeg_hdr.contains("--enable-librtmp")) {
 			properties.put("librtmp", "true");
-			if (FormatFactory.getAssociatedExtension("rtmp://?") == null) {
+			if (FormatFactory.getAssociatedFormat("rtmp://?") == null) {
 				FormatFactory.getSupportedFormats().add(0, new WEB() {
 					@Override
 					public String[] getSupportedExtensions() {
@@ -327,7 +318,7 @@ public final class utils {
 		// see if we have a user-specified editor
 		String[] cmd;
 		String editor;
-		if ((editor = (String)PMS.get().getConfiguration().getCustomProperty("text.editor")) != null) {
+		if ((editor = (String)PMS.getConfiguration().getCustomProperty("text.editor")) != null) {
 			cmd = new String[] {editor, file};
 			try {
 				Runtime.getRuntime().exec(cmd);

@@ -1,21 +1,18 @@
 package net.pms.external.infidel.jumpy;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-
-import java.util.Map;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-
+import java.util.HashMap;
+import java.util.Map;
+import net.pms.configuration.RendererConfiguration;
+import net.pms.dlna.DLNAMediaInfo;
+import net.pms.dlna.Range;
+import net.pms.encoders.PlayerFactory;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.formats.WEB;
-import net.pms.encoders.PlayerFactory;
-import net.pms.dlna.Range;
-import net.pms.dlna.DLNAMediaInfo;
-import net.pms.configuration.RendererConfiguration;
-import net.pms.util.PlayerUtil;
 
 public class resolver extends xmbObject {
 	public String uri0, uri = null, syspath = null;
@@ -34,7 +31,7 @@ public class resolver extends xmbObject {
 
 	public resolver(jumpy jumpy, int type, String name, String uri, String thumb, String syspath, Map<String,String> env) {
 		super(name, thumb);
-		jumpy = jumpy;
+		resolver.jumpy = jumpy;
 		this.uri0 = uri;
 		this.syspath = syspath;
 		this.env = new HashMap<String,String>();
@@ -63,9 +60,9 @@ public class resolver extends xmbObject {
 			}
 			setSpecificType(type);
 		} else {
-			f = FormatFactory.getAssociatedExtension(u);
+			f = FormatFactory.getAssociatedFormat(u);
 			if (f == null) {
-				f = FormatFactory.getAssociatedExtension(
+				f = FormatFactory.getAssociatedFormat(
 					type == Format.IMAGE ? ".jpg" : type == Format.AUDIO ? ".mp3" : ".mpg");
 			}
 		}
