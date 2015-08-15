@@ -128,6 +128,10 @@ public class player extends Player implements jumpyAPI {
 				public String toString() {
 					return self.id;
 				}
+				@Override
+				public boolean skip(String extensions, String moreExtensions) {
+					return true; // always force transcode
+				}
 			};
 			this.format.setType(this.type);
 			FormatFactory.getSupportedFormats().add(0, this.format/*.duplicate()*/);
