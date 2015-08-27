@@ -80,6 +80,7 @@ div.main {
 <li><a href="#FEEDREADER">Feedreader</a></li>
 <li><a href="#RESOLVER">Resolver</a></li>
 <li><a href="#EARMARKER">Earmarker</a></li>
+<li><a href="#CAPTURE">Capture</a></li>
 <br/>
 <center><a href="scripts.html">SCRIPTS</a></center><br/>
 <li><a href="scripts.html#QUICKSTART">Quick Start</a></li>
@@ -104,7 +105,7 @@ div.main {
 </ul>
 </div>
 <div class="main">
-<a name="TOP"><H3 style="color:darkblue"><span class="orange">Jumpy</span> - Jump into Python (and onto XBMC)</H3></a>
+<a name="TOP"><H3 style="color:darkblue"><span class="orange">Jumpy</span> - Jump into Python (and onto Kodi)</H3></a>
 
 Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for <span class="orange">M</span>odules in <span class="orange">PY</span>thon) is a framework for scripts or other external processes to plug into <a href="http://www.ps3mediaserver.org/">PS3 Media Server</a> (or its cousin <a href="http://www.universalmediaserver.com/">UMS</a>) and mainly
 <ul>
@@ -126,10 +127,10 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <ol>
 <li>Shut down PMS.
 </li>
-<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.6.exe/download" title="Windows: jumpy-0.3.6.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.6.run/download" title="Linux: jumpy-0.3.6.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
-<!-- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.6.osx.zip/download" title="Mac: jumpy-0.3.6.app (Mountain Lion only). Mavericks users: please run the linux installer (jumpy-0.3.6.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
- <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, Mac app version not available yet. Please launch the linux installer (jumpy-0.3.6.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
+<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.exe/download" title="Windows: jumpy-0.3.7.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
+ <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.run/download" title="Linux: jumpy-0.3.7.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
+<!-- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.osx.zip/download" title="Mac: jumpy-0.3.7.app (Mountain Lion only). Mavericks users: please run the linux installer (jumpy-0.3.7.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
+ <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, Mac app version not available yet. Please launch the linux installer (jumpy-0.3.7.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
  <span style="visibility: hidden">.</span> )<span style="visibility: hidden">.</span> in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -147,7 +148,7 @@ Launch it and follow through as usual with external package installers if prompt
 <br/>
 <div style="margin-left:-1.5em;">
 You should end up with
-<i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>beautifulsoup4</code>, <code>XBMC</code>, <code>rtmpdump</code>,
+<i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>beautifulsoup4</code>, <code>lxml</code>, <code>XBMC</code>, <code>rtmpdump</code>,
 <code>phantomjs</code>, <code>youtube-dl</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
 the grey section below ('mostly', i.e. maybe install
 some <a href="#ADDONS"><i>xbmc addons</i></a> or
@@ -163,24 +164,27 @@ some <a href="#ADDONS"><i>xbmc addons</i></a> or
 To make life simpler <a href="http://superuser.com/questions/143119/how-to-add-python-to-the-windows-path/143121#143121">add python to your system path</a>
 and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-instructions">easy_install</a>.
 </li>
-<li><a href="http://py4j.sourceforge.net/download.html">py4j</a>.
+<li>Python modules:
+<ul>
+<li><a href="http://py4j.sourceforge.net/download.html">py4j</a></li>
+<li><a href="http://www.crummy.com/software/BeautifulSoup/">beautifulsoup4</a></li>
+<li><a href="http://lxml.de/index.html">lxml</a>
+(in Windows must be version 2.3, use <code>easy_install "lxml==2.3"</code>)</li>
 </li>
-<li><a href="http://rtmpdump.mplayerhq.hu/">rtmpdump</a> and <a href="https://github.com/chocolateboy/pmsencoder">PMSEncoder</a>,
-not required strictly speaking but useful with PMS.
-</li>
-<li><a href="http://www.crummy.com/software/BeautifulSoup/">beautifulsoup4</a>
-(optional for <i>jumpy-xbmc</i>, required for <a href="#EARMARKER"><i>Earmarker</i></a>).
+</ul>
+<li>Not required but useful if you're using PMS: <a href="http://rtmpdump.mplayerhq.hu/">rtmpdump</a> and <a href="https://github.com/chocolateboy/pmsencoder">PMSEncoder</a>,
+.
 </li>
 </ol>
 <br/>
-<b><a name="XBMC">XBMC Installation</a></b> ("optional")
+<b><a name="XBMC">Kodi/XBMC Installation</a></b> ("optional")
 <ol>
-<li>Install <a href="http://xbmc.org/download/">xbmc</a> using the default configuration
+<li>Install <a href="http://xbmc.org/download/">Kodi</a> using the default configuration
 for your platform.
 </li>
 <li><a name="ADDONS"></a><a href="http://wiki.xbmc.org/index.php?title=Unofficial_Add-on_Repositories">Install and configure</a>
 some <a href="http://wiki.xbmc.org/index.php?title=Category:All_add-ons">addons</a>
-inside xbmc (and of course test them too, some are broken). You may need to configure username/password depending
+inside Kodi (and of course test them too, some are broken). You may need to configure username/password depending
 on the addon, and so on.
 </li>
 </ol>
@@ -202,7 +206,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.6.zip/download">jumpy-0.3.6.zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.zip/download">jumpy-0.3.7.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -214,7 +218,7 @@ perl.path = c:\\perl\\bin\\perl.exe
 </pre>
 </li>
 <li>Restart PMS. You should see a 'Jumpy' folder on the xmb containing the examples and any
-media addons found in your xbmc user directory.
+media addons found in your Kodi user directory.
 </li>
 </ol>
 <b><a name="MANUALUPDATE">Updating</a></b>
@@ -260,12 +264,12 @@ The available settings are:
 </pre>
 </li>
 <li><a name="PMSCONF"></a><b><i>PMS.conf</i></b>:
-<a name="CONF_XBMC"></a>If you need to override the locations where jumpy looks for xbmc set:
+<a name="CONF_XBMC"></a>If you need to override the locations where jumpy looks for Kodi set:
 <pre>
-<i class="comment"># xbmc user folder</i>
+<i class="comment"># kodi/xbmc user folder</i>
 <b>xbmc.path</b> = c:\\path\\to\\my\\XBMC
-<i class="comment"># xbmc program folder</i>
-<b>xbmc.main.path</b> = c:\\path\\to\\program\\XBMC
+<i class="comment"># kodi/xbmc program folder</i>
+<b>xbmc.main.path</b> = c:\\path\\to\\program\\Kodi
 </pre>
 <a name="CONF_BINPATH"></a>You can set paths where external binaries needed by your scripts can be found,
 separating them with '<code><span class="orange">;</span></code>' in Windows or '<code><span class="orange">:</span></code>' in linux/mac:
@@ -464,19 +468,19 @@ World news/Europe, http://www.guardian.co.uk/world/europe/roundup/rss
 <ul>
 Jumpy acts as a url resolver for unresolved <i>WEB.conf</i> items (youtube, vimeo, many more)
 in UMS if it can find either the
-<i>xbmc urlresolver addon</i>
+<i>Kodi/xbmc urlresolver addon</i>
 or the <i>youtube-dl python library</i>.
 <br/><br/>
 Both are automatically added by the jumpy installer and require no special setup,
 but you may wish to note the following details:
 <ul>
 <br/>
-<li><b>xbmc</b>: two new addons are auto-installed:
+<li><b>Kodi</b>: two new addons are auto-installed:
 <ul>
 <li>script.module.jumpy <i class="comment">(Programs>jumpy)</i></li>
 <li>repository.jumpy.addons <i class="comment">(System>Add-ons>Get Add-ons>jumpy repo)</i></li>
 </ul>
-Restart xbmc and you should see
+Restart Kodi and you should see
 a brief update notice for the '<i>jumpy</i>' addon, which just means that <i>urlresolver</i> and
 <i>youtube</i> are being added if not already present. You can then uninstall the new jumpy
 addons if you like.
@@ -491,7 +495,7 @@ already resolves using youtube-dl in Windows) you may want to disable it in the 
 Alternatively, you can of course install these resolvers by hand:
 <br/><br/>
 <ul>
-<li>Install from zip in xbmc: <a href="http://mirrors.xbmc.org/addons/frodo/script.module.urlresolver/">script.module.urlresolver</a>
+<li>Install from zip in Kodi: <a href="http://mirrors.xbmc.org/addons/gotham/script.module.urlresolver/">script.module.urlresolver</a>
 </li>
 <li>Download <a href="http://rg3.github.io/youtube-dl/download.html">youtube-dl</a>'s
 latest <i>Full source tarball</i>, untar and point
@@ -555,6 +559,51 @@ In this case (e.g. youtube) the workaround is to go to the <i><b>http</b></i> ve
 </li>
 </ul>
 </ul>
+<br/>
+
+
+
+<b><a name="CAPTURE">Capture</a></b>
+<ul>
+Capture is a script to discover and stream system media sources (e.g. computer screen, video cam, audio card) to your renderer.
+It's basically a wrapper around <a href="http://ffmpeg.org/ffmpeg-devices.html">ffmpeg devices support</a>. Some notes:
+<br/><br/>
+<ul>
+<li>Discovered devices (in various A/V combinations) are listed inside the <i><b>Devices</b></i> folder in the xmb root.
+</li>
+<br/>
+<li>Windows:
+<ul>
+<li>Directshow devices are supported, VFW is not.
+</li>
+<li>For screencasting install any/all of these directshow filters:
+<ul>
+<li><i>x86 edition</i> of <a href="http://www.umediaserver.net/components/index.html">UScreenCapture</a> from Unreal Media.</li>
+<li><a href="https://github.com/rdp/screen-capture-recorder-to-video-windows-free">screen-capture-recorder</a>.</li>
+<li><a href="https://github.com/rdp/virtual-audio-capture-grabber-device">virtual-audio-capture-grabber</a>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<br/>
+<li>Linux: Only screencasting is implemented and X11 display screens are automatically detected assuming your ffmpeg has been compiled with <a href="http://ffmpeg.org/ffmpeg-devices.html#x11grab">x11grab</a> enabled
+(which is not true for the linux ffmpeg binaries shipped with UMS).
+</li>
+<br/>
+<li>OS-X: Sorry, no device capture support in ffmpeg.
+</li>
+<br/>
+<li>There's a transcoding delay of 10 seconds or more, so this isn't really practical for real-time uses
+such as interacting with your desktop. See <a href="http://www.universalmediaserver.com/forum/viewtopic.php?f=9&t=907&p=10670#p10675">here</a>
+for some more hands-on user notes.
+</li>
+</ul>
+
+</ul>
+
+</ul>
+</ul>
+
 <br/>
 
 </div>

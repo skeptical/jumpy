@@ -98,6 +98,7 @@ function preview(img, bg) {
 <li><a href="readme.html#FEEDREADER">Feedreader</a></li>
 <li><a href="readme.html#RESOLVER">Resolver</a></li>
 <li><a href="readme.html#EARMARKER">Earmarker</a></li>
+<li><a href="readme.html#CAPTURE">Capture</a></li>
 <br/>
 <center><a href="#SCRIPTS">SCRIPTS</a></center><br/>
 <li><a href="#QUICKSTART">Quick Start</a></li>
@@ -139,6 +140,7 @@ function preview(img, bg) {
 <option>log</option>
 <option>mkDirs</option>
 <option>ok</option>
+<option>popVar</option>
 <option>readConf</option>
 <option>reboot</option>
 <option>refresh</option>
@@ -624,8 +626,13 @@ name is taken from the calling object or executable.
 </ul>
 </li>
 <br/>
+<li><a name="popVar"><kbd>pms.popVar</kbd><code>(key)</code></a>
+<ul>Remove and return a previously set session variable (or <code>''</code> if not found).
+</ul>
+</li>
+<br/>
 <li><a name="setVar"><kbd>pms.setVar</kbd><code>(key, val)</code></a>
-<ul>Set a session variable (for later retrieval via <code>getVar</code>)</i>.
+<ul>Set a session variable (for later retrieval via <code>getVar</code> or <code>popVar</code>)</i>.
 </ul>
 </li>
 <br/>
