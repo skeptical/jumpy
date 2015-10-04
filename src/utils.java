@@ -144,8 +144,12 @@ public final class utils {
 			sub.setLang(lang);
 			sub.setType(SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(path)));
 			sub.setExternalFile(new File(path));
-			setField(d, "media_subtitle", sub);
-			setField(d, "srtFile", true);
+			try {
+				d.setMediaSubtitle(sub); // ums
+			} catch (Throwable t) {
+				setField(d, "media_subtitle", sub); // pms
+			}
+			setField(d, "srtFile", true); // protected
 		} catch (Exception e) {e.printStackTrace();}
 	}
 

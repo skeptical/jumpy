@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URLResolver {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.3.7";
+	public static final String version = "0.3.8-dev";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	public PmsConfiguration configuration;
@@ -60,7 +60,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public jumpy() {
 		pms = PMS.get();
 		configuration = PMS.getConfiguration();
-		utils.setField(xmb.fakeroot, "defaultRenderer", RendererConfiguration.getDefaultConf());
+		xmb.init();
 		host = new File(configuration.getProfilePath()).getName().split("\\.conf")[0];
 		String plugins = configuration.getPluginDirectory();
 		home = new File(plugins + File.separatorChar + appName)

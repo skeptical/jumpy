@@ -32,10 +32,14 @@ import static net.pms.external.infidel.jumpy.jumpyAPI.*;
 
 public final class xmb {
 
-	public static DLNAResource fakeroot = new xmbObject("fakeroot", null, true);
+	public static volatile DLNAResource fakeroot = new xmbObject("fakeroot", null, true);
 	public static DLNAResource home = null;
-	static ArrayList<RendererConfiguration> foundRenderers = null;
+	static List<RendererConfiguration> foundRenderers = null;
 	public static boolean startup = true;
+
+	public static void init() {
+		fakeroot.setDefaultRenderer(RendererConfiguration.getDefaultConf());
+	}
 
 	public static DLNAResource pwd(xmbObject obj) {
 		return obj.isFolder ? obj : obj.getParent() == null ? jumpy.top : obj.getParent();
@@ -60,7 +64,7 @@ public final class xmb {
 		try {
 			((xmbObject)folder).touch();
 		} catch (Exception e) {
-			utils.setField(folder, "lastmodified", 1);
+			utils.setField(folder, "lastmodified", 1); // protected
 		}
 	}
 
@@ -97,13 +101,20 @@ public final class xmb {
 
 	public static void refresh() {
 		if (foundRenderers == null) {
-			foundRenderers = (ArrayList<RendererConfiguration>)
-				utils.getField(PMS.get(), "foundRenderers");
+			try {
+				foundRenderers = PMS.get().getFoundRenderers(); // ums
+			} catch (Throwable t) {
+				foundRenderers = (List<RendererConfiguration>) utils.getField(PMS.get(), "foundRenderers"); // pms
+			}
 		}
 		for (RendererConfiguration r : foundRenderers) {
 			RootFolder root = r.getRootFolder();
 			root.getChildren().clear();
-			utils.setField(root, "discovered", false);
+			try {
+				root.reset(); // ums
+			} catch (Throwable t) {
+				utils.setField(root, "discovered", false); // pms
+			}
 		}
 	}
 
@@ -251,7 +262,11 @@ public final class xmb {
 				((xmbObject)obj.newItem).tag = obj.tag;
 			}
 			if (mediaInfo != null) {
-				utils.setField(obj.newItem, "media", mediaInfo);
+				try {
+					obj.newItem.setMedia(mediaInfo); // ums
+				} catch (Throwable t) {
+					utils.setField(obj.newItem, "media", mediaInfo); // pms
+				}
 			}
 			pwd.addChild(obj.newItem);
 			touch(pwd);
