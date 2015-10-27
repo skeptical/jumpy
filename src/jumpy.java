@@ -418,7 +418,8 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	}
 
 	public Object dbgpack_cb() {
-		return new String[] {jumpylog, jumpyconf, scriptsini, metaini};
+		return new String[] {jumpylog, jumpyconf, scriptsini, metaini,
+			home + File.separator + "setup" + File.separator + "setup.log"};
 	}
 
 	@Override
