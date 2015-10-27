@@ -64,9 +64,8 @@ public class scriptFolder extends xmbObject {
 		lastcount = 0;
 		jumpy.log("\n");
 		jumpy.log("Opening folder: " + name + ".\n");
-		ex = new runner();
-		ex.run(this, uri, syspath, env);
-		if (jumpy.showBookmarks && canBookmark && (children.size() > 0 || isBookmark)) {
+		boolean bookmarked = false;
+		if (jumpy.showBookmarks && canBookmark) {
 			final scriptFolder self = this;
 			addChild(new xmbAction((isBookmark ? "Delete" : "Add") + " bookmark",
 					"jump+CMD : Bookmark " + (isBookmark ? "deleted" : "added") + " :  ", null,
@@ -76,8 +75,12 @@ public class scriptFolder extends xmbObject {
 					return 0;
 				}
 			});
-			// put the action first (note: this breaks id=index correspondence in the children)
-			children.add(0, children.remove(children.size() - 1));
+			bookmarked = true;
+		}
+		ex = new runner();
+		ex.run(this, uri, syspath, env);
+		if (bookmarked && children.size() == 1 && ! isBookmark) {
+			children.clear();
 		}
 		refreshOnce = false;
 		lastmodified = 0;
