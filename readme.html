@@ -72,6 +72,7 @@ div.main {
 <li><a href="#XBMC">XBMC Installation</a></li>
 <li><a href="#PHANTOMJS">PhantomJS Installation</a></li>
 <li><a href="#INSTALLATION">Plugin Installation</a></li>
+<li><a href="#SHORTPATHS">Windows Short Paths</a></li>
 <li><a href="#BOOKMARKS">Bookmarks</a></li>
 <li><a href="#LOGCONF">Log and Conf</a></li>
 <li><a href="#BUGS">Bugs</a></li>
@@ -227,8 +228,52 @@ When updating by hand you may want to merge any new sections or changes in
 <i>plugins/jumpy/examples/sample-jumpy-scripts.ini</i>
 into your own <i><a href="#SCRIPTSINI">jumpy-scripts.ini</a></i>.
 </ul>
+
 </div>
 <br/><br/>
+
+<b><a name="SHORTPATHS">Windows Short Paths</a></b>
+<ul>
+In Windows jumpy uses several 'short' paths (e.g. in the <a href="scripts.html#OTHERSCRIPTS"><code><span class="orange">pms</span></code></a> and <code><span class="orange">imconvert</span></code> variables)
+to circumvent space-containing path errors when invoking <i>cmd.exe</i>, which requires that
+<a href="https://en.wikipedia.org/wiki/8.3_filename">8dot3 filenames</a>
+be available on your file system.
+<br/><br/>
+You can check whether 8dot3 filenames are currently enabled using <a href="https://technet.microsoft.com/en-us/library/ff621566.aspx">fsutil</a>,
+by opening a command window and typing
+<pre>fsutil 8dot3name query c:</pre>
+If you see warnings about 8dot3 short paths in <b><i>jumpy.log</i></b> or the jumpy installer, it means that short filenames
+are (or were) disabled on your system, possibly as a result of running a system optimizer utility at some point,
+and you will need to create the required short paths using the following (unfortunately somewhat painful) method:
+<br/><br/>
+<ul>
+<li>Ensure the target directories are not in use by the system:
+<ul>
+<li>If the warnings show paths with "<code>Program Files</code>" reboot Windows in Safe Mode with command prompt.
+The reason for this is that in normal mode the <i>Program Files</i> folders are always in use by running programs,
+so the system won't allow any changes (e.g. setting short names).</li>
+<li>Otherwise make sure PMS/UMS is not running and open a command window.</li>
+</ul>
+<br/>
+<li>Enable 8dot3 (with prompt at drive c:):<pre>fsutil behavior set disable8dot3 0</pre></li>
+<li>Set short names for your Program Files and/or PMS/UMS directories as appropriate, i.e. run one or more of the
+following commands:
+<pre>fsutil file setshortname "Program Files" PROGRA~1
+fsutil file setshortname "Program Files (x86)" PROGRA~2
+fsutil file setshortname "Program Files (x86)\Universal Media Server" UNIVER~1
+fsutil file setshortname "Program Files (x86)\PS3 Media Server" PS3MED~1
+</pre>
+</li>
+<li>(Optional) set the 8dot3name behavior back to the original setting (returned by the initial query cmd, e.g. 1).
+Please note that doing this may cause other similar errors in the future.
+<pre>fsutil behavior set disable8dot3 1</pre>
+</li>
+</ul>
+Note that the above applies to a default installation on drive c. If UMS/PMS is installed at a non-standard location
+you will need to adjust the commands accordingly.
+</ul>
+<br/>
+
 <b><a name="BOOKMARKS">Bookmarks</a></b>
 <ul>
 Press the <i>Add bookmark</i> button in any folder to create a bookmark inside <i> Jumpy > Bookmarks</i>. These are saved to <b><i>jumpy-bookmarks.ini</i></b> in your PMS profile folder (wherever <i>PMS.conf</i> is). You can edit this file, for instance to change the labels or reorder the items.

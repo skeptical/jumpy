@@ -390,13 +390,17 @@ if __name__ == "__main__" and len(sys.argv) == 1:
 
 	if sys.platform.startswith('win32'):
 		try:
-			# reset %pms% to short paths so we don't get into trouble with cmd /c
 			from ctypes import windll, create_unicode_buffer, sizeof
 			buf = create_unicode_buffer(512)
-			windll.kernel32.GetShortPathNameW(u'%s' % sys.executable, buf, sizeof(buf))
-			py = buf.value
-			windll.kernel32.GetShortPathNameW(u'%s' % sys.argv[0], buf, sizeof(buf))
-			pms_util(PMS_SETPMS, '%s %s' % (py, buf.value))
+			def shortpath(path):
+				windll.kernel32.GetShortPathNameW(u'%s' % path, buf, sizeof(buf))
+				_8dot3 = buf.value
+				if ' ' in _8dot3:
+					sys.stderr.write("\nWarning: 8dot3 short path '%s' contains spaces.\n         To fix this see 'Windows Short Paths' in the readme.\n" % _8dot3)
+				return _8dot3
+
+			# reset %pms% to short paths so we don't get into trouble with cmd /c
+			pms_util(PMS_SETPMS, '%s %s' % (shortpath(sys.executable), shortpath(sys.argv[0])))
 
 			# in Windows 'convert.exe' has a name conflict with a system utility
 			# (ntfs partition converter) and python's underlying CreateProcess()
@@ -405,8 +409,7 @@ if __name__ == "__main__" and len(sys.argv) == 1:
 			for path in os.environ.get('Path').split(os.path.pathsep):
 				convert = os.path.join(path, 'convert.exe')
 				if os.path.exists(convert):
-					windll.kernel32.GetShortPathNameW(u'%s' % convert, buf, sizeof(buf))
-					pms_setEnv('imconvert', buf.value)
+					pms_setEnv('imconvert', shortpath(convert))
 					break;
 		except:
 			traceback.print_exc(file=sys.stderr)
