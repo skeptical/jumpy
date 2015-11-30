@@ -22,12 +22,14 @@ import net.pms.dlna.RootFolder;
 import net.pms.dlna.VideosFeed;
 import net.pms.dlna.WebAudioStream;
 import net.pms.dlna.WebVideoStream;
+import net.pms.encoders.FFmpegWebVideo;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
 import net.pms.network.UPNPHelper;
 import net.pms.PMS;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import static net.pms.external.infidel.jumpy.jumpyAPI.*;
 
 public final class xmb {
@@ -137,17 +139,12 @@ public final class xmb {
 		touch(parent);
 	}
 
-	public static Object add(xmbObject obj, int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
+	public static Object add(xmbObject obj, int type, String filename, String uri, String thumbnail, Map details, String data) {
 		if (filename == null || uri == null) {
 			return null;
 		}
 
 		jumpy jumpy = obj.jumpy;
-
-		DLNAMediaInfo mediaInfo = mediainfo != null ? getMediaInfo(mediainfo) : null;
-		if (mediaInfo != null) {
-			jumpy.log("mediaInfo: " + mediaInfo);
-		}
 
 		filename = StringEscapeUtils.unescapeXml(StringEscapeUtils.unescapeHtml(filename));
 		String label = unesc(FilenameUtils.getName(filename));
@@ -261,12 +258,8 @@ public final class xmb {
 			if (obj.newItem instanceof xmbObject) {
 				((xmbObject)obj.newItem).tag = obj.tag;
 			}
-			if (mediaInfo != null) {
-				try {
-					obj.newItem.setMedia(mediaInfo); // ums
-				} catch (Throwable t) {
-					utils.setField(obj.newItem, "media", mediaInfo); // pms
-				}
+			if (details != null) {
+				new mediaDetails(details).update(obj.newItem);
 			}
 			pwd.addChild(obj.newItem);
 			touch(pwd);
@@ -419,61 +412,138 @@ public final class xmb {
 		return result != null ? result : "";
 	}
 
-	public static DLNAMediaInfo getMediaInfo(Map mediainfo) {
-		DLNAMediaInfo m = new DLNAMediaInfo();
-		ArrayList<DLNAMediaAudio> audio = new ArrayList<DLNAMediaAudio>();
-		ArrayList<DLNAMediaSubtitle> subs = new ArrayList<DLNAMediaSubtitle>();
+	public static class mediaDetails {
+		Map data;
 
-		if (mediainfo.containsKey("duration")) {
-			m.setDuration(utils.duration((String)mediainfo.get("duration")));
-		} else if (mediainfo.containsKey("streams")) {
-			for (Map<String,String> s : (List<Map<String,String>>)mediainfo.get("streams")) {
+		public mediaDetails(Map m) {
+			this(m, false);
+		}
+
+		public mediaDetails(Map m, boolean isParent) {
+			data = (m != null && isParent) ? (Map)m.get("details") : m;
+		}
+
+		public DLNAMediaInfo getMedia() {
+			return data != null ? getMediaInfo((Map)data.get("media")) : null;
+		}
+
+		public List<String> getFFmpegHeaderOptions() {
+			return data != null ? getFFmpegHeaderOptions((Map)data.get("headers")) : null;
+		}
+
+		public void update(DLNAResource d) {
+			DLNAMediaInfo m = getMedia();
+			if (m != null) {
 				try {
-					String type = s.get("type").toLowerCase();
-					if (type.equals("video")) {
-						if (s.containsKey("codec")) {
-							m.setCodecV(s.get("codec"));
-						}
-						if (s.containsKey("aspect")) {
-							m.setAspect(s.get("aspect"));
-						}
-						if (s.containsKey("width")) {
-							m.setWidth(Integer.parseInt(s.get("width")));
-						}
-						if (s.containsKey("height")) {
-							m.setHeight(Integer.parseInt(s.get("height")));
-						}
-						if (s.containsKey("duration")) {
-							m.setDuration(utils.duration(s.get("duration")));
-						}
-					} else if (type.equals("audio")) {
-						DLNAMediaAudio a = new DLNAMediaAudio();
-						if (s.containsKey("codec")) {
-							a.setCodecA(s.get("codec"));
-						}
-						if (s.containsKey("language")) {
-							a.setLang(s.get("language"));
-						}
-						if (s.containsKey("channels")) {
-							a.getAudioProperties().setNumberOfChannels(Integer.parseInt(s.get("channels")));
-						}
-						audio.add(a);
-					} else if (type.equals("subtitle")) {
-						DLNAMediaSubtitle t = new DLNAMediaSubtitle();
-						if (s.containsKey("language")) {
-							t.setLang(s.get("language"));
-						}
-						subs.add(t);
-					}
-				} catch (Exception e) {
-					jumpy.log("Error reading media info: " + e);
+					d.setMedia(m); // ums
+				} catch (Throwable t) {
+					utils.setField(d, "media", m); // pms
+				}
+			}
+			List<String> ffopts = getFFmpegHeaderOptions();
+			if (ffopts != null) {
+				try {
+					d.attach(FFmpegWebVideo.ID, quoteArgs(ffopts)); // ums
+				} catch (Throwable t) {
+					// pms
 				}
 			}
 		}
-		m.setAudioTracksList(audio);
-		m.setSubtitleTracksList(subs);
-		m.setMediaparsed(true);
-		return m;
+
+		public static DLNAMediaInfo getMediaInfo(Map mediainfo) {
+			if (mediainfo == null) {
+				return null;
+			}
+			DLNAMediaInfo m = new DLNAMediaInfo();
+			ArrayList<DLNAMediaAudio> audio = new ArrayList<DLNAMediaAudio>();
+			ArrayList<DLNAMediaSubtitle> subs = new ArrayList<DLNAMediaSubtitle>();
+
+			if (mediainfo.containsKey("duration")) {
+				m.setDuration(utils.duration((String)mediainfo.get("duration")));
+			} else if (mediainfo.containsKey("streams")) {
+				for (Map<String,String> s : (List<Map<String,String>>)mediainfo.get("streams")) {
+					try {
+						String type = s.get("type").toLowerCase();
+						if (type.equals("video")) {
+							if (s.containsKey("codec")) {
+								m.setCodecV(s.get("codec"));
+							}
+							if (s.containsKey("aspect")) {
+								m.setAspect(s.get("aspect"));
+							}
+							if (s.containsKey("width")) {
+								m.setWidth(Integer.parseInt(s.get("width")));
+							}
+							if (s.containsKey("height")) {
+								m.setHeight(Integer.parseInt(s.get("height")));
+							}
+							if (s.containsKey("duration")) {
+								m.setDuration(utils.duration(s.get("duration")));
+							}
+						} else if (type.equals("audio")) {
+							DLNAMediaAudio a = new DLNAMediaAudio();
+							if (s.containsKey("codec")) {
+								a.setCodecA(s.get("codec"));
+							}
+							if (s.containsKey("language")) {
+								a.setLang(s.get("language"));
+							}
+							if (s.containsKey("channels")) {
+								a.getAudioProperties().setNumberOfChannels(Integer.parseInt(s.get("channels")));
+							}
+							audio.add(a);
+						} else if (type.equals("subtitle")) {
+							DLNAMediaSubtitle t = new DLNAMediaSubtitle();
+							if (s.containsKey("language")) {
+								t.setLang(s.get("language"));
+							}
+							subs.add(t);
+						}
+					} catch (Exception e) {
+						jumpy.log("Error reading media info: " + e);
+					}
+				}
+			}
+			m.setAudioTracksList(audio);
+			m.setSubtitleTracksList(subs);
+			m.setMediaparsed(true);
+			jumpy.log("media: " + m);
+			return m;
+		}
+
+		public static List<String> getFFmpegHeaderOptions(Map<String,String> headers) {
+			if (headers == null) {
+				return null;
+			}
+			String hdrs = "";
+			ArrayList<String> opts = new ArrayList<String>();
+			for (String key : headers.keySet()) {
+				String k = key.toLowerCase();
+				if (k.equals("user-agent")) {
+					opts.add("-user-agent");
+					opts.add(headers.get(key));
+				} else if (k.equals("cookie") || k.equals("cookies")) {
+					opts.add("-cookies");
+					opts.add(headers.get(key));
+				} else {
+					hdrs += key + ": " + headers.get(key).trim() + "\r\n";
+				}
+			}
+			if (StringUtils.isNotBlank(hdrs)) {
+				opts.add("-headers");
+				opts.add(hdrs);
+			}
+			jumpy.log("ffmpeg options: " + opts);
+			return opts;
+		}
 	}
 
+	public static String quoteArgs(List<String> args) {
+		StringBuilder s = new StringBuilder();
+		for (String arg : args) {
+			String q = arg.startsWith("-") ? "" : "\"";
+			s.append(q).append(arg).append(q).append(" ");
+		}
+		return s.toString().trim();
+	}
 }

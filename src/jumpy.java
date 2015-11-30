@@ -426,7 +426,12 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	public URLResult urlResolve(String url) {
 		if (resolver.enabled) {
 			URLResult res = new URLResult();
-			if((res.url = resolver.resolve(url)) != null) {
+			Map<String, Object> r = resolver.resolve(url);
+			res.url = (String)r.get("uri");
+			if(res.url != null) {
+				if (r.containsKey("details")) {
+					res.args = new xmb.mediaDetails((Map)r.get("details")).getFFmpegHeaderOptions();
+				}
 				return res;
 			}
 		}

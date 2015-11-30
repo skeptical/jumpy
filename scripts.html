@@ -265,9 +265,9 @@ defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the f
 <br/><br/>
 <li><a name="addFolder"></a><kbd>pms.addFolder</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addBookmark"></a><kbd>pms.addBookmark</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
-<a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
-<a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
-<a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/>
+<a name="addAudio"></a><kbd>pms.addAudio</kbd><code>(name, cmd, thumb<i>=None</i>, details<i>=None</i>)</code><br/>
+<a name="addImage"></a><kbd>pms.addImage</kbd><code>(name, cmd, thumb<i>=None</i>, details<i>=None</i>)</code><br/>
+<a name="addVideo"></a><kbd>pms.addVideo</kbd><code>(name, cmd, thumb<i>=None</i>, details<i>=None</i>)</code><br/>
 <a name="addPlaylist"></a><kbd>pms.addPlaylist</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addISO"></a><kbd>pms.addISO</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
 <a name="addAudiofeed"></a><kbd>pms.addAudiofeed</kbd><code>(name, cmd, thumb<i>=None</i>)</code><br/>
@@ -278,9 +278,9 @@ defining a global object <kbd>pms</kbd> (i.e. the current xmb folder) with the f
 </li>
 
 <br/>
-<li><a name="addItem"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>, mediainfo<i>=None</i>)</code></a>
+<li><a name="addItem"><kbd>pms.addItem</kbd><code>(type, name, cmd, thumb<i>=None</i>, details<i>=None</i>)</code></a>
 <br/>or<br/>
-<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>, mediainfo<i>=None</i>)</code><br/><br/>
+<kbd>pms.addItem</kbd><code>(type, name, [cmd, argv1, argv2, ...], thumb<i>=None</i>, details<i>=None</i>)</code><br/><br/>
 where
 <ul>
 <li><code>type</code> is one of these constants:
@@ -360,8 +360,11 @@ To control color, shading and other effects an optional <a href="#FX"><i>+fx str
 appended here (see <a href="#ICONS">icons</a> for syntax examples).
 </li>
 <br/>
-<li><a name="mediainfo"></a><code>mediainfo</code> is a python dict describing the item's media
-properties with any of the following keys:
+
+<li><a name="details"></a><code>details</code> is a python dict describing the item's detailed properties
+with any of the following keys:
+<ul>
+<li><a name="media"></a><code>media</code>: a dict of media properties with any of these keys:
 <ul>
 <li><code>duration</code>: a time string in <i>seconds</i> or <i>hh:mm:ss</i> format.</li>
 <li><code>streams</code>: a list of dicts each describing one stream and containing the
@@ -379,20 +382,30 @@ Only one video stream is allowed.
 </li>
 </ul>
 </li>
+<li><code>headers</code>: a dict of http headers to be set when <code>cmd</code> is a url.</li>
+</ul>
+</li>
+
 for example
 <ul>
-<code>{'duration': '<i>12:34</i>', 'streams': [
-	{'type': '<i>video</i>', 'width': '<i>720</i>, 'height': '<i>480</i>'},
-	{'type': '<i>audio</i>', 'channels': '<i>2</i>'},
-	{'type': '<i>subtitle</i>', 'language': '<i>eng</i>'},
-	{'type': '<i>subtitle</i>', 'language': '<i>jpn</i>'}]
+<code>{
+	'media': {
+		'duration': <i class="comment">'12:34'</i>,
+		'streams': [
+			{'type': <i class="comment">'video'</i>, 'width': <i class="comment">'720'</i>, 'height': <i class="comment">'480'</i>},
+			{'type': <i class="comment">'audio'</i>, 'channels': <i class="comment">'2'</i>},
+			{'type': <i class="comment">'subtitle'</i>, 'language': <i class="comment">'eng'</i>},
+			{'type': <i class="comment">'subtitle'</i>, 'language': <i class="comment">'jpn'</i>}
+		]
+	},
+	'headers': { 'User-Agent': <i class="comment">'my ua'</i>, 'Cookie': <i class="comment">'my cookie;'</i>}
 }</code>
 </ul>
 </ul>
 </li>
 <br/>
 
-<li><a name="addUnresolved"><kbd>pms.addUnresolved</kbd><code>(name, cmd, thumb<i>=None</i>, type<i>=PMS_VIDEO</i>, mediainfo<i>=None</i>)</code></a>
+<li><a name="addUnresolved"><kbd>pms.addUnresolved</kbd><code>(name, cmd, thumb<i>=None</i>, type<i>=PMS_VIDEO</i>, details<i>=None</i>)</code></a>
 <ul>
 Add an incomplete media item whose final uri/url will be resolved at playback, where
 <ul>

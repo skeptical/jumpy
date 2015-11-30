@@ -19,9 +19,10 @@ try: pms
 except NameError:
 	host, port = os.environ['JGATEWAY'].split(':')
 	hascb, cbport = (True, int(os.getenv('JCLIENT'))) if 'JCLIENT' in os.environ else (False, None)
-	client = GatewayClient(address=host, port=int(port))
-	gateway = JavaGateway(client, start_callback_server=hascb, python_proxy_port=cbport, auto_convert=True)
+	gateway_client = GatewayClient(address=host, port=int(port))
+	gateway = JavaGateway(gateway_client, start_callback_server=hascb, python_proxy_port=cbport, auto_convert=True)
 	__builtin__.pms = gateway.entry_point
+	__builtin__.pms.gateway_client = gateway_client
 	__builtin__.pms._addItem = pms.addItem
 	__builtin__.pms._addPath = pms.addPath
 	__builtin__.pms._setEnv = pms.setEnv
@@ -102,12 +103,12 @@ def stringify(obj, container=None, index=None):
 		container[index] = str(obj)
 	return obj
 
-def pms_addItem(itemtype, name, argv, thumb=None, mediainfo=None, data=None):
+def pms_addItem(itemtype, name, argv, thumb=None, details=None, data=None):
 	global gateway
 	if type(argv).__name__ == 'list':
 		argv = flatten(argv)
-	if mediainfo: print mediainfo
-	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), stringify(mediainfo), decode(data))
+	if details: print details
+	pms._addItem(itemtype, decode(name.strip()), decode(argv), decode(thumb), stringify(details), decode(data))
 
 # convenience wrappers
 def pms_addFolder(name, cmd, thumb=None):
@@ -116,14 +117,14 @@ def pms_addFolder(name, cmd, thumb=None):
 def pms_addBookmark(name, cmd, thumb=None):
 	pms_addItem(PMS_BOOKMARK, name, cmd, thumb)
 
-def pms_addAudio(name, cmd, thumb=None, mediainfo=None):
-	pms_addItem(PMS_AUDIO, name, cmd, thumb, mediainfo)
+def pms_addAudio(name, cmd, thumb=None, details=None):
+	pms_addItem(PMS_AUDIO, name, cmd, thumb, details)
 
-def pms_addImage(name, cmd, thumb=None, mediainfo=None):
-	pms_addItem(PMS_IMAGE, name, cmd, thumb, mediainfo)
+def pms_addImage(name, cmd, thumb=None, details=None):
+	pms_addItem(PMS_IMAGE, name, cmd, thumb, details)
 
-def pms_addVideo(name, cmd, thumb=None, mediainfo=None):
-	pms_addItem(PMS_VIDEO, name, cmd, thumb, mediainfo)
+def pms_addVideo(name, cmd, thumb=None, details=None):
+	pms_addItem(PMS_VIDEO, name, cmd, thumb, details)
 
 def pms_addPlaylist(name, cmd, thumb=None):
 	pms_addItem(PMS_PLAYLIST, name, cmd, thumb)
@@ -141,8 +142,8 @@ def pms_addVideofeed(name, cmd, thumb=None):
 	pms_addItem(PMS_VIDEOFEED, name, cmd, thumb)
 
 def pms_addAction(name, cmd, thumb=None, duration=None, playback=None):
-	mediainfo = {'duration' : str(duration)} if duration else None
-	pms_addItem(PMS_ACTION, name, cmd, thumb, mediainfo, data=playback)
+	details = {'media': {'duration' : str(duration)}} if duration else None
+	pms_addItem(PMS_ACTION, name, cmd, thumb, details, data=playback)
 
 def pms_addCmd(name, cmd, thumb=None, ok='Success', fail='Failed'):
 	pms_addItem(PMS_ACTION, name, cmd, thumb, data=('+CMD : %s : %s' % (ok, fail)))
@@ -153,11 +154,11 @@ def pms_addConsoleCmd(name, cmd, thumb=None):
 def pms_addMedia(name, format, cmd, thumb=None):
 	pms_addItem(PMS_MEDIA, name, cmd, thumb, data=format)
 
-def pms_addUnresolved(name, cmd, thumb=None, type=PMS_VIDEO, mediainfo=None):
-	pms_addItem(type|PMS_UNRESOLVED, name, cmd, thumb, mediainfo)
+def pms_addUnresolved(name, cmd, thumb=None, type=PMS_VIDEO, details=None):
+	pms_addItem(type|PMS_UNRESOLVED, name, cmd, thumb, details)
 
-def pms_submit(name, uri, thumb=None, mediainfo=None):
-	pms_addItem(PMS_MEDIA, name, uri, thumb, mediainfo)
+def pms_submit(name, uri, thumb=None, details=None):
+	pms_addItem(PMS_MEDIA, name, uri, thumb, details)
 
 def pms_addPath(path=None):
 	pms._addPath(path)
@@ -173,7 +174,7 @@ def pms_util(action, arg1=None, arg2=None):
 
 # 'varargs' version to use with 'String...' on java side:
 #def pms_util(action, *args):
-#	argarray = JavaGateway(client).new_array(gateway.jvm.java.lang.String, len(args))
+#	argarray = JavaGateway(gateway_client).new_array(gateway.jvm.java.lang.String, len(args))
 #	for i in range(len(args)):
 #		argarray[i] = args[i]
 #	return pms.util(action, argarray)
@@ -307,6 +308,9 @@ __builtin__.pms.log = pms_log
 __builtin__.pms.play = pms_play
 __builtin__.pms.addPlayer = pms_addPlayer
 __builtin__.pms.esc = esc
+__builtin__.pms.decode = decode
+__builtin__.pms.stringify = stringify
+__builtin__.pms.flatten = flatten
 
 lib = os.path.dirname(os.path.realpath(__file__))
 resources = os.path.join(lib, 'resources')

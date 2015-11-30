@@ -148,7 +148,7 @@ class scanner:
 		for u in iframes:
 			self.scrape(urljoin(base, u), depth + 1)
 
-	def check(self, base, url, name=None, thumb=None, sub=None):
+	def check(self, base, url, name=None, thumb=None, sub=None, details=None):
 		u = urljoin(base, url)
 		if self.media.search(u):
 			self.add(u, name, thumb)
@@ -156,23 +156,25 @@ class scanner:
 			self.add(u, url[:-1], thumb, isfolder=True)
 		elif self.resolver._resolve(u):
 			r = self.resolver
-			self.add(r.url, r.name if r.name else name, r.thumb if r.thumb else thumb, r.sub if r.sub else sub)
+			self.add(r.url, r.name if r.name else name, r.thumb if r.thumb else thumb, r.sub if r.sub else sub,
+				r.details if r.details else details)
 		else:
 			return False
 		return True
 
-	def add(self, url, name=None, thumb=None, sub=None, isfolder=False):
+	def add(self, url, name=None, thumb=None, sub=None, details=None, isfolder=False):
 		label = name if name else os.path.basename(urlparse(url)[2])
 		self.items[url] = (label, thumb, isfolder)
 		if self.mode & scanner.UPDATEXMB:
 			if isfolder:
 				pms.addFolder(pms.esc(label), [sys.argv[0], url], thumb)
 			else:
-				pms.addVideo(pms.esc(label), url, thumb)
+				pms.addVideo(pms.esc(label), url, thumb, details)
 				if sub:
 					pms.setSubtitles(sub)
 		if self.mode & scanner.SINGLE and not isfolder:
-			raise ResultFound(url)
+			raise ResultFound({'uri': pms.decode(url), 'name': pms.decode(name), 'thumb': pms.decode(thumb), 'sub': pms.decode(sub),
+					'details': pms.stringify(details) if details else None})
 
 	def getitems(self):
 		return self.items.items()

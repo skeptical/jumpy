@@ -104,13 +104,13 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 		return addItem(type, filename, uri, thumbnail, null, null);
 	}
 
-	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo) {
-		return addItem(type, filename, uri, thumbnail, mediainfo, null);
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map details) {
+		return addItem(type, filename, uri, thumbnail, details, null);
 	}
 
 	@Override
-	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
-		return xmb.add(this, type, filename, uri, thumbnail, mediainfo, data);
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map details, String data) {
+		return xmb.add(this, type, filename, uri, thumbnail, details, data);
 	}
 
 	@Override

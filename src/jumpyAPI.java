@@ -25,7 +25,7 @@ public interface jumpyAPI {
 	public static final int AUDIOFEED = 4097; // Format.AUDIO|FEED
 	public static final int IMAGEFEED = 4098; // Format.IMAGE|FEED
 
-	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data);
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map details, String data);
 	public void addPath(String path);
 	public void setEnv(String name, String val);
 

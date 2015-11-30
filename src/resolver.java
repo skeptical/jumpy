@@ -9,6 +9,7 @@ import java.util.Map;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.DLNAMediaInfo;
 import net.pms.dlna.Range;
+import net.pms.encoders.FFmpegWebVideo;
 import net.pms.encoders.PlayerFactory;
 import net.pms.formats.Format;
 import net.pms.formats.FormatFactory;
@@ -77,11 +78,15 @@ public class resolver extends xmbObject {
 				startPyServer();
 			}
 			root.newItem = this; //TODO: synchronization issues?
-			uri = resolve(uri0, syspath, env);
+			Map<String, Object> r = resolve(uri0, syspath, env);
+			uri = (String)r.get("uri");
 			if (uri != null) {
 				resolved = true;
 				reset(uri);
 				setPlayer(PlayerFactory.getPlayer(this));
+			}
+			if (r.containsKey("details")) {
+				new xmb.mediaDetails((Map)r.get("details")).update(this);
 			}
 		}
 		return uri == null ? null : super.getInputStream(range, mediarenderer);
@@ -115,19 +120,21 @@ public class resolver extends xmbObject {
 
 	// the actual resolving functionality:
 
-	public static String resolve(String str) {
+	public static Map resolve(String str) {
 		return resolve(str, null, null);
 	}
 
-	public static String resolve(String str, String syspath, Map<String,String> env) {
+	public static Map resolve(String str, String syspath, Map<String,String> env) {
 		if (isCmdArray(str)) {
 			// it's a script, run it and capture addItem() or stdout
-			class result {String uri = null;}
-			final result r = new result();
+			final HashMap<String,Object> r = new HashMap<String,Object>();
 			scriptFolder s = new scriptFolder(jumpy, "Resolver", null, null) {
 				@Override
-				public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
-					r.uri = uri;
+				public Object addItem(int type, String filename, String uri, String thumbnail, Map details, String data) {
+					r.put("uri", uri);
+					r.put("thumbnail", thumbnail);
+					r.put("details", details);
+					r.put("data", data);
 					return null;
 				}
 			};
@@ -135,8 +142,10 @@ public class resolver extends xmbObject {
 			ex.cache = true;
 			jumpy.log("\n");
 			int exitcode = ex.run(s, str, syspath, env);
-			return r.uri != null ? r.uri :
-				(exitcode == 0 && ex.output != null) ? ex.output.split("\n")[0] : null;
+			if (r.isEmpty() && exitcode == 0 && ex.output != null) {
+				r.put("uri", ex.output.split("\n")[0]);
+			}
+			return r;
 
 		} else if (scrapers != 0) {
 			// it's a url, use the available scrapers
@@ -156,7 +165,7 @@ public class resolver extends xmbObject {
 	// py4j python callback server support:
 
 	public interface Resolver {
-		public String resolve(String url);
+		public Map<String,Object> resolve(String url);
 	}
 
 	public static Resolver pyResolver = null;

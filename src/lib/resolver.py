@@ -4,8 +4,9 @@ from subprocess import Popen, PIPE
 pms_await = True
 import jumpy
 from pageScanner import scanner
+from py4j.java_collections import MapConverter
 
-version = '1.4'
+version = '1.5'
 
 class resolver:
 
@@ -25,14 +26,16 @@ class resolver:
 			except: traceback.print_exc()
 			if self.url:
 				pms.log('%s : %s' % (scraper.name(), self.url), True)
-				return self.url
+				return {'uri': pms.decode(self.url), 'name': pms.decode(self.name), 'thumb': pms.decode(self.thumb), 'sub': pms.decode(self.sub),
+					'details': pms.stringify(self.details) if self.details else None}
 		return None
 
-	def add(self, url, name=None, thumb=None, sub=None):
+	def add(self, url, name=None, thumb=None, sub=None, details=None):
 		self.url = url.strip()
 		self.name = name.strip() if name else None
 		self.thumb = thumb.strip() if thumb else None
 		self.sub = sub.strip() if sub else None
+		self.details = details if details else None
 
 
 class cbresolver(scanner):
@@ -42,8 +45,10 @@ class cbresolver(scanner):
 
 	def resolve(self, url):
 		if 'plugin://' in url or url.startswith('['):
-			return self.resolver.resolve(url)
-		return self.scan(url)
+			r = self.resolver.resolve(url)
+		else:
+			r = self.scan(url)
+		return MapConverter().convert(r, pms.gateway_client)# if r else None
 
 	def __init__(self, s=None):
 		scanner.__init__(self, resolver(s), scanner.SINGLE)
@@ -124,10 +129,10 @@ class _xbmc_urlresolver(_scraper):
 			if 'plugin://' in u:
 				pmsaddItem = __builtin__.pms.addItem
 				pmsutil = __builtin__.pms.util
-				def addItem(itemtype, name, argv, thumb=None, mediainfo=None, data=None):
+				def addItem(itemtype, name, argv, thumb=None, details=None, data=None):
 					if type(argv).__name__ == 'list':
-						argv = jumpy.flatten(argv)
-					resolver.add(argv, name, thumb)
+						argv = pms.flatten(argv)
+					resolver.add(argv, name, thumb, details=details)
 				__builtin__.pms.addItem = addItem
 				def util(action, arg1=None, arg2=None):
 					if action == PMS_SUBTITLE:
@@ -140,7 +145,11 @@ class _xbmc_urlresolver(_scraper):
 				__builtin__.pms.addItem = pmsaddItem
 				__builtin__.pms.util = pmsutil
 			else:
-				resolver.add(u)
+				details = {}
+				url,headers = xbmc.split_url_headers(u)
+				if headers:
+					details['headers'] = headers
+				resolver.add(url, details=details)
 
 	def setloglevel(self, level):
 		# backward compatibility
@@ -228,7 +237,15 @@ class _youtube_dl(_scraper):
 					i = req[0]
 				else:
 					raise 'Error: multiple "merged format" urls received'
-			resolver.add(i['url'] + i.get('play_path', ''), i.get('fulltitle'), i.get('thumbnail'))
+#			from pprint import pprint
+#			pprint(i)
+			details = {}
+			if 'http_headers' in i:
+				headers = {k:v for k,v in i['http_headers'].items() if not k.lower().startswith('accept')}
+				if headers:
+					details['headers'] = headers
+			resolver.add(i['url'] + i.get('play_path', ''), i.get('fulltitle'), i.get('thumbnail'),
+				details=details if details else None)
 
 #		# TODO: return all results (i.e. multi-part or playlist)
 #		u = '\n'.join([(i['url'] + i.get('play_path', '')) for i in self.info_dicts])

@@ -455,8 +455,8 @@ public class player extends Player implements jumpyAPI {
 	// pass thru
 
 	@Override
-	public Object addItem(int type, String filename, String uri, String thumbnail, Map mediainfo, String data) {
-		return apiObj.addItem(type, filename, uri, thumbnail, mediainfo, data);
+	public Object addItem(int type, String filename, String uri, String thumbnail, Map details, String data) {
+		return apiObj.addItem(type, filename, uri, thumbnail, details, data);
 	}
 
 	@Override
