@@ -29,7 +29,7 @@ class scanner:
 		self.mode = mode or scanner.FULL
 		self.timeout = float(timeout or 10)
 		self.items = {}
-		self.media = re.compile(r'([a-z]+://.+?\.(wma|wmv|mpg|mpeg|mp3|mp2|mp4|vob|divx|avi|ogg|ogv|flac|speex|mkv|3gp|flv|ts))')
+		self.media = re.compile(r'([a-z]+://.+?\.(3g2|3gp|asf|avi|divx|drc|f4a|f4b|f4p|f4v|flac|flv|gif|gifv|m2v|m4p|m4v|mkv|mng|mov|mp2|mp3|mp4|mpe|mpeg|mpg|mpv|mxf|nsv|ogg|ogv|qt|rm|rmvb|roq|speex|svi|ts|vob|wav|webm|wma|wmv|yuv))')
 
 	def scan(self, url):
 		self.items = {}
@@ -51,13 +51,18 @@ class scanner:
 		if len(self.items) > prev:
 			return
 
+#		import requests
+#		req = requests.head(url, allow_redirects=False)
+#		info = req.headers
+
 		# send a head request to see the content-type
 		req = urllib2.Request(url)
 		req.get_method = lambda : 'HEAD'
 		info = urllib2.urlopen(req, timeout=self.timeout).info()
+
 		if info:
 			print '\nHEAD:\n%s' % info
-			content = info['content-type']
+			content = info.get('content-type')
 			if content:
 				if ismedia(content):
 					# found it
