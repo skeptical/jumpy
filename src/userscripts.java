@@ -317,7 +317,7 @@ public class userscripts {
 					for (i=1; i < values.length; i++) {
 						v.add(section.remove(key, 1).trim());
 					}
-					section.put(key, org.apache.commons.lang.StringUtils.join(v, "\n"), 0);
+					section.put(key, org.apache.commons.lang.StringUtils.join(v, "\n").trim(), 0);
 				}
 			}
 		}
@@ -410,7 +410,7 @@ public class userscripts {
 			@Override
 			public void handleOption(String optionName, String optionValue) {
 				// unglob
-				for (String val : optionValue.split("\n")) {
+				for (String val : optionValue.trim().split("\n")) {
 					super.handleOption(optionName, val);
 				}
 			}

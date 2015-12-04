@@ -370,7 +370,9 @@ def pms_readConf(filename):
 		if os.path.exists(c):
 			conf.readfp(StringIO('[.]\n'+open(c).read()))
 	try:
-		return dict(conf.items('.'))
+		conf = dict(conf.items('.'))
+		print '%s: %s' % (filename, conf)
+		return conf
 	except:
 		return {}
 
