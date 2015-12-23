@@ -1,9 +1,9 @@
 WINDOWS
-	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.7.exe,plugins
-	exec,plugins/jumpy-0.3.7.exe
+	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.8.exe,plugins
+	exec,plugins/jumpy-0.3.8.exe
 LINUX
-	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.7.run,plugins
-	exec,plugins/jumpy-0.3.7.run
+	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.8.run,plugins
+	exec,plugins/jumpy-0.3.8.run
 OSX
-	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.7.run,plugins
-	exec,plugins/jumpy-0.3.7.run
+	http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.8.run,plugins
+	exec,plugins/jumpy-0.3.8.run
