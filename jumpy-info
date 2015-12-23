@@ -1,0 +1,7 @@
+name=Jumpy
+url=http://skeptical.github.io/jumpy/jumpy-inst
+desc=Plug in your scripts, Kodi addons, and more.
+author=infidel
+rating=5.0
+version=0.3.8
+require=2.0.1
