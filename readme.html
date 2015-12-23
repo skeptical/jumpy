@@ -69,7 +69,7 @@ div.main {
 <center><a href="#TOP">BASICS</a></center><br/>
 <li><a href="#QUICKSETUP">Quick Setup</a></li>
 <li><a href="#REQUIREMENTS">Requirements</a></li>
-<li><a href="#XBMC">XBMC Installation</a></li>
+<li><a href="#XBMC">Kodi Installation</a></li>
 <li><a href="#PHANTOMJS">PhantomJS Installation</a></li>
 <li><a href="#INSTALLATION">Plugin Installation</a></li>
 <li><a href="#SHORTPATHS">Windows Short Paths</a></li>
@@ -115,9 +115,9 @@ Jumpy (<span class="orange">J</span>ava <span class="orange">U</span>nderlay for
 </ul>
 The API is accessible from python via jumpy's python module, or from other languages via system calls. Interaction is through a localhost socket managed by <a href="http://py4j.sourceforge.net">py4j</a>.
 <br/><br/>
-Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org">xbmc</a> addons for use in PMS, and deciding to see if I could mock the xbmc plugin API itself so as to run these addons under PMS as-is. The result is Jumpy plus <a href="https://github.com/skeptical/jumpy-xbmc">jumpy-xbmc</a>, an included set of python modules to 'jump' the xbmc addons.
+Jumpy began with my having grown tired of occasionally poaching stuff 'by hand' from <a href="http://xbmc.org">xbmc (Kodi)</a> addons for use in PMS, and deciding to see if I could mock the xbmc plugin API itself so as to run these addons under PMS as-is. The result is Jumpy plus <a href="https://github.com/skeptical/jumpy-xbmc">jumpy-xbmc</a>, an included set of python modules to 'jump' the xbmc addons.
 <br/><br/>
-Jumpy-xbmc works with most xbmc video addons: <i>Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube</i>, and many more. Addons are 'mostly' functional in the sense that all content is shown but interactive features that require user input are inactive.
+Jumpy-xbmc works with most Kodi video addons: <i>Hulu, Free Cable, Al Jazeera, PBS, Academic Earth, YouTube</i>, and many more. Addons are 'mostly' functional in the sense that all content is shown but interactive features that require user input are inactive.
 <br/><br/>
 Jumpy itself is general-purpose, of course, and you can use it to plug your own scripts, python or other, into PMS as well.
 <br/><br/>
@@ -125,13 +125,21 @@ Jumpy itself is general-purpose, of course, and you can use it to plug your own 
 <b><a name="QUICKSETUP">Quick Setup</a></b>
 <!--<ul>-->
 <!--<b><a name="INSTALLERS">Using the Installer</a></b>-->
+<br/>
 <ol>
+<div style="text-indent:-1.5em;">
+<b>Quickest</b>: install automatically from the UMS <i>Plugin Management</i> tab.
+</div>
+<br/>
+<div style="text-indent:-1.5em;">
+Or else use the installer directly:
+</div><br/>
 <li>Shut down PMS.
 </li>
-<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.exe/download" title="Windows: jumpy-0.3.7.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.run/download" title="Linux: jumpy-0.3.7.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
-<!-- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.osx.zip/download" title="Mac: jumpy-0.3.7.app (Mountain Lion only). Mavericks users: please run the linux installer (jumpy-0.3.7.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
- <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, Mac app version not available yet. Please launch the linux installer (jumpy-0.3.7.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
+<li>Put the installer <span style="visibility: hidden">.</span>( <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.8.exe/download" title="Windows: jumpy-0.3.8.exe"><img src="lib/resources/windows.png" alt="Windows" align="absmiddle"></a></i></img>
+ <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.8.run/download" title="Linux: jumpy-0.3.8.run"><img src="lib/resources/linux.png" alt="Linux" align="absmiddle"></a></i></img>
+<!-- <span style="visibility: hidden">.</span> <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.8.osx.zip/download" title="Mac: jumpy-0.3.8.app (Mountain Lion only). Mavericks users: please run the linux installer (jumpy-0.3.8.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>-->
+ <span style="visibility: hidden">.</span> <i><a href="" title="Sorry, Mac app version not available yet. Please launch the linux installer (jumpy-0.3.8.run) inside Terminal instead."><img src="lib/resources/mac.png" alt="Mac" align="absmiddle"></a></i></img>
  <span style="visibility: hidden">.</span> )<span style="visibility: hidden">.</span> in your PMS <b><i>plugins</i> folder</b>.
 </li>
 <li>
@@ -149,17 +157,17 @@ Launch it and follow through as usual with external package installers if prompt
 <br/>
 <div style="margin-left:-1.5em;">
 You should end up with
-<i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>beautifulsoup4</code>, <code>lxml</code>, <code>XBMC</code>, <code>rtmpdump</code>,
+<i><code>jumpy</code>, <code>python</code>, <code>py4j</code>, <code>beautifulsoup4</code>, <code>lxml</code>, <code>polib</code>, <code>Kodi</code>, <code>rtmpdump</code>,
 <code>phantomjs</code>, <code>youtube-dl</code></i>, and an updated <i>PMS.conf</i> all ready to go and can skip
 the grey section below ('mostly', i.e. maybe install
-some <a href="#ADDONS"><i>xbmc addons</i></a> or
+some <a href="#ADDONS"><i>kodi addons</i></a> or
 <a href="https://github.com/chocolateboy/pmsencoder"><i>PMSEncoder</i></a>).
 </div>
 </ol>
 <!--</div>-->
 <br/>
 <div style="background-color:#f7f7f1;margin:-8;padding:8;padding-bottom:2">
-<b><a name="REQUIREMENTS">Requirements</a></b>
+<b><a name="REQUIREMENTS">Requirements / Manual Installation</a></b>
 <ol>
 <li><a href="http://www.python.org/download/releases/2.7.3/#download">Python 2.7</a>.
 To make life simpler <a href="http://superuser.com/questions/143119/how-to-add-python-to-the-windows-path/143121#143121">add python to your system path</a>
@@ -172,13 +180,14 @@ and then set up <a href="http://pypi.python.org/pypi/setuptools#installation-ins
 <li><a href="http://lxml.de/index.html">lxml</a>
 (in Windows must be version 2.3, use <code>easy_install "lxml==2.3"</code>)</li>
 </li>
+<li><a href="https://bitbucket.org/izi/polib/wiki/Home">polib</a></li>
 </ul>
 <li>Not required but useful if you're using PMS: <a href="http://rtmpdump.mplayerhq.hu/">rtmpdump</a> and <a href="https://github.com/chocolateboy/pmsencoder">PMSEncoder</a>,
 .
 </li>
 </ol>
 <br/>
-<b><a name="XBMC">Kodi/XBMC Installation</a></b> ("optional")
+<b><a name="XBMC">Kodi Installation</a></b> ("optional")
 <ol>
 <li>Install <a href="http://xbmc.org/download/">Kodi</a> using the default configuration
 for your platform.
@@ -207,7 +216,7 @@ in one of these places:
 <br/>
 <b><a name="INSTALLATION">Plugin Installation</a></b>
 <ol>
-<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.7.zip/download">jumpy-0.3.7.zip</a></i> to your PMS <i>plugins</i> folder.
+<li>Unzip <i><a href="http://sourceforge.net/projects/jumpy-plugin/files/jumpy-0.3.8.zip/download">jumpy-0.3.8.zip</a></i> to your PMS <i>plugins</i> folder.
 </li>
 <li>Open up <i>PMS.conf</i> and set <code>python.path</code>, e.g.
 <pre>python.path = c:\\Python27\\python</pre>
@@ -513,7 +522,7 @@ World news/Europe, http://www.guardian.co.uk/world/europe/roundup/rss
 <ul>
 Jumpy acts as a url resolver for unresolved <i>WEB.conf</i> items (youtube, vimeo, many more)
 in UMS if it can find either the
-<i>Kodi/xbmc urlresolver addon</i>
+<i>Kodi urlresolver addon</i>
 or the <i>youtube-dl python library</i>.
 <br/><br/>
 Both are automatically added by the jumpy installer and require no special setup,
