@@ -21,15 +21,20 @@ public class jumpstart {
 	public static Properties pmsconf = null;
 	public static boolean windows = System.getProperty("os.name").startsWith("Windows");
 	public static boolean mac = System.getProperty("os.name").contains("OS X");
-	public static boolean ums;
+	public static boolean ums, rediscover = false;
 
 	public static void main(String[] argv) {
 
 		if (argv.length == 0) usage();
 
+		if (argv[0].equals("-r")) {
+			rediscover = true;
+			// shift
+			argv = Arrays.copyOfRange(argv, 1, argv.length);
+		}
 		runner ex = new runner(new command());
 
-		runner.version = "0.2.6";
+		runner.version = "0.2.7b";
 		System.out.println("jumpstart " + runner.version);
 
 		Console c = System.console();
@@ -91,14 +96,13 @@ public class jumpstart {
 		command.basesubs.put("home", home.replace("\\", "\\\\"));
 		command.basesubs.put("PMS", "JUMPSTART");
 
-		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "",
-			lib, null);
+		root = new item(-1, "root", "[" + StringUtils.toString(argv, " , ") + "]", "", null, null, lib, null);
 		ex.run(runner.QUIET, root, "[" + command.pms + "]", lib, null);
 
 		item current = root;
 
 		while (true) {
-			if (! current.discovered && current.type != 0) {
+			if ((! current.discovered || rediscover) && current.type != 0 && ! "".equals(current.uri) && current.uri != null) {
 				if (current.children.size() != 0) current.children.clear();
 				new runner().run(current, current.uri, current.syspath, current.env);
 				current.discovered = true;
@@ -109,27 +113,7 @@ public class jumpstart {
 			if (size != 0) {
 				for (int i=0; i<size; i++) {
 					item x = (item)current.get(i);
-					String type = "";
-					switch (x.type) {
-						case    1: type = " (AUDIO)"; break;
-						case    2: type = " (IMAGE)"; break;
-						case    4: type = " (VIDEO)"; break;
-						case   16: type = " (PLAYLIST)"; break;
-						case   32: type = " (ISO)"; break;
-						case 1025: type = " (MEDIA)"; break;
-						case    0:
-						case 1026: type = ""; break; // FOLDER
-						case 1028: type = " (BOOKMARK)"; break;
-						case 1032: type = " (ACTION)"; break;
-						case 2048: type = " (UNRESOLVED)"; break;
-						case 4096: type = " (FEED)"; break;
-						case 4097: type = " (AUDIOFEED)"; break;
-						case 4098: type = " (IMAGEFEED)"; break;
-						case 4100: type = " (VIDEOFEED)"; break;
-						case    8:
-						default  : type = " (UNKNOWN)"; break;
-					}
-					c.printf("  [%d] %s%s\n", i+1, x.name, type);
+					c.printf("  [%d] %s %s\n", i+1, x.name, item.getTypeName(x.type, true));
 				}
 			} else c.printf("  [empty]\n");
 
@@ -159,11 +143,13 @@ public class jumpstart {
 				int s = Integer.parseInt(sel)-1;
 				assert s > 0 && s < size;
 				current = (item)current.get(s);
-				c.printf("--------------------------------\ntype : %d\nname : %s\nuri  : %s\nthumb: %s\n--------------------------------\n",
-					current.type, current.name, current.uri, current.thumb);
+				c.printf("--------------------------------\ntype   : %s\nname   : %s\nuri    : %s\nthumb  : %s\ndata   : %s\ndetails: %s\n--------------------------------\n",
+					item.getTypeName(current.type, false), current.name, current.uri, current.thumb,
+					current.data == null ? "" : current.data, current.details == null ? "" : current.details);
 				if (current.type < 1024 || current.type > 4095) break;
 			} catch (Exception e) {
 				System.err.printf("Invalid selection: %s\n", sel);
+//				e.printStackTrace();
 				break;
 			}
 		}
@@ -220,7 +206,7 @@ public class jumpstart {
 	}
 
 	public static void usage() {
-		System.err.printf("Usage: jumpstart <scriptfile>\n");
+		System.err.printf("Usage: jumpstart [-r] <scriptfile> [<args>...]\n       -r   always rediscover folders\n");
 		System.exit(1);
 	}
 }
@@ -252,17 +238,18 @@ class node {
 class item extends node implements jumpyAPI {
 
 	public int type;
-	public String uri, thumb, syspath, basepath;
-	public Map<String,String> env;
+	public String uri, thumb, data, syspath, basepath;
+	public Map<String,String> env, details;
 	public boolean discovered;
 
-	item(int type, String name, String uri, String thumb, String syspath, Map<String,String> env) {
-		this.type = type; this.name = name; this.uri = uri; this.thumb = thumb;
+	item(int type, String name, String uri, String thumb, Map details, String data, String syspath, Map<String,String> env) {
+		this.type = type; this.name = name; this.uri = uri; this.thumb = thumb; this.data = data;
 		this.basepath = this.syspath = syspath;
 		this.env = new HashMap<String,String>();
 		if (env != null && !env.isEmpty()) {
 			this.env.putAll(env);
 		}
+		this.details = details;
 		this.discovered = false;
 	}
 
@@ -274,7 +261,7 @@ class item extends node implements jumpyAPI {
 		String name = f.getName();
 		String path = f.getParent();
 		item folder = path == null ? this : mkdirs(path, this);
-		item i = new item(type, name, uri, thumb, syspath, env);
+		item i = new item(type, name, uri, thumb, details, data, syspath, env);
 		folder.add(i);
 		return i;
 	}
@@ -341,6 +328,29 @@ class item extends node implements jumpyAPI {
 		}
 		return "";
 	}
+
+	public static String getTypeName(int type, boolean menu) {
+		switch (type) {
+			case  0:         return "(0)";
+			case  1:         return "(AUDIO)";
+			case  2:         return "(IMAGE)";
+			case  4:         return "(VIDEO)";
+			case 16:         return "(PLAYLIST)";
+			case 32:         return "(ISO)";
+			case MEDIA:      return "(MEDIA)";
+			case FOLDER:     return menu ? "" : "(FOLDER)";
+			case BOOKMARK:   return "(BOOKMARK)";
+			case ACTION:     return "(ACTION)";
+			case UNRESOLVED: return "(UNRESOLVED)";
+			case FEED:       return "(FEED)";
+			case AUDIOFEED:  return "(AUDIOFEED)";
+			case IMAGEFEED:  return "(IMAGEFEED)";
+			case VIDEOFEED:  return "(VIDEOFEED)";
+			case  8:
+			default:         return "(UNKNOWN)";
+		}
+	}
+
 	public static item mkdirs(String path, item pwd) {
 		item child, parent = path.startsWith("/") || path.startsWith("~/") ? jumpstart.root : pwd;
 		boolean exists = true;
@@ -349,7 +359,7 @@ class item extends node implements jumpyAPI {
 				continue;
 			}
 			if (! (exists && (child = (item)parent.get(dir)) != null)) {
-				child = new item(0, dir, "", "", "", parent.env);
+				child = new item(FOLDER, dir, "", "", null, null, "", parent.env);
 				parent.add(child);
 				parent.discovered = true;
 				exists = false;

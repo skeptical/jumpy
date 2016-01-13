@@ -16,5 +16,5 @@ set lib=%CD%\lib
 set lib=%lib:\=/%
 popd
 
-%JAVA_HOME%\bin\java.exe -cp "%lib%/jumpstart.jar;%lib%/py4j0.8.1.jar;%lib%/py4j0.8.jar;%lib%/commons-exec-1.1.jar;%lib%/winp-1.14.jar" jumpstart %*
+%JAVA_HOME%\bin\java.exe -cp "%lib%/jumpstart.jar;%lib%/py4j0.9.jar;%lib%/py4j0.8.1.jar;%lib%/commons-exec-1.1.jar;%lib%/winp-1.14.jar" jumpstart %*
 
