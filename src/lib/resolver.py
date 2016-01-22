@@ -120,7 +120,7 @@ class _xbmc_urlresolver(_scraper):
 				u = url
 			elif url.startswith('['):
 				argv = url[1:-1].split(' , ')
-				u = (argv[1] if len(argv) > 1 and argv[1].startswith('plugin://') else None)
+				u = (argv[2] if len(argv) > 2 and argv[2].startswith('plugin://') else None)
 		elif self.urlresolver:
 			loglevel = self.setloglevel(xbmc.LOGINFO)
 			u = urlresolver.resolve(url)
