@@ -25,6 +25,8 @@ public class resolver extends xmbObject {
 	public static final int URLRESOLVER = 2;
 	public static final int YOUTUBE_DL = 4;
 
+	public static final String UNRESOLVED = "http://jumpy.unresolved/";
+
 	public static int scrapers = 0;
 	public static jumpy jumpy;
 	public static boolean enabled = false, playback = true;
@@ -94,7 +96,7 @@ public class resolver extends xmbObject {
 
 	@Override
 	public String getSystemName() {
-		return uri != null ? uri : (isweb && iscmdarray) ? "http://unresolved" : uri0;
+		return uri != null ? uri : (isweb && iscmdarray) ? (UNRESOLVED + uri0) : uri0;
 	}
 
 	@Override
@@ -125,6 +127,9 @@ public class resolver extends xmbObject {
 	}
 
 	public static Map resolve(String str, String syspath, Map<String,String> env) {
+		if (str.startsWith(UNRESOLVED)) {
+			str = str.substring(UNRESOLVED.length());
+		}
 		if (isCmdArray(str)) {
 			// it's a script, run it and capture addItem() or stdout
 			final HashMap<String,Object> r = new HashMap<String,Object>();
