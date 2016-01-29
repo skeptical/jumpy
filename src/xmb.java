@@ -460,6 +460,8 @@ public final class xmb {
 
 			if (mediainfo.containsKey("duration")) {
 				m.setDuration(utils.duration((String)mediainfo.get("duration")));
+			} else if (mediainfo.containsKey("size")) {
+				m.setSize(Long.parseLong((String)mediainfo.get("size")));
 			} else if (mediainfo.containsKey("streams")) {
 				for (Map<String,String> s : (List<Map<String,String>>)mediainfo.get("streams")) {
 					try {
