@@ -29,7 +29,7 @@ class scanner:
 		self.mode = mode or scanner.FULL
 		self.timeout = float(timeout or 10)
 		self.items = {}
-		self.media = re.compile(r'([a-z]+://.+?\.(3g2|3gp|asf|avi|divx|drc|f4a|f4b|f4p|f4v|flac|flv|gif|gifv|m2v|m4p|m4v|mkv|mng|mov|mp2|mp3|mp4|mpe|mpeg|mpg|mpv|mxf|nsv|ogg|ogv|qt|rm|rmvb|roq|speex|svi|ts|vob|wav|webm|wma|wmv|yuv))')
+		self.media = re.compile(r'([a-z]+://.+?\.(3g2|3gp|asf|avi|divx|drc|f4a|f4b|f4p|f4v|flac|flv|m2v|m4p|m4v|mkv|mng|mov|mp2|mp3|mp4|mpe|mpeg|mpg|mpv|mxf|nsv|ogg|ogv|qt|rm|rmvb|roq|speex|svi|ts|vob|wav|webm|wma|wmv|yuv))')
 
 	def scan(self, url):
 		self.items = {}
@@ -42,7 +42,7 @@ class scanner:
 		return None
 
 	def scrape(self, url, depth=1):
-		print 'scanning: %s' % url
+		print 'checking: %s' % url
 
 		prev = len(self.items)
 
