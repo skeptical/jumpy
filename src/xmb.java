@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.pms.configuration.RendererConfiguration;
 import net.pms.dlna.AudiosFeed;
 import net.pms.dlna.DLNAMediaAudio;
@@ -513,6 +515,9 @@ public final class xmb {
 			return m;
 		}
 
+		public static final Matcher cPath = Pattern.compile("\\s*Path=[^;]+;", Pattern.CASE_INSENSITIVE).matcher("");
+		public static final Matcher cDomain = Pattern.compile("\\s*Domain=[^;]+;", Pattern.CASE_INSENSITIVE).matcher("");
+
 		public static List<String> getFFmpegHeaderOptions(Map<String,String> headers) {
 			if (headers == null) {
 				return null;
@@ -525,8 +530,16 @@ public final class xmb {
 					opts.add("-user-agent");
 					opts.add(headers.get(key));
 				} else if (k.equals("cookie") || k.equals("cookies")) {
+					String c = headers.get(key);
+					String path = cPath.reset(c).find() ? c.substring(cPath.start(), cPath.end()) : "Path=/;";
+					c = c.replace(path, "").trim();
+					String domain = cDomain.reset(c).find() ? c.substring(cDomain.start(), cDomain.end()) : "";
+					if (! domain.equals("")) {
+						c = c.replace(domain, "").trim();
+					}
+					String attrs = "; " + domain + path;
 					opts.add("-cookies");
-					opts.add(headers.get(key));
+					opts.add(StringUtils.join(c.split("\\s*;"), attrs + "\n") + attrs);
 				} else {
 					hdrs += key + ": " + headers.get(key).trim() + "\r\n";
 				}
