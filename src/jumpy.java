@@ -274,7 +274,7 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 		if (players.size() > 0) {
 			boolean changed = false;
 			for (player p : players) {
-				changed = p.enable(false);
+				changed = p.enable(false, true);
 			}
 			if (changed) pms.save();
 		}

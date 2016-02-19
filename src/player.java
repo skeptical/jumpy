@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import net.pms.configuration.FormatConfiguration;
 import net.pms.configuration.PmsConfiguration;
 import net.pms.configuration.RendererConfiguration;
@@ -160,7 +161,7 @@ public class player extends Player implements jumpyAPI {
 			}
 			jumpy.setIcon(fmt, icon);
 		}
-		enable(true);
+		enable(true, false);
 	}
 
 	@Override
@@ -325,37 +326,61 @@ public class player extends Player implements jumpyAPI {
 		return false;
 	}
 
-	public boolean enable(boolean on) {
+	public boolean enable(boolean on, boolean shutdown) {
 		PmsConfiguration configuration = PMS.getConfiguration();
 		List<String> engines = configuration.getEnginesAsList(PMS.get().getRegistry());
 		int index = engines.indexOf(id);
 		boolean remove = (!on && index > -1) || (on && index > 0);
 		boolean add = (on && index != 0);
+		boolean ok = true;
 		if (remove) {
 			engines.removeAll(Arrays.asList(id));
-			configuration.setEnginesAsList(new ArrayList(engines));
+			ok = setEngines(engines, configuration, shutdown);
 		}
 		if (add) {
 			int last = engines.size();
 			engines.add(priority > -1 && priority < last ? priority : last, id);
-			// store the gui's reload button state
-			boolean isGui = (PMS.get().getFrame() instanceof LooksFrame);
-			AbstractButton reload = isGui ? ((LooksFrame)PMS.get().getFrame()).getReload() : null;
-			Icon icon = isGui ? reload.getIcon() : null;
-			String tooltip = isGui ? reload.getToolTipText() : null;
-			// modify the engine list
-			configuration.setEnginesAsList(new ArrayList(engines));
-			if (isGui) {
-				// restore the reload button state
-				reload.setIcon(icon);
-				reload.setToolTipText(tooltip);
-			}
+			ok = setEngines(engines, configuration, shutdown);
 		}
 		if (add || remove) {
-			jumpy.log((on ? "en" : "dis") + "abling " + id + " player.", true);
-			return true;
+			jumpy.log((ok ? "" : "error ") + (on ? "en" : "dis") + "abling " + id + " player.", true);
+			return ok;
 		}
 		return false;
+	}
+
+	public static boolean setEngines(final List<String> engines, final PmsConfiguration configuration, boolean shutdown) {
+		boolean isGui = (PMS.get().getFrame() instanceof LooksFrame);
+		// modify the engine list
+		if (isGui && !shutdown) {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						// store the gui's reload button state
+						final AbstractButton reload = ((LooksFrame)PMS.get().getFrame()).getReload();
+						final Icon icon = reload.getIcon();
+						final String tooltip = reload.getToolTipText();
+						// modify the engine list (this triggers highlighting of the reload button)
+						configuration.setEnginesAsList(new ArrayList(engines));
+						// restore the reload button state, but only after pending gui events are
+						// processed, in case the highlighting itself is yet to occur via invokeLater()
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								reload.setIcon(icon);
+								reload.setToolTipText(tooltip);
+							}
+						});
+					}
+				});
+			} catch (Exception e) {
+				// TODO: maybe attempt post-mortem/forensics/recovery here
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			configuration.setEnginesAsList(new ArrayList(engines));
+		}
+		return true;
 	}
 
 	@Override
