@@ -92,7 +92,7 @@ public final class utils {
 		System.exit(0);
 	}
 
-	private static Field _getField(Class c, String name) throws NoSuchFieldException {
+	public static Field _getField(Class c, String name) throws NoSuchFieldException {
 		Class clazz = c;
 		while (true) {
 			try {
@@ -116,9 +116,16 @@ public final class utils {
 	}
 
 	public static Object getField(Object obj, String name) {
+		return getField(obj, name, false);
+	}
+
+	public static Object getField(Object obj, String name, boolean quiet) {
 		try {
-			return _getField(obj.getClass(), name).get(obj);
-		} catch (Exception e) {e.printStackTrace();}
+			boolean isClass = obj instanceof Class;
+			return _getField(isClass ? (Class)obj : obj.getClass(), name).get(isClass ? null : obj);
+		} catch (Exception e) {
+			if (! quiet) e.printStackTrace();
+		}
 		return null;
 	}
 
