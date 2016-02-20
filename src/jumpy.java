@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URLResolver {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.3.9-dev";
+	public static final String version = "0.3.9";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	public PmsConfiguration configuration;
