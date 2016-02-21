@@ -367,6 +367,7 @@ with any of the following keys:
 <li><a name="media"></a><code>media</code>: a dict of media properties with any of these keys:
 <ul>
 <li><code>duration</code>: a time string in <i>seconds</i> or <i>hh:mm:ss</i> format.</li>
+<li><code>size</code>: the total number of bytes.</li>
 <li><code>streams</code>: a list of dicts each describing one stream and containing the
 mandatory key <code>type</code> which determines what other keys are valid (all values are strings).
 <code>type</code> can be:
@@ -391,6 +392,7 @@ for example
 <code>{
 	'media': {
 		'duration': <i class="comment">'12:34'</i>,
+		'size': <i class="comment">'7654321'</i>,
 		'streams': [
 			{'type': <i class="comment">'video'</i>, 'width': <i class="comment">'720'</i>, 'height': <i class="comment">'480'</i>},
 			{'type': <i class="comment">'audio'</i>, 'channels': <i class="comment">'2'</i>},
@@ -398,7 +400,7 @@ for example
 			{'type': <i class="comment">'subtitle'</i>, 'language': <i class="comment">'jpn'</i>}
 		]
 	},
-	'headers': { 'User-Agent': <i class="comment">'my ua'</i>, 'Cookie': <i class="comment">'my cookie;'</i>}
+	'headers': { 'User-Agent': <i class="comment">'my ua'</i>, 'Cookie': <i class="comment">'foo=x; bar=y;'</i>}
 }</code>
 </ul>
 </ul>
