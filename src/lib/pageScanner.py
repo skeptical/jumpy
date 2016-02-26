@@ -9,7 +9,7 @@ def isRelativeFolderPath(url):
 	return url.endswith('/') and not '://' in url
 
 def ismedia(mime):
-	return mime.startswith('video/') or mime.startswith('audio/') or mime.startswith('image/')
+	return mime.startswith(('video/', 'audio/', 'image/'))
 
 def istext(mime):
 	return 'text' in mime or 'xml' in mime or 'json' in mime or 'charset' in mime.lower()

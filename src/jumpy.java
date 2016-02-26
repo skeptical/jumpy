@@ -36,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
 public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URLResolver {
 
 	public static final String appName = "jumpy";
-	public static final String version = "0.3.9";
+	public static final String version = "0.3.9b";
 	private static final String msgtag = appName + ": ";
 	private PMS pms;
 	public PmsConfiguration configuration;
@@ -425,14 +425,16 @@ public class jumpy implements AdditionalFoldersAtRoot, dbgpack, DebugPacker, URL
 	@Override
 	public URLResult urlResolve(String url) {
 		if (resolver.enabled) {
-			URLResult res = new URLResult();
 			Map<String, Object> r = resolver.resolve(url);
-			res.url = (String)r.get("uri");
-			if(res.url != null) {
-				if (r.containsKey("details")) {
-					res.args = new xmb.mediaDetails((Map)r.get("details")).getFFmpegHeaderOptions();
+			if (r != null) {
+				URLResult res = new URLResult();
+				res.url = (String)r.get("uri");
+				if(res.url != null) {
+					if (r.containsKey("details")) {
+						res.args = new xmb.mediaDetails((Map)r.get("details")).getFFmpegHeaderOptions();
+					}
+					return res;
 				}
-				return res;
 			}
 		}
 		return null;

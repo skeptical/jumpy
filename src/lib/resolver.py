@@ -48,7 +48,7 @@ class cbresolver(scanner):
 			r = self.resolver.resolve(url)
 		else:
 			r = self.scan(url)
-		return MapConverter().convert(r, pms.gateway_client)# if r else None
+		return MapConverter().convert(r, pms.gateway_client) if r else None
 
 	def __init__(self, s=None):
 		scanner.__init__(self, resolver(s), scanner.SINGLE)
