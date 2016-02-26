@@ -1,4 +1,4 @@
-version=0.3.9
-win32=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9.exe
-linux=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9.run
-osx=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9.run
+version=0.3.9b
+win32=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9b.exe
+linux=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9b.run
+osx=http://downloads.sourceforge.net/project/jumpy-plugin/jumpy-0.3.9b.run
