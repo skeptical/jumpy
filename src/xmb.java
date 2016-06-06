@@ -259,6 +259,11 @@ public final class xmb {
 		if (obj.newItem != null) {
 			if (obj.newItem instanceof xmbObject) {
 				((xmbObject)obj.newItem).tag = obj.tag;
+				if (data != null) {
+					((xmbObject)obj.newItem).setEnv("USERDATA", data);
+				}
+//			} else if (data != null) {
+//				obj.newItem.attach("jumpy.USERDATA", data); // TODO
 			}
 			if (details != null) {
 				new mediaDetails(details).update(obj.newItem);

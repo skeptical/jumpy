@@ -27,15 +27,16 @@ class resolver:
 			if self.url:
 				pms.log('%s : %s' % (scraper.name(), self.url), True)
 				return {'uri': pms.decode(self.url), 'name': pms.decode(self.name), 'thumb': pms.decode(self.thumb), 'sub': pms.decode(self.sub),
-					'details': pms.stringify(self.details) if self.details else None}
+					'details': pms.stringify(self.details) if self.details else None, 'data': pms.decode(self.data) if self.data else None}
 		return None
 
-	def add(self, url, name=None, thumb=None, sub=None, details=None):
+	def add(self, url, name=None, thumb=None, sub=None, details=None, data=None):
 		self.url = url.strip()
 		self.name = name.strip() if name else None
 		self.thumb = thumb.strip() if thumb else None
 		self.sub = sub.strip() if sub else None
 		self.details = details if details else None
+		self.data = data if data else None
 
 
 class cbresolver(scanner):
@@ -43,11 +44,16 @@ class cbresolver(scanner):
 	class Java:
 		implements = ['net.pms.external.infidel.jumpy.resolver$Resolver']
 
-	def resolve(self, url):
+	def resolve(self, url, userdata):
+		if userdata:
+			os.environ['USERDATA'] = userdata
 		if 'plugin://' in url or url.startswith('['):
 			r = self.resolver.resolve(url)
 		else:
 			r = self.scan(url)
+#		# FIXME: popping USERDATA here causes Py4JException
+#		if userdata and userdata == os.getEnv('USERDATA'):
+#			os.environ.pop('USERDATA')
 		return MapConverter().convert(r, pms.gateway_client) if r else None
 
 	def __init__(self, s=None):
@@ -132,7 +138,7 @@ class _xbmc_urlresolver(_scraper):
 				def addItem(itemtype, name, argv, thumb=None, details=None, data=None):
 					if type(argv).__name__ == 'list':
 						argv = pms.flatten(argv)
-					resolver.add(argv, name, thumb, details=details)
+					resolver.add(argv, name, thumb, details=details, data=data)
 				__builtin__.pms.addItem = addItem
 				def util(action, arg1=None, arg2=None):
 					if action == PMS_SUBTITLE:

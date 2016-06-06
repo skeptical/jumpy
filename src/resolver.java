@@ -17,7 +17,6 @@ import net.pms.formats.WEB;
 
 public class resolver extends xmbObject {
 	public String uri0, uri = null, syspath = null;
-	public Map<String,String> env;
 	public boolean resolved = false, isweb, iscmdarray;
 	public int type;
 
@@ -157,7 +156,7 @@ public class resolver extends xmbObject {
 			if (pyResolver == null) {
 				startPyServer();
 			}
-			return pyResolver.resolve(str);
+			return pyResolver.resolve(str, env != null ? env.get("USERDATA") : null);
 		}
 		return null;
 	}
@@ -170,7 +169,7 @@ public class resolver extends xmbObject {
 	// py4j python callback server support:
 
 	public interface Resolver {
-		public Map<String,Object> resolve(String url);
+		public Map<String,Object> resolve(String url, String userdata);
 	}
 
 	public static Resolver pyResolver = null;

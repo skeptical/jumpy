@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
 import java.util.Map;
 import net.pms.dlna.DLNAResource;
 import net.pms.network.HTTPResource;
@@ -125,6 +126,9 @@ public class xmbObject extends DLNAResource implements jumpyAPI {
 
 	@Override
 	public void setEnv(String name, String val) {
+		if (env == null) {
+			env = new HashMap<String,String>();
+		}
 		if (name == null || name.isEmpty()) {
 			jumpy.log("setEnv: clear all.");
 			env.clear();
