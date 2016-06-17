@@ -80,14 +80,18 @@ public class resolver extends xmbObject {
 			}
 			root.newItem = this; //TODO: synchronization issues?
 			Map<String, Object> r = resolve(uri0, syspath, env);
-			uri = (String)r.get("uri");
-			if (uri != null) {
-				resolved = true;
-				reset(uri);
-				setPlayer(PlayerFactory.getPlayer(this));
-			}
-			if (r.containsKey("details")) {
-				new xmb.mediaDetails((Map)r.get("details")).update(this);
+			if (r != null) {
+				uri = (String)r.get("uri");
+				if (uri != null) {
+					resolved = true;
+					reset(uri);
+					setPlayer(PlayerFactory.getPlayer(this));
+				}
+				if (r.containsKey("details")) {
+					new xmb.mediaDetails((Map)r.get("details")).update(this);
+				}
+			} else {
+				jumpy.log("failed to resolve " + uri0);
 			}
 		}
 		return uri == null ? null : super.getInputStream(range, mediarenderer);

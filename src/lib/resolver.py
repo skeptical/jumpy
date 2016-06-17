@@ -54,6 +54,8 @@ class cbresolver(scanner):
 #		# FIXME: popping USERDATA here causes Py4JException
 #		if userdata and userdata == os.getEnv('USERDATA'):
 #			os.environ.pop('USERDATA')
+		if not r:
+			pms.log('unresolved: %s' % (url))
 		return MapConverter().convert(r, pms.gateway_client) if r else None
 
 	def __init__(self, s=None):
