@@ -118,10 +118,6 @@ public class player extends Player implements jumpyAPI {
 					return true;
 				}
 				@Override
-				public boolean ps3compatible() {
-					return true;
-				}
-				@Override
 				public Identifier getIdentifier() {
 					return Identifier.CUSTOM;
 				}
@@ -130,12 +126,12 @@ public class player extends Player implements jumpyAPI {
 					return self.id;
 				}
 				@Override
-				public boolean skip(String extensions, String moreExtensions) {
+				public boolean skip(String... extensions) {
 					return true; // always force transcode
 				}
 			};
 			this.format.setType(this.type);
-			FormatFactory.getSupportedFormats().add(0, this.format/*.duplicate()*/);
+			FormatFactory.addFormat(this.format/*.duplicate()*/);
 		}
 		if (this.mimetype == null) {
 			this.mimetype = this.format.mimeType();

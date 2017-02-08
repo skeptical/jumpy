@@ -150,7 +150,7 @@ public final class utils {
 			sub.setId(100); // fake id, not used
 			sub.setLang(lang);
 			sub.setType(SubtitleType.valueOfFileExtension(FilenameUtils.getExtension(path)));
-			sub.setExternalFile(new File(path));
+			sub.setExternalFile(new File(path), null);
 			try {
 				d.setMediaSubtitle(sub); // ums
 			} catch (Throwable t) {
@@ -195,7 +195,7 @@ public final class utils {
 		if (ffmpeg_hdr.contains("--enable-librtmp")) {
 			properties.put("librtmp", "true");
 			if (FormatFactory.getAssociatedFormat("rtmp://?") == null) {
-				FormatFactory.getSupportedFormats().add(0, new WEB() {
+				FormatFactory.addFormat(new WEB() {
 					@Override
 					public String[] getSupportedExtensions() {
 						return (new String[] {"rtmp", "rtmpt", "rtmps", "rtmpe", "rtmfp", "rtmpte", "rtmpts"});
