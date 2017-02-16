@@ -3,6 +3,7 @@ package net.pms.external.infidel.jumpy;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +132,7 @@ public class player extends Player implements jumpyAPI {
 				}
 			};
 			this.format.setType(this.type);
-			FormatFactory.addFormat(this.format/*.duplicate()*/);
+			addFormat(this.format/*.duplicate()*/);
 		}
 		if (this.mimetype == null) {
 			this.mimetype = this.format.mimeType();
@@ -498,6 +499,17 @@ public class player extends Player implements jumpyAPI {
 	@Override
 	public Object getTag() {
 		return apiObj.getTag();
+	}
+
+	public static void addFormat(Format format) {
+		try {
+			Method method = FormatFactory.class.getMethod("addFormat", Format.class);
+			method.invoke(null, format);
+			return;
+		} catch (Exception e) {
+			// Wrong version, do it the "old way"
+		}
+		FormatFactory.getSupportedFormats().add(0, format);
 	}
 }
 

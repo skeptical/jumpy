@@ -195,7 +195,7 @@ public final class utils {
 		if (ffmpeg_hdr.contains("--enable-librtmp")) {
 			properties.put("librtmp", "true");
 			if (FormatFactory.getAssociatedFormat("rtmp://?") == null) {
-				FormatFactory.addFormat(new WEB() {
+				player.addFormat(new WEB() {
 					@Override
 					public String[] getSupportedExtensions() {
 						return (new String[] {"rtmp", "rtmpt", "rtmps", "rtmpe", "rtmfp", "rtmpte", "rtmpts"});
